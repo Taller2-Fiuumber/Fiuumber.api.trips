@@ -49,7 +49,8 @@ jobs:
       CI_IMAGE_NAME: ${{ github.repository }}
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_USERNAME: ${{ github.actor }}
-      HEROKU_APP: fiuumber-backend-python
+      HEROKU_APP: fiuumber-api-trips
+      DATABASE_URL: ${{ secrets.MONGODB_URL }}
     steps:
       - uses: actions/checkout@master
 
@@ -68,7 +69,7 @@ jobs:
           IMAGE_NAME=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')
           echo "IMAGE_TAG=$(echo $IMAGE_NAME:$VERSION)" >> $GITHUB_ENV
       - name: Build image
-        run: docker build -f Dockerfile.prod . -t ${{ env.IMAGE_TAG }}
+        run: docker build -f Dockerfile.prod . -t ${{ env.IMAGE_TAG }} --build-arg database_url=${DATABASE_URL}
 
       - name: Push image to Github Container Registry
         run: docker push ${{ env.IMAGE_TAG }}

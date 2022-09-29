@@ -1,64 +1,35 @@
-# Taller2-Fiuumber.Fiuumber.backend.python
-
-Hola, Mundo!
-============
-
-## Run app locally
-
-Apply format:
-
-``` bash
-make format
-```
-
-Create virtaul env:
-
-``` bash
-make venv
-```
-
-Run unit tests:
-
-``` bash
-make test
-```
-
-Delete virtal env:
-
-``` bash
-make deactivate-venv
-```
-
-Run app:
-
-``` bash
-make deactivate-venv
-```
+# Fiuumber.api.trips
 
 ## Run app locally with docker
 
-Insatlling docker:
+Start services:
 
 ``` bash
-sudo apt  install docker.io
+make start-services
 ```
 
-Building:
+Start FastAPI server
 
 ``` bash
-docker-compose build
+➜  Fiuumber.api.trip: make exec
+/app # python -m uvicorn main:app --reload --host 0.0.0.0 --port 8080
+INFO:     Will watch for changes in these directories: ['/app']
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     Started reloader process [25] using StatReload
+INFO:     Started server process [27]
+INFO:     Waiting for application startup.
 ```
 
-Running:
+See swagger
 
 ``` bash
-docker-compose up
+http://localhost:8080/docs
 ```
 
-Stopping
+For more info: https://www.mongodb.com/languages/python/pymongo-tutorial
 
-Running:
+Stop services:
 
 ``` bash
-docker-compose downn
+make stop-services
 ```

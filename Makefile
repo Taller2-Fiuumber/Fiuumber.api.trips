@@ -1,17 +1,4 @@
-VENV := "venv"
-
-# default target, when make executed without arguments
-all: venv
-
-# venv is a shortcut target
-venv:
-	python3 -m venv $(VENV)
-	./$(VENV)/bin/pip install -r requirements.txt
-	source $(VENV)/bin/activate
-
-deactivate-venv:
-	deactivate
-	rm -rf $(VENV)
+all: format test start-services exec
 
 test:
 	pip install pytest  --quiet
@@ -26,4 +13,16 @@ format:
 	pip install flake8 --quiet
 	flake8
 
-.PHONY: all venv test format deactivate-venv
+start-services:
+	docker-compose up --build --force-recreate -d
+
+stop-services:
+	docker-compose down
+
+exec:
+	docker exec -it fiuumberapitrip_web_1 sh
+
+run:
+	python -m uvicorn main:app --reload --host 0.0.0.0 --port 8080
+
+.PHONY: all test format start-services stop-services

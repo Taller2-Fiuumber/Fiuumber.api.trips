@@ -1,8 +1,8 @@
-flake8
 pytest
 black
 
-Flask
-flask_pymongo
-gunicorn
+uvicorn
 jsonify
+fastapi
+pymongo
+pydantic
