@@ -31,3 +31,5 @@ See swagger
 ``` bash
 http://localhost:8080/docs
 ```
+
+For more info: https://www.mongodb.com/languages/python/pymongo-tutorial
