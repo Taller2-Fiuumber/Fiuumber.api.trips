@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from pymongo import MongoClient
 from os import environ
-from src.services.routes import router as book_router
+from src.services.routes import router as trip_router
 
 
 ATLAS_URI=environ['ME_CONFIG_MONGODB_URL']
@@ -25,4 +25,4 @@ def startup_db_client():
 def shutdown_db_client():
     app.mongodb_client.close()
 
-app.include_router(book_router, tags=["trips"], prefix="/api/trips")
+app.include_router(trip_router, tags=["trips"], prefix="/api/trips")
