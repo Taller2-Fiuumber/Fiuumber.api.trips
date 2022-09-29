@@ -1,64 +1,33 @@
-# Taller2-Fiuumber.Fiuumber.backend.python
-
-Hola, Mundo!
-============
-
-## Run app locally
-
-Apply format:
-
-``` bash
-make format
-```
-
-Create virtaul env:
-
-``` bash
-make venv
-```
-
-Run unit tests:
-
-``` bash
-make test
-```
-
-Delete virtal env:
-
-``` bash
-make deactivate-venv
-```
-
-Run app:
-
-``` bash
-make deactivate-venv
-```
+# Fiuumber.api.trips
 
 ## Run app locally with docker
 
-Insatlling docker:
+Run once:
 
 ``` bash
-sudo apt  install docker.io
+docker-compose up --build --force-recreate -d
 ```
 
-Building:
+Start server
 
 ``` bash
-docker-compose build
+➜  Fiuumber.api.trip: docker ps
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS          PORTS                      NAMES
+f875750a5542   fiuumberapitrip_web   "sh"                     18 seconds ago   Up 17 seconds   0.0.0.0:8080->8080/tcp     fiuumberapitrip_web_1
+29ebfb1587a7   mongo:latest          "docker-entrypoint.s…"   19 seconds ago   Up 17 seconds   0.0.0.0:27017->27017/tcp   fiuumberapitrip_database_1➜  Fiuumber.api.trip git:(main) docker exec -it f875750a5542  sh
+
+
+➜  Fiuumber.api.trip: docker exec -it f875750a5542  sh
+/app # python -m uvicorn main:app --reload --host 0.0.0.0 --port 8080
+INFO:     Will watch for changes in these directories: ['/app']
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     Started reloader process [25] using StatReload
+INFO:     Started server process [27]
+INFO:     Waiting for application startup.
 ```
 
-Running:
+See swagger
 
 ``` bash
-docker-compose up
-```
-
-Stopping
-
-Running:
-
-``` bash
-docker-compose downn
+http://localhost:8080/docs
 ```

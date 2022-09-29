@@ -1,54 +1,28 @@
-from flask import Flask, request, jsonify
-from flask_pymongo import PyMongo
-import os
+# docuemntation: https://www.mongodb.com/languages/python/pymongo-tutorial
+
+from fastapi import FastAPI
+from pymongo import MongoClient
+from os import environ
+from src.services.routes import router as book_router
 
 
-app = Flask(__name__)
+ATLAS_URI=environ['ME_CONFIG_MONGODB_URL']
+DB_NAME="pymongo_tutorial"
 
-app.config["MONGO_URI"] = 'mongodb://' +\
-    os.environ['MONGO_INITDB_ROOT_USERNAME'] + ':' +\
-    os.environ['MONGO_INITDB_ROOT_PASSWORD'] + '@' +\
-    os.environ['MONGODB_HOSTNAME'] + ':27017/' +\
-    os.environ['MONGO_INITDB_DATABASE']
+app = FastAPI()
 
-mongo = PyMongo(app)
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the PyMongo tutorial!"}
 
-@app.route("/")
-def home():
-    return "Hello, world"
+@app.on_event("startup")
+def startup_db_client():
+    app.mongodb_client = MongoClient(ATLAS_URI)
+    app.database = app.mongodb_client[DB_NAME]
+    print("Connected to the MongoDB database!")
 
+@app.on_event("shutdown")
+def shutdown_db_client():
+    app.mongodb_client.close()
 
-@app.route('/todo')
-def todo():
-    _todos = mongo.db.todo.find()
-
-    item = {}
-    data = []
-    for todo in _todos:
-        item = {
-            'id': str(todo['_id']),
-            'todo': todo['todo']
-        }
-        data.append(item)
-
-    return jsonify(
-        status=True,
-        data=data
-    )
-
-@app.route('/todo', methods=['POST'])
-def createTodo():
-    data = request.get_json(force=True)
-    item = {
-        'todo': data['todo']
-    }
-    mongo.db.todo.insert_one(item)
-
-    return jsonify(
-        status=True,
-        message='To-do saved successfully!'
-    ), 201
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=os.env['PORT'])
-
+app.include_router(book_router, tags=["trips"], prefix="/api/trips")
