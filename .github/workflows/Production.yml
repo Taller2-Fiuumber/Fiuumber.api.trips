@@ -49,8 +49,8 @@ jobs:
       CI_IMAGE_NAME: ${{ github.repository }}
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_USERNAME: ${{ github.actor }}
-      HEROKU_APP: fiuumber-api-trips
       DATABASE_URL: ${{ secrets.MONGODB_URL }}
+      HEROKU_APP: fiuumber-api-trips
     steps:
       - uses: actions/checkout@master
 
@@ -82,14 +82,14 @@ jobs:
       - name: Tag container of Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: docker tag ${{ env.IMAGE_TAG }} registry.heroku.com/${{ env.HEROKU_APP}}/web
+        run: docker tag ${{ env.IMAGE_TAG }} registry.heroku.com/${{ env.HEROKU_APP }}/web
 
       - name: Push container to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:push web --app ${{ env.HEROKU_APP}}
+        run: heroku container:push web --app ${{ env.HEROKU_APP }}
 
       - name: Release container to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release web --app ${{ env.HEROKU_APP}}
+        run: heroku container:release web --app ${{ env.HEROKU_APP }}
