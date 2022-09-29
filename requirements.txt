@@ -1,0 +1,8 @@
+flake8
+pytest
+black
+
+Flask
+flask_pymongo
+gunicorn
+jsonify
