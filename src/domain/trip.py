@@ -1,7 +1,8 @@
 import uuid
-from typing import Optional
 from pydantic import BaseModel, Field
 import datetime
+
+
 class Trip(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     passengerId: str = Field(...)
@@ -10,7 +11,7 @@ class Trip(BaseModel):
     from_longitude: float = Field(...)
     to_latitude: float = Field(...)
     to_longitude: float = Field(...)
-    start:  datetime.datetime = Field(...)
+    start: datetime.datetime = Field(...)
     finish: datetime.datetime = Field(...)
     subscription: str = Field(...)
     status: str = Field(...)
@@ -27,13 +28,14 @@ class Trip(BaseModel):
                 "from_longitude": -58.381557,
                 "to_latitude": -34.6175841,
                 "to_longitude": -58.3682286,
-                "start": datetime.datetime(2022,9,9,2),
-                "finish": datetime.datetime(2022,9,10,5),
+                "start": datetime.datetime(2022, 9, 9, 2),
+                "finish": datetime.datetime(2022, 9, 10, 5),
                 "subscription": "VIP",
                 "status": "Done",
                 "finalPrice": 532.50,
             }
         }
+
 
 class TripUpdate(BaseModel):
     passengerId: str = Field(...)
@@ -42,7 +44,7 @@ class TripUpdate(BaseModel):
     from_longitude: float = Field(...)
     to_latitude: float = Field(...)
     to_longitude: float = Field(...)
-    start:  datetime.datetime = Field(...)
+    start: datetime.datetime = Field(...)
     finish: datetime.datetime = Field(...)
     subscription: str = Field(...)
     status: str = Field(...)
@@ -58,8 +60,8 @@ class TripUpdate(BaseModel):
                 "to_latitude": -34.6175841,
                 "to_longitude": -58.3682286,
                 "to_location": "Don Quixote",
-                "start": datetime.datetime(2022,9,9,0),
-                "finish": datetime.datetime(2022,9,10,5),
+                "start": datetime.datetime(2022, 9, 9, 0),
+                "finish": datetime.datetime(2022, 9, 10, 5),
                 "subscription": "VIP",
                 "status": "Done",
                 "finalPrice": 532.50,
