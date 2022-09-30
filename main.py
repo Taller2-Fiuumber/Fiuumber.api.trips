@@ -7,7 +7,7 @@ from src.services.routes import router as trip_router
 
 
 ATLAS_URI = environ["ME_CONFIG_MONGODB_URL"]
-DB_NAME = "pymongo_tutorial"
+DB_NAME = "fiuumber"
 
 app = FastAPI()
 
