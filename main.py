@@ -16,7 +16,6 @@ app = FastAPI()
 async def root():
     return {"message": "Fiuumber API Trips"}
 
-
 @app.on_event("startup")
 def startup_db_client():
     app.mongodb_client = MongoClient(MONGODB_URL)
