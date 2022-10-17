@@ -50,7 +50,8 @@ jobs:
       CI_IMAGE_NAME: ${{ github.repository }}
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_USERNAME: ${{ github.actor }}
-      DATABASE_URL: ${{ secrets.MONGODB_URL }}
+      MONGODB_URL: ${{ secrets.MONGODB_URL }}
+      DB_NAME: ${{ secrets.DB_NAME }}
       HEROKU_APP: fiuumber-api-trips
     steps:
       - uses: actions/checkout@master
@@ -70,7 +71,9 @@ jobs:
           IMAGE_NAME=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')
           echo "IMAGE_TAG=$(echo $IMAGE_NAME:$VERSION)" >> $GITHUB_ENV
       - name: Build image
-        run: docker build -f Dockerfile.prod . -t ${{ env.IMAGE_TAG }} --build-arg database_url=${DATABASE_URL}
+        run: docker build -t ${{ env.IMAGE_TAG }} .
+          --build-arg database_url=${{ env.MONGODB_URL }},
+          --build-arg database_name=${{ env.DB_NAME }}
 
       - name: Push image to Github Container Registry
         run: docker push ${{ env.IMAGE_TAG }}
@@ -88,7 +91,7 @@ jobs:
       - name: Push container to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:push web --arg database_url=${DATABASE_URL} --app ${{ env.HEROKU_APP }}
+        run: heroku container:push web --arg database_url=${{ env.MONGODB_URL }},database_name=${{ env.DB_NAME }} --app ${{ env.HEROKU_APP }}
 
       - name: Release container to Heroku Container Registry
         env:

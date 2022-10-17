@@ -4,7 +4,10 @@ WORKDIR /app
 COPY . /app
 
 ARG database_url
-ENV ME_CONFIG_MONGODB_URL=$database_url
+ARG database_name
+
+ENV DB_NAME=${database_name}
+ENV MONGODB_URL=${database_url}
 
 RUN pip install -r requirements.txt
 
