@@ -14,7 +14,4 @@ COPY . /app
 
 RUN pip install -r requirements.txt
 
-RUN adduser -D myuser
-USER myuser
-
 CMD python -m uvicorn main:app --reload --host 0.0.0.0 --port ${PORT}
