@@ -93,7 +93,9 @@ jobs:
       - name: Push container to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:push web --arg database_url=${{ env.MONGODB_URL }},database_name=${{ env.DB_NAME }} --app ${{ env.HEROKU_APP }}
+        run: heroku container:push web
+          --arg database_url=${{ env.MONGODB_URL }},database_name=${{ env.DB_NAME }}
+          --app ${{ env.HEROKU_APP }}
 
       - name: Release container to Heroku Container Registry
         env:
