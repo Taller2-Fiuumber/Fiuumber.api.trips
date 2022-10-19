@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/",
+    "/trip",
     response_description="Create a new trip",
     status_code=status.HTTP_201_CREATED,
     response_model=Trip,
@@ -21,14 +21,14 @@ def create_trip(request: Request, trip: Trip = Body(...)):
     return created_trip
 
 
-@router.get("/", response_description="List all trips", response_model=List[Trip])
+@router.get("/trips", response_description="List all trips", response_model=List[Trip])
 def list_trips(request: Request):
     trips = list(request.app.database["trips"].find(limit=100))
     return trips
 
 
 @router.get(
-    "/{id}", response_description="Get a single trip by id", response_model=Trip
+    "/trip/id={id}", response_description="Get a single trip by id", response_model=Trip
 )
 def find_trip(id: str, request: Request):
     if (trip := request.app.database["trips"].find_one({"_id": id})) is not None:
@@ -38,7 +38,7 @@ def find_trip(id: str, request: Request):
     )
 
 
-@router.put("/{id}", response_description="Update a trip", response_model=Trip)
+@router.put("/trip/id={id}", response_description="Update a trip", response_model=Trip)
 def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     trip = {k: v for k, v in trip.dict().items() if v is not None}
     if len(trip) >= 1:
@@ -62,7 +62,7 @@ def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     )
 
 
-@router.delete("/{id}", response_description="Delete a trip")
+@router.delete("/trip/id={id}", response_description="Delete a trip")
 def delete_trip(id: str, request: Request, response: Response):
     delete_result = request.app.database["trips"].delete_one({"_id": id})
 
