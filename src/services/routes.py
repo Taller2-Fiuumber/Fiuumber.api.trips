@@ -18,12 +18,16 @@ async def create_trip(request: Request, trip: Trip = Body(...)):
     new_trip = await request.app.database["trips"].insert_one(trip)
     created_trip = await request.app.database["trips"].find_one({"_id": new_trip.inserted_id})
 
-    return created_trip
-
+    if created_trip is not None:
+        return created_trip
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
+    )
 
 @router.get("/trips", response_description="List all trips", response_model=List[Trip])
 async def list_trips(request: Request):
-    trips = list(await request.app.database["trips"].find(limit=100))
+    _trips = await request.app.database["trips"].find(limit=100)
+    trips = list(_trips)
     return trips
 
 
@@ -46,7 +50,7 @@ async def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
             {"_id": id}, {"$set": trip}
         )
 
-        if update_result.modified_count == 0:
+        if not update_result or update_result.modified_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Trip with ID {id} not found",
@@ -66,7 +70,7 @@ async def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
 async def delete_trip(id: str, request: Request, response: Response):
     delete_result = await request.app.database["trips"].delete_one({"_id": id})
 
-    if delete_result.deleted_count == 1:
+    if not delete_result or delete_result.deleted_count == 1:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
 

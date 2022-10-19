@@ -1,5 +1,5 @@
-fastapi
-pydantic
+fastapi>=0.85.1
+pydantic>=1.10.2
 pymongo
 
 pymongo[snappy,gssapi,srv]
