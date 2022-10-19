@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.11.0 as builder
+FROM python:3.10.7 as builder
 
 ARG database_url
 ARG database_name
