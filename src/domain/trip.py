@@ -2,7 +2,6 @@ import uuid
 from pydantic import BaseModel, Field
 import datetime
 
-
 class Trip(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     passengerId: str = Field(...)
@@ -35,6 +34,7 @@ class Trip(BaseModel):
                 "finalPrice": 532.50,
             }
         }
+        orm_mode = True
 
 
 class TripUpdate(BaseModel):
@@ -67,3 +67,4 @@ class TripUpdate(BaseModel):
                 "finalPrice": 532.50,
             }
         }
+        orm_mode = True

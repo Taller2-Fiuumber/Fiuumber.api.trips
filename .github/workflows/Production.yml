@@ -29,6 +29,7 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
+        sudo apt install libkrb5-dev
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
@@ -49,8 +50,9 @@ jobs:
       CI_IMAGE_NAME: ${{ github.repository }}
       GITHUB_TOKEN: ${{ github.token }}
       GITHUB_USERNAME: ${{ github.actor }}
+      MONGODB_URL: ${{ secrets.MONGODB_URL }}
+      DB_NAME: ${{ secrets.DB_NAME }}
       HEROKU_APP: fiuumber-api-trips
-      DATABASE_URL: ${{ secrets.MONGODB_URL }}
     steps:
       - uses: actions/checkout@master
 
@@ -69,8 +71,12 @@ jobs:
           IMAGE_NAME=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')
           echo "IMAGE_TAG=$(echo $IMAGE_NAME:$VERSION)" >> $GITHUB_ENV
       - name: Build image
-        run: docker build . -t ${{ env.IMAGE_TAG }} --build-arg database_url=${DATABASE_URL}
-
+        env:
+          MONGODB_URL: ${{ secrets.MONGODB_URL }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: docker build -t ${{ env.IMAGE_TAG }} .
+          --build-arg database_url="$MONGODB_URL"
+          --build-arg database_name="$DB_NAME"
       - name: Push image to Github Container Registry
         run: docker push ${{ env.IMAGE_TAG }}
 
@@ -82,14 +88,18 @@ jobs:
       - name: Tag container of Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: docker tag ${{ env.IMAGE_TAG }} registry.heroku.com/${{ env.HEROKU_APP}}/web
+        run: docker tag ${{ env.IMAGE_TAG }} registry.heroku.com/${{ env.HEROKU_APP }}/web
 
       - name: Push container to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:push web --app ${{ env.HEROKU_APP}}
+          MONGODB_URL: ${{ secrets.MONGODB_URL }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: heroku container:push web
+          --arg database_url="$MONGODB_URL",database_name="$DB_NAME"
+          --app ${{ env.HEROKU_APP }}
 
       - name: Release container to Heroku Container Registry
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release web --app ${{ env.HEROKU_APP}}
+        run: heroku container:release web --app ${{ env.HEROKU_APP }}
