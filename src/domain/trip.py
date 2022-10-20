@@ -35,6 +35,7 @@ class Trip(BaseModel):
                 "finalPrice": 532.50,
             }
         }
+        orm_mode = True
 
 
 class TripUpdate(BaseModel):
@@ -67,3 +68,4 @@ class TripUpdate(BaseModel):
                 "finalPrice": 532.50,
             }
         }
+        orm_mode = True
