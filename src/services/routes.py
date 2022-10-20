@@ -1,8 +1,13 @@
 from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from typing import List
+from pymongo import MongoClient
 
 from src.domain.trip import Trip, TripUpdate
+from os import environ
+
+MONGODB_URL = environ["MONGODB_URL"]
+DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
 
@@ -14,9 +19,11 @@ router = APIRouter()
     response_model=Trip,
 )
 def create_trip(request: Request, trip: Trip = Body(...)):
+    mongo_client= MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
     trip = jsonable_encoder(trip)
-    new_trip = request.app.database["trips"].insert_one(trip)
-    created_trip = request.app.database["trips"].find_one({"_id": new_trip.inserted_id})
+    new_trip = database["trips"].insert_one(trip)
+    created_trip = database["trips"].find_one({"_id": new_trip.inserted_id})
 
     if created_trip is not None:
         return created_trip
@@ -26,7 +33,9 @@ def create_trip(request: Request, trip: Trip = Body(...)):
 
 @router.get("/trips", response_description="List all trips", response_model=List[Trip])
 def list_trips(request: Request):
-    _trips = request.app.database["trips"].find(limit=10)
+    mongo_client= MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    _trips = database["trips"].find(limit=10)
     trips = list(_trips)
     return trips
 
