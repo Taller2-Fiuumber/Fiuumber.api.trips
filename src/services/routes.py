@@ -13,10 +13,10 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     response_model=Trip,
 )
-async def create_trip(request: Request, trip: Trip = Body(...)):
+def create_trip(request: Request, trip: Trip = Body(...)):
     trip = jsonable_encoder(trip)
-    new_trip = await request.app.database["trips"].insert_one(trip)
-    created_trip = await request.app.database["trips"].find_one({"_id": new_trip.inserted_id})
+    new_trip = request.app.database["trips"].insert_one(trip)
+    created_trip = request.app.database["trips"].find_one({"_id": new_trip.inserted_id})
 
     if created_trip is not None:
         return created_trip
@@ -25,8 +25,8 @@ async def create_trip(request: Request, trip: Trip = Body(...)):
     )
 
 @router.get("/trips", response_description="List all trips", response_model=List[Trip])
-async def list_trips(request: Request):
-    _trips = await request.app.database["trips"].find(limit=100)
+def list_trips(request: Request):
+    _trips = request.app.database["trips"].find(limit=10)
     trips = list(_trips)
     return trips
 
@@ -34,8 +34,8 @@ async def list_trips(request: Request):
 @router.get(
     "/trip/id={id}", response_description="Get a single trip by id", response_model=Trip
 )
-async def find_trip(id: str, request: Request):
-    if (trip := await request.app.database["trips"].find_one({"_id": id})) is not None:
+def find_trip(id: str, request: Request):
+    if (trip := request.app.database["trips"].find_one({"_id": id})) is not None:
         return trip
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
@@ -43,10 +43,10 @@ async def find_trip(id: str, request: Request):
 
 
 @router.put("/trip/id={id}", response_description="Update a trip", response_model=Trip)
-async def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
+def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     trip = {k: v for k, v in trip.dict().items() if v is not None}
     if len(trip) >= 1:
-        update_result = await request.app.database["trips"].update_one(
+        update_result = request.app.database["trips"].update_one(
             {"_id": id}, {"$set": trip}
         )
 
@@ -57,7 +57,7 @@ async def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
             )
 
     if (
-        existing_trip := await request.app.database["trips"].find_one({"_id": id})
+        existing_trip := request.app.database["trips"].find_one({"_id": id})
     ) is not None:
         return existing_trip
 
@@ -67,8 +67,8 @@ async def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
 
 
 @router.delete("/trip/id={id}", response_description="Delete a trip")
-async def delete_trip(id: str, request: Request, response: Response):
-    delete_result = await request.app.database["trips"].delete_one({"_id": id})
+def delete_trip(id: str, request: Request, response: Response):
+    delete_result = request.app.database["trips"].delete_one({"_id": id})
 
     if not delete_result or delete_result.deleted_count == 1:
         response.status_code = status.HTTP_204_NO_CONTENT
