@@ -43,7 +43,7 @@ def list_trips(request: Request):
 
 
 @router.get(
-    "/trip/id={id}", response_description="Get a single trip by id", response_model=Trip
+    "/trip/{id}", response_description="Get a single trip by id", response_model=Trip
 )
 def find_trip(id: str, request: Request):
     mongo_client= MongoClient(MONGODB_URL, connect=False)
@@ -56,7 +56,7 @@ def find_trip(id: str, request: Request):
     )
 
 
-@router.put("/trip/id={id}", response_description="Update a trip", response_model=Trip)
+@router.put("/trip/{id}", response_description="Update a trip", response_model=Trip)
 def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     mongo_client= MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -83,7 +83,7 @@ def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     )
 
 
-@router.delete("/trip/id={id}", response_description="Delete a trip")
+@router.delete("/trip/{id}", response_description="Delete a trip")
 def delete_trip(id: str, request: Request, response: Response):
     mongo_client= MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -97,3 +97,34 @@ def delete_trip(id: str, request: Request, response: Response):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
+
+
+@router.get(
+    "/trip/{id}/status", response_description="Get a single trip's status by id"
+)
+def find_trip(id: str, request: Request):
+    mongo_client= MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    if (trip := database["trips"].find_one({"_id": id})) is not None:
+        return trip["status"]
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
+    )
+
+@router.patch("/trip/{id}", response_model=Trip)
+async def patch_item(id: str, trip):
+    mongo_client= MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    stored_trip = database["trips"].find_one({"_id": id})
+    if (stored_trip) is not None:
+        update_data = trip.dict(exclude_unset=True)
+        updated_item = stored_trip.copy(update=update_data)
+        update_result = database["trips"].update_one(
+            {"_id": id}, {"$set": jsonable_encoder(updated_item)}
+        )
+        return update_result
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
+    )
+
