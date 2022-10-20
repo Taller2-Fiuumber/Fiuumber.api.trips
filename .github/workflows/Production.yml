@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'feature/crud-trips'
 jobs:
   linter:
     name: Format and lint
