@@ -12,6 +12,7 @@ services:
       - "27017:27017"
     networks:
       - default
+      - gateway
     volumes:
       - ./mongo-volume:/data/db
   web:
@@ -39,6 +40,8 @@ services:
 networks:
   default:
     name: localdev
+  gateway:
+    name: gateway
 volumes:
   mongo-volume:
     driver: local
