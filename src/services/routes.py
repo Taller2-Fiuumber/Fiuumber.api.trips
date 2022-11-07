@@ -112,7 +112,8 @@ def find_trip_status(id: str, request: Request):
 
 
 @router.patch("/trip/{id}", response_model=Trip)
-async def patch_item(id: str, trip):
+async def patch_item(id: str, trip: Trip):
+    print(id)
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
     stored_trip = database["trips"].find_one({"_id": id})
@@ -126,6 +127,35 @@ async def patch_item(id: str, trip):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
+
+
+@router.post(
+    "/trip/{id}/assign-driver",
+    response_description="Assign driver to a trip",
+    response_model=Trip,
+)
+def assign_driver(id: str, request: Request, body=Body(...)):
+    try:
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+
+        stored_trip = database["trips"].find_one({"_id": id})
+
+        if stored_trip["status"] != "PENDING":
+            raise Exception("Cannot assign driver to a non pending trip")
+
+        database["trips"].update_one(
+            {"_id": id},
+            {"$set": {"driverId": body.get("driverId"), "status": "DRIVER_ASSIGNED"}},
+        )
+
+        stored_trip = database["trips"].find_one({"_id": id})
+
+        return stored_trip
+    except Exception as ex:
+        raise HTTPException(
+            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
+        )
 
 
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
