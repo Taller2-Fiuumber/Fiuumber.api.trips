@@ -109,17 +109,23 @@ def find_trip_status(id: str, request: Request):
 
 @router.put("/trip/{id}/status", response_description="Update a trip status")
 def update_trip_status(id: str, request: Request, body=Body(...)):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    try:
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
 
-    database["trips"].update_one(
-        {"_id": id},
-        {"$set": {"status": body.get("status")}},
-    )
+        database["trips"].update_one(
+            {"_id": id},
+            {"$set": {"status": body.get("status")}},
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
-    )
+        stored_trip = database["trips"].find_one({"_id": id})
+
+        return stored_trip
+
+    except Exception as ex:
+        raise HTTPException(
+            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
+        )
 
 
 @router.patch("/trip/{id}")
