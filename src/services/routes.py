@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from typing import List
 from pymongo import MongoClient
 
 from src.domain.trip import Trip, TripUpdate
@@ -43,9 +42,7 @@ def list_trips(request: Request):
     return trips
 
 
-@router.get(
-    "/trip/{id}", response_description="Get a single trip by id"
-)
+@router.get("/trip/{id}", response_description="Get a single trip by id")
 def find_trip(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -109,15 +106,16 @@ def find_trip_status(id: str, request: Request):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
+
 @router.put("/trip/{id}/status", response_description="Update a trip status")
 def update_trip_status(id: str, request: Request, body=Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
     database["trips"].update_one(
-            {"_id": id},
-            {"$set": {"status": body.get("status")}},
-        )
+        {"_id": id},
+        {"$set": {"status": body.get("status")}},
+    )
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
