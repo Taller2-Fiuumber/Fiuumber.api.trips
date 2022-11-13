@@ -16,6 +16,8 @@ class Trip(BaseModel):
     subscription: str = Field(...)
     status: str = Field(...)
     finalPrice: float = Field(...)
+    from_address: str = Field(...)
+    to_address: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -33,6 +35,8 @@ class Trip(BaseModel):
                 "subscription": "VIP",
                 "status": "Done",
                 "finalPrice": 532.50,
+                "from_address": "Calle Falsa 123",
+                "to_address": "Calle Falsa 666",
             }
         }
         orm_mode = True
@@ -50,6 +54,8 @@ class TripUpdate(BaseModel):
     subscription: str = Field(...)
     status: str = Field(...)
     finalPrice: float = Field(...)
+    from_address: str = Field(...)
+    to_address: str = Field(...)
 
     class Config:
         schema_extra = {
@@ -66,6 +72,8 @@ class TripUpdate(BaseModel):
                 "subscription": "VIP",
                 "status": "Done",
                 "finalPrice": 532.50,
+                "from_address": "Calle Falsa 123",
+                "to_address": "Calle Falsa 666",
             }
         }
         orm_mode = True

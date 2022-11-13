@@ -17,7 +17,6 @@ router = APIRouter()
     "/trip",
     response_description="Create a new trip",
     status_code=status.HTTP_201_CREATED,
-    response_model=Trip,
 )
 def create_trip(request: Request, trip: Trip = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -34,7 +33,7 @@ def create_trip(request: Request, trip: Trip = Body(...)):
     )
 
 
-@router.get("/trips", response_description="List all trips", response_model=List[Trip])
+@router.get("/trips", response_description="List all trips")
 def list_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -45,7 +44,7 @@ def list_trips(request: Request):
 
 
 @router.get(
-    "/trip/{id}", response_description="Get a single trip by id", response_model=Trip
+    "/trip/{id}", response_description="Get a single trip by id"
 )
 def find_trip(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -58,7 +57,7 @@ def find_trip(id: str, request: Request):
     )
 
 
-@router.put("/trip/{id}", response_description="Update a trip", response_model=Trip)
+@router.put("/trip/{id}", response_description="Update a trip")
 def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -110,15 +109,29 @@ def find_trip_status(id: str, request: Request):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
+@router.put("/trip/{id}/status", response_description="Update a trip status")
+def update_trip_status(id: str, request: Request, body=Body(...)):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
 
-@router.patch("/trip/{id}", response_model=Trip)
-async def patch_item(id: str, trip: Trip):
+    database["trips"].update_one(
+            {"_id": id},
+            {"$set": {"status": body.get("status")}},
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
+    )
+
+
+@router.patch("/trip/{id}")
+async def patch_item(id: str, body=Body(...)):
     print(id)
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
     stored_trip = database["trips"].find_one({"_id": id})
     if (stored_trip) is not None:
-        update_data = trip.dict(exclude_unset=True)
+        update_data = body.dict(exclude_unset=True)
         updated_item = stored_trip.copy(update=update_data)
         update_result = database["trips"].update_one(
             {"_id": id}, {"$set": jsonable_encoder(updated_item)}
@@ -132,7 +145,6 @@ async def patch_item(id: str, trip: Trip):
 @router.post(
     "/trip/{id}/assign-driver",
     response_description="Assign driver to a trip",
-    response_model=Trip,
 )
 def assign_driver(id: str, request: Request, body=Body(...)):
     try:
@@ -141,7 +153,7 @@ def assign_driver(id: str, request: Request, body=Body(...)):
 
         stored_trip = database["trips"].find_one({"_id": id})
 
-        if stored_trip["status"] != "PENDING":
+        if stored_trip["status"] != "REQUESTED":
             raise Exception("Cannot assign driver to a non pending trip")
 
         database["trips"].update_one(
