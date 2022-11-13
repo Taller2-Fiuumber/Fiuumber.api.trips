@@ -1,8 +1,10 @@
 import uuid
 from pydantic import BaseModel, Field
 import datetime
+from pymongo import MongoClient
 
-
+MONGODB_URL = environ["MONGODB_URL"]
+DB_NAME = environ["DB_NAME"]
 class Trip(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     passengerId: str = Field(...)
@@ -77,3 +79,55 @@ class TripUpdate(BaseModel):
             }
         }
         orm_mode = True
+
+    def get_driver_trips_in_day(self):
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+        stage_group_year = {
+            "$group": {
+                    "_id": "$year",
+                    # Count the number of movies in the group:
+                    "movie_count": { "$sum": 1 },
+            }
+        }
+
+        trips = database["trips"].findall({"driverId": self.driverId, "start": datetime.datetime.today()})
+        if (trips == None):
+            return 0
+        return len(trips)
+
+    def get_driver_trips_in_month(self):
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+        trips = database["trips"].findall({"driverId": self.driverId, "start": datetime.datetime.today()})
+        if (trips == None):
+            return 0
+        return len(trips)
+
+    def get_passenger_trips_in_day(self):
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+        trips = database["trips"].findall({"passengerId": self.passengerId, "start": datetime.datetime.today()})
+        if (trips == None):
+            return 0
+        return len(trips)
+
+    def get_passenger_trips_in_month(self):
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+        trips = database["trips"].findall({"passengerId": self.passengerId, "start": datetime.datetime.today()})
+        if (trips == None):
+            return 0
+        return len(trips)
+
+    def get_driver_seniority(self):
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+        pipeline = [
+            {"$unwind": "$tags"},
+            {"$group": {"driverId": "$tags", "min": {"$sum": 1}}},
+        ]
+        trips = database["trips"].find({"driverId": self.driverId}).aggregate(pipeline)
+        if (trips == None):
+            return 0
+        return len(trips)

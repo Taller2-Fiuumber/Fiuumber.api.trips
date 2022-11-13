@@ -1,7 +1,7 @@
 all: format test start-services exec
 
 test:
-	pip install pytest  --quiet
+	pip install pytest --quiet
 	pytest test
 
 format:
