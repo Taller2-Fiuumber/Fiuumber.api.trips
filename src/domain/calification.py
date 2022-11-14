@@ -48,7 +48,7 @@ class CalificationUpdate(BaseModel):
                 "passengerId": "066de609-b04a-4b30-b46c-32537c7f1f6e",
                 "driverId": "2320930329-b04a-4b30-b46c-fsdfwefwefw",
                 "tripId": "ddfdsfsdf-b04a-4b30-b4sdf6c-fsdtjkjj",
-                "createdAt": datetime.datetime(2022,7,4),
+                "createdAt": datetime.datetime(2022, 7, 4),
                 "updatedAt": datetime.datetime.now(),
                 "stars": 5,
                 "comments": "Nice driver. Love the scene.",
