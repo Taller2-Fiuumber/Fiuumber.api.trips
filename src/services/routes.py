@@ -4,13 +4,14 @@ from pymongo import MongoClient
 
 from src.domain.trip import Trip, TripUpdate
 from src.domain.fare_calculator import lineal
+from src.domain.calification import Calification, CalificationUpdate
+
 from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
-
 
 @router.post(
     "/trip",
@@ -31,7 +32,6 @@ def create_trip(request: Request, trip: Trip = Body(...)):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
-
 @router.get("/trips", response_description="List all trips")
 def list_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -40,7 +40,6 @@ def list_trips(request: Request):
     _trips = database["trips"].find(limit=10)
     trips = list(_trips)
     return trips
-
 
 @router.get("/trip/{id}", response_description="Get a single trip by id")
 def find_trip(id: str, request: Request):
@@ -52,7 +51,6 @@ def find_trip(id: str, request: Request):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
-
 
 @router.put("/trip/{id}", response_description="Update a trip")
 def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
@@ -76,7 +74,6 @@ def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
-
 @router.delete("/trip/{id}", response_description="Delete a trip")
 def delete_trip(id: str, request: Request, response: Response):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -92,7 +89,6 @@ def delete_trip(id: str, request: Request, response: Response):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
-
 @router.get(
     "/trip/{id}/status", response_description="Get a single trip's status by id"
 )
@@ -105,7 +101,6 @@ def find_trip_status(id: str, request: Request):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
-
 
 @router.put("/trip/{id}/status", response_description="Update a trip status")
 def update_trip_status(id: str, request: Request, body=Body(...)):
@@ -127,7 +122,6 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
 
-
 @router.patch("/trip/{id}")
 async def patch_item(id: str, body=Body(...)):
     print(id)
@@ -144,7 +138,6 @@ async def patch_item(id: str, body=Body(...)):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
-
 
 @router.post(
     "/trip/{id}/assign-driver",
@@ -173,7 +166,6 @@ def assign_driver(id: str, request: Request, body=Body(...)):
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
 
-
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     try:
@@ -186,3 +178,94 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
         return Response(content=str(fare), media_type="application/json")
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
+
+@router.post(
+    "/calification",
+    response_description="Create a users's comment to a trip",
+    status_code=status.HTTP_201_CREATED,
+)
+def create_calification_passenger(request: Request, calification: Calification = Body(...)):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    calification = jsonable_encoder(calification)
+    new_calification = database["calification"].insert_one(calification)
+    created_calification = database["calification"].find_one({"_id": new_calification.inserted_id})
+
+    if created_calification is not None:
+        return created_calification
+
+
+@router.get("/calification", response_description="Get a single trip by id")
+def find_califications(request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find(limit=10)
+    return list(_califications)
+
+@router.get("/calification/passenger", response_description="Get a single trip by id")
+def find_califications_passenger(request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"reviewer":"PASSENGER"})
+    return list(_califications)
+
+@router.get("/calification/driver", response_description="Get a single trip by id")
+def find_califications_passenger(request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"reviewer":"DRIVER"})
+    return list(_califications)
+
+
+@router.get("/calification/passenger/tripId/{tripId}", response_description="Get a single trip by id")
+def find_califications_passenegr_by_tripId(tripId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"tripId":tripId,"reviewer":"PASSENGER"})
+    return list(_califications)
+
+@router.get("/calification/driver/tripId/{tripId}", response_description="Get a single trip by id")
+def find_califications_driver_by_tripId(tripId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"tripId":tripId,"reviewer":"DRIVER"})
+    return list(_califications)
+
+
+@router.get("/calification/passenger/{passenger}/tripId/{tripId}", response_description="Get a single trip by id")
+def find_califications_passenegr_by_tripId_and_by_driver(passenger: str, tripId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"tripId":tripId,"reviewer":"PASSENGER","passengerId":passenger})
+    return list(_califications)
+
+@router.get("/calification/driver/{driverId}/tripId/{tripId}", response_description="Get a single trip by id")
+def find_califications_driver_by_tripId_and_by_passenger(driverId: str, tripId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"tripId":tripId,"reviewer":"DRIVER","driverId":driverId})
+    return list(_califications)
+
+@router.get("/calification/passenger/{passenger}", response_description="Get a single trip by id")
+def find_califications_passenegr_by_tripId_and_by_driver(passenger: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"reviewer":"PASSENGER","passengerId":passenger})
+    return list(_califications)
+
+@router.get("/calification/driver/{driverId}", response_description="Get a single trip by id")
+def find_califications_driver_by_tripId_and_by_passenger(driverId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = database["calification"].find({"reviewer":"DRIVER","driverId":driverId})
+    return list(_califications)
