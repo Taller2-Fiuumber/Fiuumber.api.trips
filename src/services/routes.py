@@ -338,18 +338,44 @@ def find_califications_of_passenegr_by_passengerId(
 
 
 @router.get(
-    "/calification/driver/{driverId}", response_description="Get a single trip by id"
+    "/calification/driver/{driverId}/avg",
+    response_description="Get a single trip by id",
 )
-def find_califications_of_driver_by_driverId(
-    driverId: str, skip: int, limit: int, request: Request
+def find_califications_mean_of_driver_by_driverId(driverId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    pipeline = [
+        {"$match": {"driverId": driverId}},
+        {
+            "$group": {
+                "_id": "$driverId",
+                "avg_stars": {"$avg": "$stars"},
+            }
+        },
+    ]
+
+    return list(database["calification"].aggregate(pipeline))
+
+
+@router.get(
+    "/calification/passenger/{passengerId}/avg",
+    response_description="Get a single trip by id",
+)
+def find_califications_mean_of_driver_by_passengerId(
+    passengerId: str, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
-    _califications = (
-        database["calification"]
-        .find({"reviewer": "DRIVER", "driverId": driverId})
-        .skip(skip)
-        .limit(limit)
-    )
-    return list(_califications)
+    pipeline = [
+        {"$match": {"passengerId": passengerId}},
+        {
+            "$group": {
+                "_id": "$passengerId",
+                "avg_stars": {"$avg": "$stars"},
+            }
+        },
+    ]
+
+    return list(database["calification"].aggregate(pipeline))
