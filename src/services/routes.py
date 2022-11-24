@@ -5,6 +5,8 @@ from pymongo import MongoClient
 from src.domain.trip import Trip, TripUpdate
 from src.domain.fare_calculator import lineal
 from src.domain.calification import Calification
+import src.domain.status as trip_status
+import datetime
 
 from os import environ
 
@@ -39,7 +41,7 @@ def list_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
-    _trips = database["trips"].find(limit=10)
+    _trips = database["trips"].find()
     trips = list(_trips)
     return trips
 
@@ -94,6 +96,19 @@ def delete_trip(id: str, request: Request, response: Response):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
+@router.delete("/trips", response_description="Delete all trips")
+def delete_trip(id: str, request: Request, response: Response):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    delete_result = database["trips"].delete()
+    if not delete_result:
+        return response
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
+    )
+
 
 @router.get(
     "/trip/{id}/status", response_description="Get a single trip's status by id"
@@ -107,7 +122,6 @@ def find_trip_status(id: str, request: Request):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
-
 
 @router.put("/trip/{id}/status", response_description="Update a trip status")
 def update_trip_status(id: str, request: Request, body=Body(...)):
@@ -129,6 +143,75 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
 
+@router.put("/trip/{id}/status/next", response_description="Update a trip status")
+def update_trip_status(id: str, request: Request, body=Body(...)):
+    try:
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+
+        trip = database["trips"].find_one({"_id": id})
+
+        if trip is not None:
+            status = trip_status.StatusFactory(trip["status"])
+
+            if status.name() == trip_status.DriverAssigned().name():
+                database["trips"].update_one(
+                    {"_id": id},
+                    {"$set":
+                        {
+                        "status": status.next().name(),
+                        "start": datetime.datetime.now(),
+                        }
+                    },
+                )
+            elif status == trip_status.InProgress():
+                database["trips"].update_one(
+                    {"_id": id},
+                    {"$set":
+                        {
+                        "status": status.next().name(),
+                        "finish": datetime.datetime.now(),
+                        }
+                    },
+                )
+            else:
+                database["trips"].update_one(
+                    {"_id": id},
+                    {"$set":{"status": status.next().name()}},
+                )
+
+        stored_trip = database["trips"].find_one({"_id": id})
+
+        return stored_trip
+
+    except Exception as ex:
+        raise HTTPException(
+            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
+        )
+
+@router.put("/trip/{id}/status/cancel", response_description="Update a trip status")
+def update_trip_status(id: str, request: Request, body=Body(...)):
+    try:
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+
+        trip = database["trips"].find_one({"_id": id})
+        if trip is not None:
+            status = StatusFactory(trip["status"])
+            database["trips"].update_one(
+                {"_id": id},
+                {"$set": {"status": status.cancel()}},
+            )
+            # TO-DO
+
+        stored_trip = database["trips"].find_one({"_id": id})
+
+        return stored_trip
+
+    except Exception as ex:
+        raise HTTPException(
+            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
+        )
 
 @router.patch("/trip/{id}")
 async def patch_item(id: str, body=Body(...)):
@@ -379,3 +462,4 @@ def find_califications_mean_of_driver_by_passengerId(
     ]
 
     return list(database["calification"].aggregate(pipeline))
+
