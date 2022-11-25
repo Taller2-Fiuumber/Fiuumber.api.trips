@@ -57,6 +57,22 @@ def find_trip(id: str, request: Request):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
+@router.get("/trip/{id}/duration", response_description="Get duration in minutes of trip by id")
+def find_trip(id: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    trip = database["trips"].find_one({"_id": id})
+    if trip is not None:
+        status = trip_status.StatusFactory(trip["status"])
+        if status != trip_status.Terminated():
+            raise HTTPException(
+                status_code=400, detail=f"Trip {id} status is not terminated"
+            )
+        else:
+            return (trip["finish"] - trip["start"]).seconds/60
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
+    )
 
 @router.put("/trip/{id}", response_description="Update a trip")
 def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
