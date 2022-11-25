@@ -1,4 +1,4 @@
-class Status():
+class Status:
     def name(self):
         pass
 
@@ -11,6 +11,7 @@ class Status():
     def __eq__(self, other):
         return self.name() == other.name()
 
+
 class Invalid(Status):
     def name(self):
         return "INVALID"
@@ -20,6 +21,7 @@ class Invalid(Status):
 
     def cancel(self):
         return Invalid()
+
 
 class Canceled(Status):
     def name(self):
@@ -31,6 +33,7 @@ class Canceled(Status):
     def cancel(self):
         return Canceled()
 
+
 class Requested(Status):
     def name(self):
         return "REQUESTED"
@@ -40,6 +43,7 @@ class Requested(Status):
 
     def cancel(self):
         return Canceled()
+
 
 class DriverAssigned(Status):
     def name(self):
@@ -51,6 +55,7 @@ class DriverAssigned(Status):
     def cancel(self):
         return Canceled()
 
+
 class DriverArrived(Status):
     def name(self):
         return "DRIVER_ARRIVED"
@@ -60,6 +65,7 @@ class DriverArrived(Status):
 
     def cancel(self):
         return Canceled()
+
 
 class InProgress(Status):
     def name(self):
@@ -71,6 +77,7 @@ class InProgress(Status):
     def cancel(self):
         return InProgress()
 
+
 class Terminated(Status):
     def name(self):
         return "TERMINATED"
@@ -80,6 +87,7 @@ class Terminated(Status):
 
     def cancel(self):
         return Terminated()
+
 
 def StatusFactory(name):
     if name == Requested().name():
@@ -95,4 +103,4 @@ def StatusFactory(name):
     elif name == Canceled().name():
         return Canceled()
     else:
-       return Invalid()
+        return Invalid()

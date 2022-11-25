@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Request, Response, HTTPException, status
+from fastapi import APIRouter, Body, Request, status
 from fastapi.encoders import jsonable_encoder
 from pymongo import MongoClient
 
@@ -10,6 +10,7 @@ MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
+
 
 @router.post(
     "/calification",
@@ -200,4 +201,3 @@ def find_califications_mean_of_driver_by_passengerId(
     ]
 
     return list(database["calification"].aggregate(pipeline))
-

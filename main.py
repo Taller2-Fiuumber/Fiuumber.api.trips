@@ -23,12 +23,20 @@ async def root():
 
 
 app.include_router(trip_router, tags=["trips"], prefix="/api/trips")
-app.include_router(trips_metrics_router, tags=["trips metrics"], prefix="/api/trips/metrics/trips")
+app.include_router(
+    trips_metrics_router, tags=["trips metrics"], prefix="/api/trips/metrics/trips"
+)
 
 app.include_router(trips_status_router, tags=["status"], prefix="/api/trips")
 
 app.include_router(fare_router, tags=["fare"], prefix="/api/trips")
-app.include_router(fare_metrics_router, tags=["fare metrics"], prefix="/api/trips/metrics/fares")
+app.include_router(
+    fare_metrics_router, tags=["fare metrics"], prefix="/api/trips/metrics/fares"
+)
 
 app.include_router(calification_router, tags=["calification"], prefix="/api/trips")
-app.include_router(calification_metrics_router, tags=["calification metrics"], prefix="/api/trips/metrics/calification")
+app.include_router(
+    calification_metrics_router,
+    tags=["calification metrics"],
+    prefix="/api/trips/metrics/calification",
+)

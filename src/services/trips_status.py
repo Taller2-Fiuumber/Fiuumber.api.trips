@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Body, Request, Response, HTTPException, status
-from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
 
-from src.domain.trip import Trip, TripUpdate
 import src.domain.status as trip_status
 import datetime
 
@@ -27,6 +25,7 @@ def find_trip_status(id: str, request: Request):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
+
 @router.put("/trip/{id}/status", response_description="Update a trip status")
 def update_trip_status(id: str, request: Request, body=Body(...)):
     try:
@@ -47,8 +46,9 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
 
+
 @router.put("/trip/{id}/status/next", response_description="Update a trip status")
-def update_trip_status(id: str, request: Request, body=Body(...)):
+def update_trip_to_next_status(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
@@ -61,27 +61,27 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             if status.name() == trip_status.DriverAssigned().name():
                 database["trips"].update_one(
                     {"_id": id},
-                    {"$set":
-                        {
-                        "status": status.next().name(),
-                        "start": datetime.datetime.now(),
+                    {
+                        "$set": {
+                            "status": status.next().name(),
+                            "start": datetime.datetime.now(),
                         }
                     },
                 )
             elif status == trip_status.InProgress():
                 database["trips"].update_one(
                     {"_id": id},
-                    {"$set":
-                        {
-                        "status": status.next().name(),
-                        "finish": datetime.datetime.now(),
+                    {
+                        "$set": {
+                            "status": status.next().name(),
+                            "finish": datetime.datetime.now(),
                         }
                     },
                 )
             else:
                 database["trips"].update_one(
                     {"_id": id},
-                    {"$set":{"status": status.next().name()}},
+                    {"$set": {"status": status.next().name()}},
                 )
 
         stored_trip = database["trips"].find_one({"_id": id})
@@ -93,15 +93,16 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
 
+
 @router.put("/trip/{id}/status/cancel", response_description="Update a trip status")
-def update_trip_status(id: str, request: Request, body=Body(...)):
+def cancel_trip(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
 
         trip = database["trips"].find_one({"_id": id})
         if trip is not None:
-            status = StatusFactory(trip["status"])
+            status = trip_status.StatusFactory(trip["status"])
             database["trips"].update_one(
                 {"_id": id},
                 {"$set": {"status": status.cancel()}},

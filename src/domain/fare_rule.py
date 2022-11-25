@@ -1,10 +1,8 @@
 import uuid
 from pydantic import BaseModel, Field
 import datetime
-from pymongo import MongoClient
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+
 class FareRule(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     minimum_fare: float = 0
