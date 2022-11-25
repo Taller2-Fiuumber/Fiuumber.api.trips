@@ -23,7 +23,7 @@ def find_fare_avg(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_final_price"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/min", response_description="Get trips fare minimum")
@@ -40,7 +40,7 @@ def find_fare_min(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_final_price"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/max", response_description="Get trips fare minimum")
@@ -57,4 +57,4 @@ def find_fare_max(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_final_price"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")

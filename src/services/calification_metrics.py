@@ -32,7 +32,7 @@ def get_calification_passenger_min(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_stars"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/passenger/max", response_description="Get passenger max calification")
@@ -58,7 +58,7 @@ def get_calification_passenger_max(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_stars"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/passenger/avg", response_description="Get passenger avg calification")
@@ -86,7 +86,7 @@ def get_calification_passenger_avg(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_stars_avg"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/driver/min", response_description="Get driver min calification")
@@ -112,7 +112,7 @@ def get_calification_driver_min(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_stars"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/driver/max", response_description="Get driver max calification")
@@ -138,7 +138,7 @@ def get_calification_driver_max(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_stars"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/driver/avg", response_description="Get driver avg calification")
@@ -166,4 +166,4 @@ def get_calification_driver_avg(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_stars_avg"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")

@@ -32,7 +32,7 @@ def get_trip_duration_min(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_duration"] / 60000
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get(
@@ -58,7 +58,7 @@ def get_trip_duration_max(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_duration"] / 60000
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get(
@@ -84,7 +84,7 @@ def get_trip_duration_avg(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_duration"] / 60000
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/status/count", response_description="Count trips by status")
@@ -99,7 +99,7 @@ def count_trips_by_status(status: str, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/count", response_description="Count trips")
@@ -113,4 +113,4 @@ def count_trips(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail=f"Internal error")
+    raise HTTPException(status_code=500, detail="Internal error")
