@@ -152,7 +152,26 @@ def find_califications_of_passenger_by_passengerId(
 
     _califications = (
         database["calification"]
-        .find({"reviewer": "PASSENGER", "passengerId": passengerId})
+        .find({"reviewer": "DRIVER", "passengerId": passengerId})
+        .skip(skip)
+        .limit(limit)
+    )
+    return list(_califications)
+
+
+@router.get(
+    "/calification/driver/{driverId}",
+    response_description="Find califications of driver by driverId",
+)
+def find_califications_of_driver_by_driverId(
+    driverId: str, skip: int, limit: int, request: Request
+):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = (
+        database["calification"]
+        .find({"reviewer": "PASSENGER", "driverId": driverId})
         .skip(skip)
         .limit(limit)
     )
