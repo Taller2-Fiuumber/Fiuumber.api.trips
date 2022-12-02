@@ -66,9 +66,9 @@ def find_califications_of_driver(skip: int, limit: int, request: Request):
 
 @router.get(
     "/calification/passenger/tripId/{tripId}",
-    response_description="Get a single trip by id",
+    response_description="Get califications",
 )
-def find_califications_of_passenegr_by_tripId(
+def find_califications_of_passenger_by_tripId(
     tripId: str, skip: int, limit: int, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -85,7 +85,7 @@ def find_califications_of_passenegr_by_tripId(
 
 @router.get(
     "/calification/driver/tripId/{tripId}",
-    response_description="Get a single trip by id",
+    response_description="Get califications",
 )
 def find_califications_of_driver_by_tripId(
     tripId: str, skip: int, limit: int, request: Request
@@ -104,9 +104,9 @@ def find_califications_of_driver_by_tripId(
 
 @router.get(
     "/calification/passenger/{passengerId}/tripId/{tripId}",
-    response_description="Get a single trip by id",
+    response_description="Get califications",
 )
-def find_califications_of_passenegr_by_tripId_and_by_driver(
+def find_califications_of_passenger_by_tripId_and_by_driver(
     passengerId: str, tripId: str, skip: int, limit: int, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -123,7 +123,7 @@ def find_califications_of_passenegr_by_tripId_and_by_driver(
 
 @router.get(
     "/calification/driver/{driverId}/tripId/{tripId}",
-    response_description="Get a single trip by id",
+    response_description="Get califications",
 )
 def find_califications_of_driver_by_tripId_and_by_driverId(
     driverId: str, tripId: str, skip: int, limit: int, request: Request
@@ -142,9 +142,9 @@ def find_califications_of_driver_by_tripId_and_by_driverId(
 
 @router.get(
     "/calification/passenger/{passengerId}",
-    response_description="Get a single trip by id",
+    response_description="Find califications of passenger by passengerId",
 )
-def find_califications_of_passenegr_by_passengerId(
+def find_califications_of_passenger_by_passengerId(
     passengerId: str, skip: int, limit: int, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -160,8 +160,27 @@ def find_califications_of_passenegr_by_passengerId(
 
 
 @router.get(
+    "/calification/driver/{driverId}",
+    response_description="Find califications of driver by driverId",
+)
+def find_califications_of_driver_by_driverId(
+    driverId: str, skip: int, limit: int, request: Request
+):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    _califications = (
+        database["calification"]
+        .find({"reviewer": "DRIVER", "driverId": driverId})
+        .skip(skip)
+        .limit(limit)
+    )
+    return list(_califications)
+
+
+@router.get(
     "/calification/driver/{driverId}/avg",
-    response_description="Get a single trip by id",
+    response_description="Get califications",
 )
 def find_califications_mean_of_driver_by_driverId(driverId: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -182,7 +201,7 @@ def find_califications_mean_of_driver_by_driverId(driverId: str, request: Reques
 
 @router.get(
     "/calification/passenger/{passengerId}/avg",
-    response_description="Get a single trip by id",
+    response_description="Get califications",
 )
 def find_califications_mean_of_driver_by_passengerId(
     passengerId: str, request: Request
