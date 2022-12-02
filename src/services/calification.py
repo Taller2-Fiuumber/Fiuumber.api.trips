@@ -152,7 +152,7 @@ def find_califications_of_passenger_by_passengerId(
 
     _califications = (
         database["calification"]
-        .find({"reviewer": "PASSENGER", "passengerId": passengerId})
+        .find({"reviewer": "DRIVER", "passengerId": passengerId})
         .skip(skip)
         .limit(limit)
     )
@@ -171,7 +171,7 @@ def find_califications_of_driver_by_driverId(
 
     _califications = (
         database["calification"]
-        .find({"reviewer": "DRIVER", "driverId": driverId})
+        .find({"reviewer": "PASSENGER", "driverId": driverId})
         .skip(skip)
         .limit(limit)
     )
