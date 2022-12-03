@@ -53,6 +53,7 @@ jobs:
       MONGODB_URL: ${{ secrets.MONGODB_URL }}
       DB_NAME: ${{ secrets.DB_NAME }}
       HEROKU_APP: fiuumber-api-trips
+      DD_API_KEY: ${{ secrets.DD_API_KEY }}
     steps:
       - uses: actions/checkout@master
 
@@ -74,9 +75,11 @@ jobs:
         env:
           MONGODB_URL: ${{ secrets.MONGODB_URL }}
           DB_NAME: ${{ secrets.DB_NAME }}
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
         run: docker build -t ${{ env.IMAGE_TAG }} .
           --build-arg database_url="$MONGODB_URL"
           --build-arg database_name="$DB_NAME"
+          --build-arg dd_api_key="$DD_API_KEY"
       - name: Push image to Github Container Registry
         run: docker push ${{ env.IMAGE_TAG }}
 
@@ -95,8 +98,9 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           MONGODB_URL: ${{ secrets.MONGODB_URL }}
           DB_NAME: ${{ secrets.DB_NAME }}
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
         run: heroku container:push web
-          --arg database_url="$MONGODB_URL",database_name="$DB_NAME"
+          --arg database_url="$MONGODB_URL",database_name="$DB_NAME",dd_api_key="$DD_API_KEY"
           --app ${{ env.HEROKU_APP }}
 
       - name: Release container to Heroku Container Registry
