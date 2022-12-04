@@ -5,19 +5,19 @@ import datetime
 
 class FareRule(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    selected: bool = False,
+    selected: bool = (False,)
     createdAt: datetime.datetime = Field(...)
     updatedAt: datetime.datetime = Field(...)
-    minimum_fare: float = 0,
-    duration_fare: float = 0,
-    distance_fare: float = 0,
-    dailyTripAmountDriver_fare: float = 0,
-    dailyTripAmountPassenger_fare: float = 0,
-    monthlyTripAmountDrive_fare: float = 0,
-    monthlyTripAmountPassenger_fare: float = 0,
-    seniorityDriver_fare: float = 0,
-    seniorityPassenger_fare: float = 0,
-    recentTripAmount_fare: float = 0,
+    minimum_fare: float = (0,)
+    duration_fare: float = (0,)
+    distance_fare: float = (0,)
+    dailyTripAmountDriver_fare: float = (0,)
+    dailyTripAmountPassenger_fare: float = (0,)
+    monthlyTripAmountDrive_fare: float = (0,)
+    monthlyTripAmountPassenger_fare: float = (0,)
+    seniorityDriver_fare: float = (0,)
+    seniorityPassenger_fare: float = (0,)
+    recentTripAmount_fare: float = (0,)
 
     class Config:
         allow_population_by_field_name = True
@@ -64,8 +64,6 @@ class FareRuleUpdate(BaseModel):
                 "seniorityDriver_fare": 0.5,
                 "seniorityPassenger_fare": -0.25,
                 "recentTripAmount_fare": -0.2,
-                "createdAt": datetime.datetime(2022, 9, 9, 2),
-                "minimum_fare": 400,
                 "price_per_minute": 0.3,
                 "price_per_km": 0.5,
             }

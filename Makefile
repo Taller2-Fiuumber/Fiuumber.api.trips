@@ -9,6 +9,7 @@ format:
 	black **.py
 	black src/*/*.py
 	black test/*/*.py
+	black test/*/*/*.py
 
 	pip install flake8 --quiet
 	flake8

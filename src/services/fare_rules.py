@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, HTTPException, status, Body, Request
+from fastapi import APIRouter, HTTPException, status, Body, Request
 from fastapi.encoders import jsonable_encoder
 from pymongo import MongoClient
 
@@ -11,14 +11,13 @@ DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
 
+
 @router.post(
     "/fare-rule",
     response_description="Create a fare rule",
     status_code=status.HTTP_201_CREATED,
 )
-def create_fare_rule(
-    request: Request, rule: FareRule = Body(...)
-):
+def create_fare_rule(request: Request, rule: FareRule = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
@@ -31,8 +30,9 @@ def create_fare_rule(
     if created_new_fare_rule is not None:
         return created_new_fare_rule
     raise HTTPException(
-        status_code=401, detail=f"Fare rule with ID not created successfully"
+        status_code=401, detail="Fare rule with ID not created successfully"
     )
+
 
 @router.get("/fare-rules", response_description="List all fare rules")
 def list_fare_rules(request: Request):
@@ -51,7 +51,8 @@ def find_fare_rules_by_id(id: str, request: Request):
     if (fare_rule := database["fare_rules"].find_one({"_id": id})) is not None:
         return fare_rule
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"Fare rulw with ID {id} not found"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Fare rulw with ID {id} not found",
     )
 
 
@@ -61,13 +62,17 @@ def select_a_fare_rule(id: str, request: Request):
     database = mongo_client.mongodb_client[DB_NAME]
 
     old_selected_fare_rule = database["fare_rules"].find_one({"selected": True})
-    new_selected_fare_rule = database["fare_rules"].update_one({"_id": id}, { "$set": { "selected": True } })
+    new_selected_fare_rule = database["fare_rules"].update_one(
+        {"_id": id}, {"$set": {"selected": True}}
+    )
 
     if new_selected_fare_rule is not None:
         if old_selected_fare_rule is not None:
-            print("___________________",old_selected_fare_rule)
-            database["fare_rules"].update_one({"_id": old_selected_fare_rule["_id"]}, { "$set": { "selected": False } })
-        return new_selected_fare_rule
+            database["fare_rules"].update_one(
+                {"_id": old_selected_fare_rule["_id"]}, {"$set": {"selected": False}}
+            )
+        return database["fare_rules"].find_one({"_id": id})
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"Fare rulw with ID {id} not found"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Fare rulw with ID {id} not found",
     )

@@ -1,6 +1,5 @@
 import uuid
 from pydantic import BaseModel, Field
-import datetime
 from pymongo import MongoClient
 from typing import Optional
 import geopy.distance
@@ -11,6 +10,7 @@ from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
+
 
 class Trip(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
@@ -95,16 +95,17 @@ class TripUpdate(BaseModel):
         database = mongo_client.mongodb_client[DB_NAME]
 
         stage_match_driver = {"$match": {"driverId": self.driverId}}
-        stage_match_today_trips = {"$match": {
+        stage_match_today_trips = {
+            "$match": {
                 "$gte": datetime.today(),
-                "$lte": datetime.today() + datetime.timedelta(days=1)
+                "$lte": datetime.today() + timedelta(days=1),
             }
         }
         stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
         pipeline = [stage_match_driver, stage_match_today_trips, stage_trip_count]
 
         data = database["trips"].aggregate(pipeline)
-        if (data == None):
+        if data is None:
             return 0
         return list(data)[0]["count"]
 
@@ -113,16 +114,17 @@ class TripUpdate(BaseModel):
         database = mongo_client.mongodb_client[DB_NAME]
 
         stage_match_passenger = {"$match": {"passengerId": self.passengerId}}
-        stage_match_today_trips = {"$match": {
+        stage_match_today_trips = {
+            "$match": {
                 "$gte": datetime.today(),
-                "$lte": datetime.today() + datetime.timedelta(days=1)
+                "$lte": datetime.today() + timedelta(days=1),
             }
         }
         stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
         pipeline = [stage_match_passenger, stage_match_today_trips, stage_trip_count]
 
         data = database["trips"].aggregate(pipeline)
-        if (data == None):
+        if data is None:
             return 0
         return list(data)[0]["count"]
 
@@ -131,16 +133,17 @@ class TripUpdate(BaseModel):
         database = mongo_client.mongodb_client[DB_NAME]
 
         stage_match_driver = {"$match": {"driverId": self.driverId}}
-        stage_match_monthly_trips = {"$match": {
+        stage_match_monthly_trips = {
+            "$match": {
                 "$gte": datetime.today().replace(day=1),
-                "$lte": datetime.today() + relativedelta(day=31)
+                "$lte": datetime.today() + relativedelta(day=31),
             }
         }
         stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
         pipeline = [stage_match_driver, stage_match_monthly_trips, stage_trip_count]
 
         data = database["trips"].aggregate(pipeline)
-        if (data == None):
+        if data is None:
             return 0
         return list(data)[0]["count"]
 
@@ -149,16 +152,17 @@ class TripUpdate(BaseModel):
         database = mongo_client.mongodb_client[DB_NAME]
 
         stage_match_passenger = {"$match": {"passengerId": self.passengerId}}
-        stage_match_monthly_trips = {"$match": {
+        stage_match_monthly_trips = {
+            "$match": {
                 "$gte": datetime.today().replace(day=1),
-                "$lte": datetime.today() + relativedelta(day=31)
+                "$lte": datetime.today() + relativedelta(day=31),
             }
         }
         stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
         pipeline = [stage_match_passenger, stage_match_monthly_trips, stage_trip_count]
 
         data = database["trips"].aggregate(pipeline)
-        if (data == None):
+        if data is None:
             return 0
         return list(data)[0]["count"]
 
@@ -167,13 +171,13 @@ class TripUpdate(BaseModel):
         database = mongo_client.mongodb_client[DB_NAME]
 
         stage_match_driver = {"$match": {"driverId": self.driverId}}
-        stage_sort_trip = {'$sort': {'start': 1}}
-        stage_first_trip = {'_id': None, 'first': {'$first': '$start'}}
+        stage_sort_trip = {"$sort": {"start": 1}}
+        stage_first_trip = {"_id": None, "first": {"$first": "$start"}}
 
         pipeline = [stage_match_driver, stage_sort_trip, stage_first_trip]
 
         data = database["trips"].aggregate(pipeline)
-        if (data == None):
+        if data is None:
             return None
         return list(data)
 
@@ -182,12 +186,12 @@ class TripUpdate(BaseModel):
         database = mongo_client.mongodb_client[DB_NAME]
 
         stage_match_passenger = {"$match": {"passengerId": self.passengerId}}
-        stage_sort_trip = {'$sort': {'start': 1}}
-        stage_first_trip = {'_id': None, 'first': {'$first': '$start'}}
+        stage_sort_trip = {"$sort": {"start": 1}}
+        stage_first_trip = {"_id": None, "first": {"$first": "$start"}}
 
-        pipeline = [stage_match_driver, stage_sort_trip, stage_first_trip]
+        pipeline = [stage_match_passenger, stage_sort_trip, stage_first_trip]
 
         data = database["trips"].aggregate(pipeline)
-        if (data == None):
+        if data is None:
             return None
         return list(data)

@@ -5,8 +5,6 @@ from os import environ
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-from os import environ
-
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 router = APIRouter()
