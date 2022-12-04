@@ -14,7 +14,16 @@ mongo_client = MongoClient(MONGODB_URL, connect=False)
 database = mongo_client.mongodb_client[DB_NAME]
 
 def get_pending_payments():
-    pending_payments = database["payments"].find({"processedAt": None})
+    processing_date = datetime.datetime.now() - datetime.timedelta(seconds=20)
+    # Traigo los payments que no se hayan procesado y que no se estén procesando
+    # o bien se hayan colgado procesando
+    pending_payments = database["payments"].find({"$and": [
+        { "processedAt": None },
+        {"$or": [
+            { "startedProcessing": None },
+            { "startedProcessing": {"$lte": processing_date}}
+        ]}
+    ]})
     return list(pending_payments)
 
 def create_payment(payment: Payment):
