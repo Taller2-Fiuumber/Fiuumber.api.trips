@@ -7,7 +7,6 @@ from dateutil.relativedelta import relativedelta
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
-
 router = APIRouter()
 
 # Duration----------------------------------------------------------------------
