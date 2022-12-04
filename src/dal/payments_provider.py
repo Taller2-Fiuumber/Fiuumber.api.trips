@@ -41,7 +41,7 @@ def create_payment(payment: Payment):
 
 def get_all_payments():
     try:
-        database["payments"].delete_many({})
+        # database["payments"].delete_many({})
         payments = database["payments"].find()
         return list(payments)
     except Exception as ex:
@@ -57,6 +57,7 @@ def mark_payment_as_processing(id: str):
     except Exception as ex:
         print("[ERROR] Error in mark_payment_as_processing: " + str(ex))
         raise ex
+
 
 def mark_payment_as_processed(id: str, hash: str):
     try:
