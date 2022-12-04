@@ -3,6 +3,7 @@ from pymongo import MongoClient
 
 import src.dal.payments_provider as payments_provider
 from src.domain.payment import Payment
+from src.utils.payments_processor import process_payment
 
 router = APIRouter()
 
@@ -10,11 +11,17 @@ router = APIRouter()
     "/process",
     response_description="Process all pending payments for trips",
 )
-def process(request: Request):
+def process():
     try:
         pending_payments = payments_provider.get_pending_payments()
         for payment in pending_payments:
-            print(payment)
+            try:
+                print("[INFO] processing payment: " + payment["_id"])
+                payments_provider.mark_payment_as_processing(payment["_id"])
+                hash = process_payment(payment)
+                payments_provider.mark_payment_as_processed(payment["_id"], hash)
+            except Exception as ex:
+                continue
         return pending_payments
     except Exception as ex:
         raise HTTPException(
@@ -23,7 +30,7 @@ def process(request: Request):
 
 # TODO: eliminar este endpoint, no debería exponerse
 @router.post(
-    "/",
+    "",
     response_description="Creates a new payment",
 )
 def create(payment: Payment = Body(...)):
@@ -36,13 +43,12 @@ def create(payment: Payment = Body(...)):
 
 
 @router.get(
-    "/",
+    "",
     response_description="Get all payments",
 )
 def get():
     try:
         payments = payments_provider.get_all_payments()
-        print(payments)
         return payments
     except Exception as ex:
         raise HTTPException(
