@@ -4,7 +4,6 @@ from src.domain.fare_calculator import lineal
 
 router = APIRouter()
 
-
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     try:

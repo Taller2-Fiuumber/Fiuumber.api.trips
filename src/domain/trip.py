@@ -3,9 +3,15 @@ from pydantic import BaseModel, Field
 import datetime
 from pymongo import MongoClient
 from typing import Optional
+import geopy.distance
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
+from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
+
 class Trip(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     passengerId: str = Field(...)
@@ -14,8 +20,8 @@ class Trip(BaseModel):
     from_longitude: float = Field(...)
     to_latitude: float = Field(...)
     to_longitude: float = Field(...)
-    start: Optional[datetime.datetime] = None
-    finish: Optional[datetime.datetime] = None
+    start: Optional[datetime] = None
+    finish: Optional[datetime] = None
     subscription: str = Field(...)
     status: str = Field(...)
     finalPrice: float = Field(...)
@@ -49,8 +55,8 @@ class TripUpdate(BaseModel):
     from_longitude: float = Field(...)
     to_latitude: float = Field(...)
     to_longitude: float = Field(...)
-    start: Optional[datetime.datetime] = None
-    finish: Optional[datetime.datetime] = None
+    start: Optional[datetime] = None
+    finish: Optional[datetime] = None
     subscription: str = Field(...)
     status: str = Field(...)
     finalPrice: float = Field(...)
@@ -76,54 +82,112 @@ class TripUpdate(BaseModel):
         }
         orm_mode = True
 
-    def get_driver_trips_in_day(self):
+    def duration(self):
+        return self.end - self.start
+
+    def distance_in_km(self):
+        coords_1 = (self.to_latitude, self.to_longitude)
+        coords_2 = (self.from_latitude, self.from_longitude)
+        return geopy.distance.geodesic(coords_1, coords_2).km
+
+    def daily_trip_amount_driver(self):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
-        stage_group_year = {
-            "$group": {
-                    "_id": "$year",
-                    # Count the number of movies in the group:
-                    "movie_count": { "$sum": 1 },
+
+        stage_match_driver = {"$match": {"driverId": self.driverId}}
+        stage_match_today_trips = {"$match": {
+                "$gte": datetime.today(),
+                "$lte": datetime.today() + datetime.timedelta(days=1)
             }
         }
+        stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+        pipeline = [stage_match_driver, stage_match_today_trips, stage_trip_count]
 
-        trips = database["trips"].findall({"driverId": self.driverId, "start": datetime.datetime.today()})
-        if (trips == None):
+        data = database["trips"].aggregate(pipeline)
+        if (data == None):
             return 0
-        return len(trips)
+        return list(data)[0]["count"]
 
-    def get_driver_trips_in_month(self):
+    def daily_trip_amount_passenger(self):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
-        trips = database["trips"].findall({"driverId": self.driverId, "start": datetime.datetime.today()})
-        if (trips == None):
-            return 0
-        return len(trips)
 
-    def get_passenger_trips_in_day(self):
+        stage_match_passenger = {"$match": {"passengerId": self.passengerId}}
+        stage_match_today_trips = {"$match": {
+                "$gte": datetime.today(),
+                "$lte": datetime.today() + datetime.timedelta(days=1)
+            }
+        }
+        stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+        pipeline = [stage_match_passenger, stage_match_today_trips, stage_trip_count]
+
+        data = database["trips"].aggregate(pipeline)
+        if (data == None):
+            return 0
+        return list(data)[0]["count"]
+
+    def monthly_trip_amount_driver(self):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
-        trips = database["trips"].findall({"passengerId": self.passengerId, "start": datetime.datetime.today()})
-        if (trips == None):
-            return 0
-        return len(trips)
 
-    def get_passenger_trips_in_month(self):
+        stage_match_driver = {"$match": {"driverId": self.driverId}}
+        stage_match_monthly_trips = {"$match": {
+                "$gte": datetime.today().replace(day=1),
+                "$lte": datetime.today() + relativedelta(day=31)
+            }
+        }
+        stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+        pipeline = [stage_match_driver, stage_match_monthly_trips, stage_trip_count]
+
+        data = database["trips"].aggregate(pipeline)
+        if (data == None):
+            return 0
+        return list(data)[0]["count"]
+
+    def monthly_trip_amount_passenger(self):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
-        trips = database["trips"].findall({"passengerId": self.passengerId, "start": datetime.datetime.today()})
-        if (trips == None):
+
+        stage_match_passenger = {"$match": {"passengerId": self.passengerId}}
+        stage_match_monthly_trips = {"$match": {
+                "$gte": datetime.today().replace(day=1),
+                "$lte": datetime.today() + relativedelta(day=31)
+            }
+        }
+        stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+        pipeline = [stage_match_passenger, stage_match_monthly_trips, stage_trip_count]
+
+        data = database["trips"].aggregate(pipeline)
+        if (data == None):
             return 0
-        return len(trips)
+        return list(data)[0]["count"]
 
     def get_driver_seniority(self):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
-        pipeline = [
-            {"$unwind": "$tags"},
-            {"$group": {"driverId": "$tags", "min": {"$sum": 1}}},
-        ]
-        trips = database["trips"].find({"driverId": self.driverId}).aggregate(pipeline)
-        if (trips == None):
-            return 0
-        return len(trips)
+
+        stage_match_driver = {"$match": {"driverId": self.driverId}}
+        stage_sort_trip = {'$sort': {'start': 1}}
+        stage_first_trip = {'_id': None, 'first': {'$first': '$start'}}
+
+        pipeline = [stage_match_driver, stage_sort_trip, stage_first_trip]
+
+        data = database["trips"].aggregate(pipeline)
+        if (data == None):
+            return None
+        return list(data)
+
+    def get_passenger_seniority(self):
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+        database = mongo_client.mongodb_client[DB_NAME]
+
+        stage_match_passenger = {"$match": {"passengerId": self.passengerId}}
+        stage_sort_trip = {'$sort': {'start': 1}}
+        stage_first_trip = {'_id': None, 'first': {'$first': '$start'}}
+
+        pipeline = [stage_match_driver, stage_sort_trip, stage_first_trip]
+
+        data = database["trips"].aggregate(pipeline)
+        if (data == None):
+            return None
+        return list(data)

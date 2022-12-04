@@ -43,6 +43,7 @@ EXPOSE 8125/udp 8126/tcp
 RUN apt-get update && apt-get -y --force-yes install --reinstall datadog-agent
 
 # Build dependencies
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 CMD ["bash", "./scripts/entrypoint.sh"]
