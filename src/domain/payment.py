@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 import datetime
 from typing import Optional
 
+
 class Payment(BaseModel):
 
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
@@ -13,7 +14,9 @@ class Payment(BaseModel):
     startedProcessing: datetime.datetime = None
     ammount: float = Field(...)
     tx_hash: str = None
-    wallet_address: str = Field(...) # Segun el campo type, puede ser la de origen o la de destino
+    wallet_address: str = Field(
+        ...
+    )  # Segun el campo type, puede ser la de origen o la de destino
     type: str = Field(...)
     order: Optional[int] = Field(...)
 
