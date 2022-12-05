@@ -1,6 +1,8 @@
 import requests
 
 from src.domain.payment import Payment
+import src.dal.trips_provider as trips_provider
+import src.dal.payments_provider as payments_provider
 
 URL_USERS = "https://fiuumber-api-users.herokuapp.com/api/users-service"
 URL_PAYMENTS = "https://fiuumber-api-payments.herokuapp.com/api/wallets-service"
@@ -24,6 +26,8 @@ def process_payment(payment):
         hash = None
         if (payment["type"] == "FROM_SENDER"):
             hash = deposit_from_sender(payment["wallet_address"], payment["ammount"])
+            if (payment["tripId"] is not None):
+                create_to_receiver_payment(payment["tripId"])
 
         if (payment["type"] == "TO_RECEIVER"):
             # TODO: descontar comisión de Fiuumber ;)
@@ -40,9 +44,9 @@ def deposit_from_sender(sender_address, ammount):
     if (ammount > MAX_ETH_TEST): raise Exception("ETH value provided is too large for testing purposes")
     try:
         url = f'{URL_PAYMENTS}/depositFromSender'
-        req_body = {'senderAddress': sender_address, 'amountInEthers': '{:f}'.format(ammount)}
-        
-        print(f'[INFO] deposit_from_sender {url} -> ETH: {ammount} sender: {sender_address}')
+        formatted_ammount = '{:f}'.format(ammount)
+        req_body = {'senderAddress': sender_address, 'amountInEthers': formatted_ammount}
+        print(f'[INFO] deposit_from_sender {url} -> ETH: {formatted_ammount} sender: {sender_address}')
 
         r = requests.post(url, json=req_body)
 
@@ -60,10 +64,11 @@ def deposit_from_sender(sender_address, ammount):
 def deposit_to_receiver(receiver_address, ammount):
     if (ammount > MAX_ETH_TEST): raise Exception("ETH value provided is too large for testing purposes")
     try:
-        url = format("{URL_PAYMENTS}/depositToReceiver", URL_PAYMENTS)
-        req_body = {'receiverAddress': receiver_address, 'amountInEthers': '{:f}'.format(ammount)}
+        url = f'{URL_PAYMENTS}/depositToReceiver'
+        formatted_ammount = '{:f}'.format(ammount)
+        req_body = {'receiverAddress': receiver_address, 'amountInEthers': formatted_ammount}
 
-        print(f'[INFO] deposit_from_sender {url} -> ETH: {ammount} sender: {receiver_address}')
+        print(f'[INFO] deposit_from_sender {url} -> ETH: {formatted_ammount} sender: {receiver_address}')
 
         r = requests.post(url, json=req_body)
 
@@ -75,3 +80,41 @@ def deposit_to_receiver(receiver_address, ammount):
     except Exception as ex:
         print("[ERROR] Error in deposit_to_receiver: " + str(ex))
         raise ex
+
+def get_user_wallet(user_id):
+    try:
+        url = f'{URL_USERS}/user/{user_id}'
+
+        r = requests.get(url)
+
+        if (r.status_code != 200): raise Exception(r.json())
+
+        user = r.json()
+        
+        return user["walletAddress"]
+    except Exception as ex:
+        print("[ERROR] Error in get_user_wallet: " + str(ex))
+        raise ex
+
+def create_trip_payments(trip_id):
+    
+    try:
+        trip = trips_provider.get_trip_by_id(trip_id)
+        wallet_passenger = get_user_wallet(trip["passengerId"])
+        wallet_driver = get_user_wallet(trip["driverId"])
+        passenger_payment = create_payment(trip["_id"], "FROM_SENDER", trip["finalPrice"], wallet_passenger, 1)
+        driver_payment = create_payment(trip["_id"], "TO_RECEIVER", trip["finalPrice"], wallet_driver, 2)
+        return (passenger_payment, driver_payment)
+    except Exception as ex:
+        print("[ERROR] Error in create_trip_payments: " + str(ex))
+        raise ex
+
+def create_payment(trip_id, type, ammount, wallet_address, order):
+    payment = Payment.parse_obj({
+        "tripId": trip_id,
+        "type": type,
+        "ammount": ammount,
+        "wallet_address": wallet_address,
+        "order": order
+    })
+    return payments_provider.create_payment(payment)

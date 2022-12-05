@@ -30,6 +30,13 @@ def create_payment(payment: Payment):
     if (payment.ammount > MAX_ETH_TEST): raise Exception("ETH value provided is too large for testing purposes")
     try:
         payment = jsonable_encoder(payment)
+
+        existing_payment = database["payments"].find_one(
+            {"$and": [{"tripId": payment["tripId"]}, {"type": payment["type"]}]}
+        )
+
+        if (existing_payment is not None): raise Exception(f'Cannot create another {payment["type"]} payment for this trip')
+
         new_payment = database["payments"].insert_one(payment)
         created_payment = database["payments"].find_one(
             {"_id": new_payment.inserted_id}
@@ -37,6 +44,23 @@ def create_payment(payment: Payment):
         return created_payment
     except Exception as ex:
         print("[ERROR] Error in create_payment: " + str(ex))
+        raise ex
+
+def get_incomplete_payments():
+    try:
+        payments = database["payments"].aggregate([{
+            '$group': {
+                '_id': {'tripId': '$tripId'}, 
+                'count': {'$sum': 1}, 
+                'data': {'$addToSet': '$$ROOT'}},
+            }, 
+            {
+            '$match': {
+                'count': {'$eq': 1}
+            }}])
+        return list(payments)
+    except Exception as ex:
+        print("[ERROR] Error in get_all_payments: " + str(ex))
         raise ex
 
 def get_all_payments():
@@ -57,7 +81,6 @@ def mark_payment_as_processing(id: str):
     except Exception as ex:
         print("[ERROR] Error in mark_payment_as_processing: " + str(ex))
         raise ex
-
 
 def mark_payment_as_processed(id: str, hash: str):
     try:

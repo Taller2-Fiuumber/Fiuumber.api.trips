@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 import src.dal.payments_provider as payments_provider
 from src.domain.payment import Payment
-from src.utils.payments_processor import process_payment
+from src.utils.payments_processor import process_payment, create_trip_payments
 
 router = APIRouter()
 
@@ -28,25 +28,34 @@ def process():
             status_code=500, detail=f"Cannot process payments" + str(ex)
         )
 
+# @router.get(
+#     "/generate",
+#     response_description="Generate payments from proccessed",
+# )
+# def process():
+#     try:
+#         incomplete_payments = payments_provider.get_incomplete_payments()
+#         for payment in incomplete_payments:
+#             try:
+                
+#             except Exception as ex:
+#                 continue
+#         return incomplete_payments
+#     except Exception as ex:
+#         raise HTTPException(
+#             status_code=500, detail=f"Cannot process payments" + str(ex)
+#         )
+
 @router.get(
-    "/generate",
+    "/create-for-trip",
     response_description="Generate payments from proccessed",
 )
-def process():
+def create_for_trip():
     try:
-        pending_payments = payments_provider.get_pending_payments()
-        for payment in pending_payments:
-            try:
-                print("[INFO] processing payment: " + payment["_id"])
-                payments_provider.mark_payment_as_processing(payment["_id"])
-                hash = process_payment(payment)
-                payments_provider.mark_payment_as_processed(payment["_id"], hash)
-            except Exception as ex:
-                continue
-        return pending_payments
+        return create_trip_payments("15576e35-390a-478b-bd05-0572c023bdee")
     except Exception as ex:
         raise HTTPException(
-            status_code=500, detail=f"Cannot process payments" + str(ex)
+            status_code=500, detail=f"Cannot process payments: " + str(ex)
         )
 
 # TODO: eliminar este endpoint, no debería exponerse

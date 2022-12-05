@@ -4,8 +4,9 @@ import datetime
 from typing import Optional
 
 class Payment(BaseModel):
+
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    tripId: str = Field(...)
+    tripId: Optional[str] = Field(...)
     createdAt: datetime.datetime = datetime.datetime.now()
     updatedAt: datetime.datetime = datetime.datetime.now()
     processedAt: datetime.datetime = None
@@ -14,6 +15,7 @@ class Payment(BaseModel):
     tx_hash: str = None
     wallet_address: str = Field(...) # Segun el campo type, puede ser la de origen o la de destino
     type: str = Field(...)
+    order: Optional[int] = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -27,6 +29,7 @@ class Payment(BaseModel):
                 "tx_hash": "0x030d20dab0b53c123a12f2696a5c8bd23f449789d677a1571e1cdea6eacf0285",
                 "type": "FROM_SENDER",
                 "wallet_address": "",
+                "order": 1,
             }
         }
         orm_mode = True
