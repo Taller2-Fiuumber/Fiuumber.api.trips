@@ -200,6 +200,19 @@ def trips_by_passenger_id(userId: str, skip: int, limit: int, request: Request):
     )
 
 
+@router.get("/passenger/{userId}/count", response_description="Count trips by passenger id")
+def total_trips_by_passenger_id(userId: str,  request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    trips = database["trips"].find({"passengerId": userId})
+    if trips is not None:
+        return len(list(trips))
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Trips with passenger id {userId} not found",
+    )
+
+
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
 def trips_by_driver_id(userId: str, skip: int, limit: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -207,6 +220,18 @@ def trips_by_driver_id(userId: str, skip: int, limit: int, request: Request):
     trips = database["trips"].find({"driverId": userId}).skip(skip).limit(limit)
     if trips is not None:
         return list(trips)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Trips with driver id {userId} not found",
+    )
+
+@router.get("/driver/{userId}/count", response_description="Count trips by driver id")
+def total_trips_by_driver_id(userId: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    trips = database["trips"].find({"driverId": userId})
+    if trips is not None:
+        return len(list(trips))
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Trips with driver id {userId} not found",
