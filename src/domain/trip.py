@@ -1,8 +1,9 @@
 import uuid
 from pydantic import BaseModel, Field
-from pymongo import MongoClient
 from typing import Optional
 from datetime import datetime
+
+
 class Trip(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     passengerId: str = Field(...)

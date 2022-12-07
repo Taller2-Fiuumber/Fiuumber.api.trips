@@ -14,7 +14,7 @@ router = APIRouter()
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     try:
-        fare = lineal(
+        fare = fare_calculator.lineal(
             float(from_latitude),
             float(to_latitude),
             float(from_longitude),
@@ -25,8 +25,15 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
 
-@router.get("/fare/final", response_description="Get a calculated fare from coordinates")
-def get_trip_fare(passenger_id: str, driver_id: str, distance: float, duration: float):
+@router.get(
+    "/fare/final", response_description="Get a calculated fare from coordinates"
+)
+def get_trip_fare_final(
+    passenger_id: str = 2,
+    driver_id: str = 1,
+    distance: float = 12,
+    duration: float = 26,
+):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
@@ -56,7 +63,10 @@ def get_trip_fare(passenger_id: str, driver_id: str, distance: float, duration: 
             )
             return Response(content=str(fare), media_type="application/json")
         else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="There is no selected fare rule")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="There is no selected fare rule",
+            )
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 

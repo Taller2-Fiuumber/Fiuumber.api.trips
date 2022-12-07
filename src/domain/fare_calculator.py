@@ -1,5 +1,5 @@
 from math import radians, cos, sin, asin, sqrt
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from pymongo import MongoClient
@@ -9,11 +9,13 @@ from os import environ
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
+
 def calculate(from_latitude, to_latitude, from_longitude, to_longitude):
     distance_km = __distance(from_latitude, to_latitude, from_longitude, to_longitude)
     base_price = 250  # TODO add to database
     price_per_km = 40  # TODO add to database
     return round(base_price + (distance_km * price_per_km), 2)
+
 
 def calculate_final(
     minimum_fare,
@@ -49,6 +51,7 @@ def calculate_final(
         + seniorityPassenger_fare * seniorityPassenger
         + recentTripAmount_fare * recentTripAmount
     )
+
 
 def calculate_test(
     minimum_fare,
@@ -116,30 +119,32 @@ def __distance(lat1, lat2, lon1, lon2):
     # calculate the result
     return c * r
 
+
 def daily_trip_amount_driver(driverId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
-    today =  datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     stage_match_driver = {"$match": {"driverId": driverId}}
-    stage_match_today_trips = {"$match": {"start":{"$gte": today}}}
+    stage_match_today_trips = {"$match": {"start": {"$gte": today}}}
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
     pipeline = [stage_match_driver, stage_match_today_trips, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
     if data is None:
         return 0
-    return list(data)[0]['count']
+    return list(data)[0]["count"]
+
 
 def daily_trip_amount_passenger(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
-    today =  datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     stage_match_passenger = {"$match": {"passengerId": passengerId}}
-    stage_match_today_trips = {"$match": {"start":{"$gte": today}}}
+    stage_match_today_trips = {"$match": {"start": {"$gte": today}}}
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
     pipeline = [stage_match_passenger, stage_match_today_trips, stage_trip_count]
 
@@ -148,6 +153,7 @@ def daily_trip_amount_passenger(passengerId):
         return 0
     return list(data)[0]["count"]
 
+
 def monthly_trip_amount_driver(driverId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -155,10 +161,14 @@ def monthly_trip_amount_driver(driverId):
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     stage_match_driver = {"$match": {"driverId": driverId}}
-    stage_match_monthly_trips = {"$match": {"start":{
-        "$gte": today.replace(day=1),
-        "$lte": today + relativedelta(day=31),
-    }}}
+    stage_match_monthly_trips = {
+        "$match": {
+            "start": {
+                "$gte": today.replace(day=1),
+                "$lte": today + relativedelta(day=31),
+            }
+        }
+    }
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
     pipeline = [stage_match_driver, stage_match_monthly_trips, stage_trip_count]
 
@@ -167,6 +177,7 @@ def monthly_trip_amount_driver(driverId):
         return 0
     return list(data)[0]["count"]
 
+
 def monthly_trip_amount_passenger(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
@@ -174,10 +185,14 @@ def monthly_trip_amount_passenger(passengerId):
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     stage_match_passenger = {"$match": {"passengerId": passengerId}}
-    stage_match_monthly_trips = {"$match": {"start":{
-        "$gte": today.replace(day=1),
-        "$lte": today + relativedelta(day=31),
-    }}}
+    stage_match_monthly_trips = {
+        "$match": {
+            "start": {
+                "$gte": today.replace(day=1),
+                "$lte": today + relativedelta(day=31),
+            }
+        }
+    }
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
     pipeline = [stage_match_passenger, stage_match_monthly_trips, stage_trip_count]
 
@@ -185,6 +200,7 @@ def monthly_trip_amount_passenger(passengerId):
     if data is None:
         return 0
     return list(data)[0]["count"]
+
 
 def get_driver_seniority(driverId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -199,10 +215,13 @@ def get_driver_seniority(driverId):
     if data is None:
         return None
     for d in list(data):
-        if d["start"] != None:
+        if d["start"] is not None:
             today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-            return (today-datetime.strptime(d["start"], '%Y-%m-%dT%H:%M:%S')).total_seconds()/60
+            return (
+                today - datetime.strptime(d["start"], "%Y-%m-%dT%H:%M:%S")
+            ).total_seconds() / 60
     return 0
+
 
 def get_passenger_seniority(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -217,9 +236,11 @@ def get_passenger_seniority(passengerId):
     if data is None:
         return None
     for d in list(data):
-        if d["start"] != None:
+        if d["start"] is not None:
             today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-            return (today-datetime.strptime(d["start"], '%Y-%m-%dT%H:%M:%S')).total_seconds()/60
+            return (
+                today - datetime.strptime(d["start"], "%Y-%m-%dT%H:%M:%S")
+            ).total_seconds() / 60
     return 0
 
 
@@ -230,9 +251,13 @@ def get_recent_trip_amount(passengerId):
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     stage_match_passenger = {"$match": {"passengerId": passengerId}}
-    stage_match_monthly_trips = {"$match": {"start":{
-        "$gte": today - relativedelta(day=7),
-    }}}
+    stage_match_monthly_trips = {
+        "$match": {
+            "start": {
+                "$gte": today - relativedelta(day=7),
+            }
+        }
+    }
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
     pipeline = [stage_match_passenger, stage_match_monthly_trips, stage_trip_count]
 
