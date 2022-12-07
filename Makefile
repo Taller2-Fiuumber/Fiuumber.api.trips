@@ -14,6 +14,10 @@ format:
 	pip install flake8 --quiet
 	flake8
 
+coverage:
+	pip install coverage --quiet
+	python -m coverage report --fail-under=75
+
 start-services:
 	docker-compose up --build --force-recreate -d
 
