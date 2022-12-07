@@ -58,7 +58,7 @@ def find_trip_by_id(id: str, request: Request):
 @router.get(
     "/trip/{id}/duration", response_description="Get duration in minutes of trip by id"
 )
-def _duration_by_id(id: str, request: Request):
+def duration_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
     trip = database["trips"].find_one({"_id": id})
@@ -186,3 +186,29 @@ def assign_driver(id: str, request: Request, body=Body(...)):
         raise HTTPException(
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
+
+
+@router.get("/passenger/{userId}", response_description="Get trips by passenger id")
+def trips_by_passenger_id(userId: str, skip: int, limit: int, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    trips = database["trips"].find({"passengerId": userId}).skip(skip).limit(limit)
+    if trips is not None:
+        return list(trips)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Trips with passenger id {userId} not found",
+    )
+
+
+@router.get("/driver/{userId}", response_description="Get trips by driver id")
+def trips_by_driver_id(userId: str, skip: int, limit: int, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+    trips = database["trips"].find({"driverId": userId}).skip(skip).limit(limit)
+    if trips is not None:
+        return list(trips)
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Trips with driver id {userId} not found",
+    )
