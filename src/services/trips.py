@@ -188,9 +188,7 @@ def assign_driver(id: str, request: Request, body=Body(...)):
         )
 
 
-@router.get(
-    "/passenger/{userId}", response_description="Get trips by passenger id"
-)
+@router.get("/passenger/{userId}", response_description="Get trips by passenger id")
 def trips_by_passenger_id(userId: str, skip: int, limit: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
