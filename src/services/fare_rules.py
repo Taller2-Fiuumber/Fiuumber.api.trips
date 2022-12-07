@@ -12,6 +12,21 @@ DB_NAME = environ["DB_NAME"]
 router = APIRouter()
 
 
+@router.get("/fare-rule/selected", response_description="Get selected fare")
+def get_selected_fare(request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    selected_rule = database["fare_rules"].find_one({"selected": True})
+
+    if selected_rule is not None:
+        return selected_rule
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="No fare rule is selected",
+    )
+
+
 @router.post(
     "/fare-rule",
     response_description="Create a fare rule",
@@ -52,7 +67,7 @@ def find_fare_rules_by_id(id: str, request: Request):
         return fare_rule
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Fare rulw with ID {id} not found",
+        detail=f"Fare rule with ID {id} not found",
     )
 
 
@@ -74,5 +89,5 @@ def select_a_fare_rule(id: str, request: Request):
         return database["fare_rules"].find_one({"_id": id})
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Fare rulw with ID {id} not found",
+        detail=f"Fare rule with ID {id} not found",
     )

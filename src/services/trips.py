@@ -144,7 +144,6 @@ def find_trip_status(id: str, request: Request):
 
 @router.patch("/trip/{id}")
 async def patch_item(id: str, body=Body(...)):
-    print(id)
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
     stored_trip = database["trips"].find_one({"_id": id})
