@@ -147,7 +147,7 @@ def create_payment(trip_id, type, ammount, wallet_address, order):
         {
             "tripId": trip_id,
             "type": type,
-            "ammount": 0.00000001,
+            "ammount": ammount,
             "wallet_address": wallet_address,
             "order": order,
         }

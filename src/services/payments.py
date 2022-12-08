@@ -64,7 +64,6 @@ def create_for_trip(params: TripId = Body(...)):
 )
 def create(payment: Payment = Body(...)):
     try:
-        print(payment.wallet_address)
         return payments_provider.create_payment(payment)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"Cannot create payment: {str(ex)}")
