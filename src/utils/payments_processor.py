@@ -119,13 +119,16 @@ def create_trip_payments(trip_id):
 
     try:
         trip = trips_provider.get_trip_by_id(trip_id)
-        if (trip is None):  raise Exception(f"Trip with id={trip_id} was not found")
+        if trip is None:
+            raise Exception(f"Trip with id={trip_id} was not found")
 
         wallet_passenger = get_user_wallet(trip["passengerId"])
-        if (trip is None):  raise Exception(f"Passenger has not a wallet")
+        if trip is None:
+            raise Exception("Passenger has not a wallet")
 
         wallet_driver = get_user_wallet(trip["driverId"])
-        if (trip is None):  raise Exception(f"Driver has not a wallet")
+        if trip is None:
+            raise Exception("Driver has not a wallet")
 
         passenger_payment = create_payment(
             trip["_id"], "FROM_SENDER", trip["finalPrice"], wallet_passenger, 1

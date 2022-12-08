@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 class TripId(BaseModel):
     trip_id: str = Field(...)
+
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
@@ -17,6 +18,7 @@ class TripId(BaseModel):
             }
         }
         orm_mode = True
+
 
 router = APIRouter()
 
@@ -40,6 +42,7 @@ def process():
     except Exception as ex:
         detail = f"Cannot process payments: {str(ex)}"
         raise HTTPException(status_code=500, detail=detail)
+
 
 @router.post(
     "/create-for-trip",

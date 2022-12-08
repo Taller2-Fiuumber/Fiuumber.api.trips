@@ -34,13 +34,13 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
         status = body.get("status")
-        
+
         database["trips"].update_one(
             {"_id": id},
             {"$set": {"status": status}},
         )
 
-        if (status == "TERMINATED"):
+        if status == "TERMINATED":
             create_trip_payments(id)
 
         stored_trip = database["trips"].find_one({"_id": id})
