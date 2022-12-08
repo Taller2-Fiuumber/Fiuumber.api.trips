@@ -4,6 +4,20 @@ import src.dal.payments_provider as payments_provider
 from src.domain.payment import Payment
 from src.utils.payments_processor import process_payment, create_trip_payments
 
+from pydantic import BaseModel, Field
+
+
+class TripId(BaseModel):
+    trip_id: str = Field(...)
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "trip_id": "15576e35-390a-478b-bd05-0572c023bdee",
+            }
+        }
+        orm_mode = True
+
 router = APIRouter()
 
 
@@ -27,36 +41,16 @@ def process():
         detail = f"Cannot process payments: {str(ex)}"
         raise HTTPException(status_code=500, detail=detail)
 
-
-# @router.get(
-#     "/generate",
-#     response_description="Generate payments from proccessed",
-# )
-# def process():
-#     try:
-#         incomplete_payments = payments_provider.get_incomplete_payments()
-#         for payment in incomplete_payments:
-#             try:
-
-#             except Exception as ex:
-#                 continue
-#         return incomplete_payments
-#     except Exception as ex:
-#         raise HTTPException(
-#             status_code=500, detail=f"Cannot process payments" + str(ex)
-#         )
-
-
-@router.get(
+@router.post(
     "/create-for-trip",
-    response_description="Generate payments from proccessed",
+    response_description="Generate payments from proccessed trip",
 )
-def create_for_trip():
+def create_for_trip(params: TripId = Body(...)):
     try:
-        return create_trip_payments("15576e35-390a-478b-bd05-0572c023bdee")
+        return create_trip_payments(params.trip_id)
     except Exception as ex:
         raise HTTPException(
-            status_code=500, detail=f"Cannot process payments: {str(ex)}"
+            status_code=500, detail=f"Cannot create payments for trip: {str(ex)}"
         )
 
 
@@ -67,6 +61,7 @@ def create_for_trip():
 )
 def create(payment: Payment = Body(...)):
     try:
+        print(payment.wallet_address)
         return payments_provider.create_payment(payment)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"Cannot create payment: {str(ex)}")
@@ -78,7 +73,6 @@ def create(payment: Payment = Body(...)):
 )
 def get():
     try:
-        payments = payments_provider.get_all_payments()
-        return payments
+        return payments_provider.get_all_payments()
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=f"Cannot get payments{ str(ex)}")
+        raise HTTPException(status_code=500, detail=f"Cannot get payments: {str(ex)}")

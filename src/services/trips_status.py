@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
 
+from src.utils.payments_processor import create_trip_payments
+
 import src.domain.status as trip_status
 import datetime
 
@@ -31,11 +33,15 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         database = mongo_client.mongodb_client[DB_NAME]
-
+        status = body.get("status")
+        
         database["trips"].update_one(
             {"_id": id},
-            {"$set": {"status": body.get("status")}},
+            {"$set": {"status": status}},
         )
+
+        if (status == "TERMINATED"):
+            create_trip_payments(id)
 
         stored_trip = database["trips"].find_one({"_id": id})
 

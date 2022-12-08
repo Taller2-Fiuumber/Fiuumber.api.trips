@@ -6,7 +6,7 @@ import src.dal.payments_provider as payments_provider
 
 URL_USERS = "https://fiuumber-api-users.herokuapp.com/api/users-service"
 URL_PAYMENTS = "https://fiuumber-api-payments.herokuapp.com/api/wallets-service"
-MAX_ETH_TEST = 0.00000001
+MAX_ETH_TEST = 0.00005
 HEADERS = {"Content-type": "application/json", "Accept": "application/json"}
 
 
@@ -46,7 +46,7 @@ def deposit_from_sender(sender_address, ammount):
         raise Exception("ETH value provided is too large for testing purposes")
     try:
         url = f"{URL_PAYMENTS}/depositFromSender"
-        formatted_ammount = "{:f}".format(ammount)
+        formatted_ammount = "{:.10f}".format(ammount)
         req_body = {
             "senderAddress": sender_address,
             "amountInEthers": formatted_ammount,
@@ -75,7 +75,7 @@ def deposit_to_receiver(receiver_address, ammount):
         raise Exception("ETH value provided is too large for testing purposes")
     try:
         url = f"{URL_PAYMENTS}/depositToReceiver"
-        formatted_ammount = "{:f}".format(ammount)
+        formatted_ammount = "{:.10f}".format(ammount)
         req_body = {
             "receiverAddress": receiver_address,
             "amountInEthers": formatted_ammount,
@@ -119,8 +119,14 @@ def create_trip_payments(trip_id):
 
     try:
         trip = trips_provider.get_trip_by_id(trip_id)
+        if (trip is None):  raise Exception(f"Trip with id={trip_id} was not found")
+
         wallet_passenger = get_user_wallet(trip["passengerId"])
+        if (trip is None):  raise Exception(f"Passenger has not a wallet")
+
         wallet_driver = get_user_wallet(trip["driverId"])
+        if (trip is None):  raise Exception(f"Driver has not a wallet")
+
         passenger_payment = create_payment(
             trip["_id"], "FROM_SENDER", trip["finalPrice"], wallet_passenger, 1
         )
@@ -138,7 +144,7 @@ def create_payment(trip_id, type, ammount, wallet_address, order):
         {
             "tripId": trip_id,
             "type": type,
-            "ammount": ammount,
+            "ammount": 0.00000001,
             "wallet_address": wallet_address,
             "order": order,
         }

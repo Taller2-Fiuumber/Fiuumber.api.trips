@@ -7,7 +7,7 @@ from src.domain.payment import Payment
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
-MAX_ETH_TEST = 0.00000001
+MAX_ETH_TEST = 0.00005
 
 mongo_client = MongoClient(MONGODB_URL, connect=False)
 database = mongo_client.mongodb_client[DB_NAME]
@@ -43,7 +43,7 @@ def create_payment(payment: Payment):
             {"$and": [{"tripId": payment["tripId"]}, {"type": payment["type"]}]}
         )
 
-        if existing_payment is not None:
+        if payment["tripId"] is not None and existing_payment is not None:
             raise Exception(
                 f'Cannot create another {payment["type"]} payment for this trip'
             )

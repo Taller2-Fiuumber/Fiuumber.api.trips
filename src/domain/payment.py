@@ -7,7 +7,7 @@ from typing import Optional
 class Payment(BaseModel):
 
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
-    tripId: Optional[str] = Field(...)
+    tripId: Optional[str] = None
     createdAt: datetime.datetime = datetime.datetime.now()
     updatedAt: datetime.datetime = datetime.datetime.now()
     processedAt: datetime.datetime = None
@@ -39,7 +39,7 @@ class Payment(BaseModel):
 
 
 class PaymentUpdate(BaseModel):
-    tripId: str = Field(...)
+    tripId: Optional[str] = Field(...)
     createdAt: datetime.datetime = datetime.datetime.now()
     updatedAt: datetime.datetime = datetime.datetime.now()
     processedAt: datetime.datetime = None
