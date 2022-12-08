@@ -1,7 +1,7 @@
 import uuid
 from pydantic import BaseModel, Field
-import datetime
 from typing import Optional
+from datetime import datetime
 
 
 class Trip(BaseModel):
@@ -12,8 +12,8 @@ class Trip(BaseModel):
     from_longitude: float = Field(...)
     to_latitude: float = Field(...)
     to_longitude: float = Field(...)
-    start: Optional[datetime.datetime] = None
-    finish: Optional[datetime.datetime] = None
+    start: Optional[datetime] = None
+    finish: Optional[datetime] = None
     subscription: str = Field(...)
     status: str = Field(...)
     finalPrice: float = Field(...)
@@ -24,8 +24,8 @@ class Trip(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "passengerId": "066de609-b04a-4b30-b46c-32537c7f1f6e",
-                "driverId": "2320930329-b04a-4b30-b46c-fsdfwefwefw",
+                "passengerId": "12",
+                "driverId": "27",
                 "from_latitude": -34.603683,
                 "from_longitude": -58.381557,
                 "to_latitude": -34.6175841,
@@ -47,8 +47,8 @@ class TripUpdate(BaseModel):
     from_longitude: float = Field(...)
     to_latitude: float = Field(...)
     to_longitude: float = Field(...)
-    start: Optional[datetime.datetime] = None
-    finish: Optional[datetime.datetime] = None
+    start: Optional[datetime] = None
+    finish: Optional[datetime] = None
     subscription: str = Field(...)
     status: str = Field(...)
     finalPrice: float = Field(...)
@@ -58,8 +58,8 @@ class TripUpdate(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "passengerId": "066de609-b04a-4b30-b46c-32537c7f1f6e",
-                "driverId": "2320930329-b04a-4b30-b46c-fsdfwefwefw",
+                "passengerId": "12",
+                "driverId": "27",
                 "from_latitude": -34.603683,
                 "from_longitude": -58.381557,
                 "to_latitude": -34.6175841,

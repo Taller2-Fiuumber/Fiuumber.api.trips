@@ -7,7 +7,6 @@ from dateutil.relativedelta import relativedelta
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
-
 router = APIRouter()
 
 # Duration----------------------------------------------------------------------
@@ -229,9 +228,56 @@ def count_trips_by_status(status: str, request: Request):
     pipeline = [stage_match_terminated_status, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
-    if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail="Internal error")
+
+    try:
+        if data is not None:
+            return list(data)[0]["count"]
+        return 0
+    except Exception as ex:
+        print(ex)
+        return 0
+
+
+@router.get(
+    "/status/passenger/{id}/count", response_description="Count trips by status"
+)
+def count_trips_of_passenger_by_status(id: str, status: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    stage_match_terminated_status = {"$match": {"status": status, "passengerId": id}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    pipeline = [stage_match_terminated_status, stage_trip_count]
+
+    data = database["trips"].aggregate(pipeline)
+
+    try:
+        if data is not None:
+            return list(data)[0]["count"]
+        return 0
+    except Exception as ex:
+        print(ex)
+        return 0
+
+
+@router.get("/status/driver/{id}/count", response_description="Count trips by status")
+def count_trips_of_driver_by_status(id: str, status: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    database = mongo_client.mongodb_client[DB_NAME]
+
+    stage_match_terminated_status = {"$match": {"status": status, "driverId": id}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    pipeline = [stage_match_terminated_status, stage_trip_count]
+
+    data = database["trips"].aggregate(pipeline)
+
+    try:
+        if data is not None:
+            return list(data)[0]["count"]
+        return 0
+    except Exception as ex:
+        print(ex)
+        return 0
 
 
 # Count------------------------------------------------------------------------
