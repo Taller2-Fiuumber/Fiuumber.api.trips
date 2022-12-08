@@ -14,6 +14,9 @@ from src.services.fare_metrics import router as fare_metrics_router
 from src.services.calification import router as calification_router
 from src.services.calification_metrics import router as calification_metrics_router
 
+from src.services.payments import router as payments_router
+
+
 app = FastAPI()
 
 
@@ -41,3 +44,5 @@ app.include_router(
     tags=["calification metrics"],
     prefix="/api/trips/metrics/calification",
 )
+
+app.include_router(payments_router, tags=["payments"], prefix="/api/trips/payments")

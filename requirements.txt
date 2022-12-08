@@ -8,4 +8,6 @@ pymongo[snappy,gssapi,srv]
 pytest
 black
 uvicorn
+
+requests
 geopy

@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from src.domain.trip import Trip, TripUpdate
 import src.domain.status as trip_status
 
+
 from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
