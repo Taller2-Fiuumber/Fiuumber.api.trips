@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, HTTPException
 
 import src.dal.payments_provider as payments_provider
 from src.domain.payment import Payment
-from src.utils.payments_processor import process_payment, create_trip_payments
+from src.utils.payments_processor import process_payments, create_trip_payments
 
 from pydantic import BaseModel, Field
 
@@ -29,16 +29,7 @@ router = APIRouter()
 )
 def process():
     try:
-        pending_payments = payments_provider.get_pending_payments()
-        for payment in pending_payments:
-            try:
-                print("[INFO] processing payment: " + payment["_id"])
-                payments_provider.mark_payment_as_processing(payment["_id"])
-                hash = process_payment(payment)
-                payments_provider.mark_payment_as_processed(payment["_id"], hash)
-            except Exception:
-                continue
-        return pending_payments
+        return process_payments()
     except Exception as ex:
         detail = f"Cannot process payments: {str(ex)}"
         raise HTTPException(status_code=500, detail=detail)

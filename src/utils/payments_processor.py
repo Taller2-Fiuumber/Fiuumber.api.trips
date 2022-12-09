@@ -10,10 +10,32 @@ MAX_ETH_TEST = 0.00005
 HEADERS = {"Content-type": "application/json", "Accept": "application/json"}
 
 
+def process_payments():
+    try:
+        pending_payments = payments_provider.get_pending_payments()
+        for payment in pending_payments:
+            try:
+                print("[INFO] processing payment: " + payment["_id"])
+                payments_provider.mark_payment_as_processing(payment["_id"])
+                hash = process_payment(payment)
+                payments_provider.mark_payment_as_processed(payment["_id"], hash)
+            except Exception as ex:
+                print(
+                    "[INFO] error processing payment: "
+                    + payment["_id"]
+                    + ": "
+                    + str(ex)
+                )
+                continue
+
+        return pending_payments
+    except Exception as ex:
+        raise ex
+
+
 def get_wallet_address(userId):
     try:
         url = format("{URL_USERS}/user/{userId}", URL_USERS, str(userId))
-        print(url)
         r = requests.get(url)
         r_user = r.json()
         address = r_user["walletAddress"]

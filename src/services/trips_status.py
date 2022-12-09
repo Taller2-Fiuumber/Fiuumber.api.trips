@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
 
-from src.utils.payments_processor import create_trip_payments
+from src.utils.payments_processor import create_trip_payments, process_payment
 
 import src.domain.status as trip_status
 import datetime
@@ -40,8 +40,16 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             {"$set": {"status": status}},
         )
 
-        if status == "TERMINATED":
-            create_trip_payments(id)
+        if status == trip_status.Terminated().name():
+            try:
+                (passenger_payment, driver_payment) = create_trip_payments(id)
+                process_payment(passenger_payment)
+                process_payment(driver_payment)
+            except Exception as ex:
+                print(
+                    f"[ERROR -> Continue] cannot create or process payments for trip {id} reason: {str(ex)}"
+                )
+                pass
 
         stored_trip = database["trips"].find_one({"_id": id})
 
