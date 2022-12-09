@@ -199,28 +199,15 @@ def trips_by_passenger_id(
         {
             "$and": [
                 {"passengerId": userId},
-                {
-                    "$or": [
-                        {"status": "REQUESTED"},
-                        {"status": "DRIVER_ASSIGNED"},
-                        {"status": "DRIVER_ARRIVED"},
-                        {"status": "IN_PROGRESS"},
-                    ]
-                },
+                # {"status": {"$in": ["REQUESTED", "DRIVER_ASSIGNED", "DRIVER_ARRIVED", "IN_PROGRESS"]}},
+                {"status": "REQUESTED"},
             ]
         }
         if in_progress is not None
         else {"passengerId": userId}
     )
 
-    print(filters)
-    trips = (
-        database["trips"]
-        .find({"passengerId": userId})
-        .skip(skip)
-        .limit(limit)
-        .sort("start", -1)
-    )
+    trips = database["trips"].find(filters).skip(skip).limit(limit).sort("start", -1)
     if trips is not None:
         return list(trips)
     raise HTTPException(
@@ -255,12 +242,14 @@ def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = F
             "$and": [
                 {"driverId": userId},
                 {
-                    "$or": [
-                        {"status": "REQUESTED"},
-                        {"status": "DRIVER_ASSIGNED"},
-                        {"status": "DRIVER_ARRIVED"},
-                        {"status": "IN_PROGRESS"},
-                    ]
+                    "status": {
+                        "$in": [
+                            "REQUESTED",
+                            "DRIVER_ASSIGNED",
+                            "DRIVER_ARRIVED",
+                            "IN_PROGRESS",
+                        ]
+                    }
                 },
             ]
         }
