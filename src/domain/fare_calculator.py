@@ -90,15 +90,15 @@ def calculate_test(
 
 
 def lineal(from_latitude, to_latitude, from_longitude, to_longitude):
-    
+
     distance_km = __distance(from_latitude, to_latitude, from_longitude, to_longitude)
 
-    # 0.00046 = $100
-    base_price = 0.00046 # TODO add to database
+    # 0.00046 = $10
+    base_price = 0.000046  # TODO add to database
 
-    # 0.00014 = $30
-    price_per_km = 0.00014  # TODO add to database
-    return round(base_price + (distance_km * price_per_km), 2)
+    # 0.00014 = $3
+    price_per_km = 0.000014  # TODO add to database
+    return round(base_price + (distance_km * price_per_km), 6)
 
 
 def __distance(lat1, lat2, lon1, lon2):
