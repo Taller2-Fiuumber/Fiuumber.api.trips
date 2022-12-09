@@ -55,17 +55,6 @@ def find_trip_by_id(id: str, request: Request):
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
     )
 
-@router.get("/trip/{id}", response_description="Get a single trip by id")
-def find_trip_by_id(id: str, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
-
-    if (trip := database["trips"].find_one({"_id": id})) is not None:
-        return trip
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
-    )
-
 
 @router.get(
     "/trip/{id}/duration", response_description="Get duration in minutes of trip by id"
@@ -200,24 +189,38 @@ def assign_driver(id: str, request: Request, body=Body(...)):
 
 
 @router.get("/passenger/{userId}", response_description="Get trips by passenger id")
-def trips_by_passenger_id(userId: str, skip: int, limit: int, in_progress: bool = False):
+def trips_by_passenger_id(
+    userId: str, skip: int, limit: int, in_progress: bool = False
+):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
-    
-    filters = {
-        "$and": [
-            {"passengerId": userId},
-            {"$or": [
-                {"status": "REQUESTED"},
-                {"status": "DRIVER_ASSIGNED"},
-                {"status": "DRIVER_ARRIVED"},
-                {"status": "IN_PROGRESS"}
-            ]}   
-        ]
-    } if in_progress is not None else {"passengerId": userId}
-    
+
+    filters = (
+        {
+            "$and": [
+                {"passengerId": userId},
+                {
+                    "$or": [
+                        {"status": "REQUESTED"},
+                        {"status": "DRIVER_ASSIGNED"},
+                        {"status": "DRIVER_ARRIVED"},
+                        {"status": "IN_PROGRESS"},
+                    ]
+                },
+            ]
+        }
+        if in_progress is not None
+        else {"passengerId": userId}
+    )
+
     print(filters)
-    trips = database["trips"].find({"passengerId": userId}).skip(skip).limit(limit).sort("start", -1)
+    trips = (
+        database["trips"]
+        .find({"passengerId": userId})
+        .skip(skip)
+        .limit(limit)
+        .sort("start", -1)
+    )
     if trips is not None:
         return list(trips)
     raise HTTPException(
@@ -247,17 +250,23 @@ def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = F
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     database = mongo_client.mongodb_client[DB_NAME]
 
-    filters = {
-        "$and": [
-            {"driverId": userId},
-            {"$or": [
-                {"status": "REQUESTED"},
-                {"status": "DRIVER_ASSIGNED"},
-                {"status": "DRIVER_ARRIVED"},
-                {"status": "IN_PROGRESS"}
-            ]}   
-        ]
-    } if in_progress is not None else {"driverId": userId}
+    filters = (
+        {
+            "$and": [
+                {"driverId": userId},
+                {
+                    "$or": [
+                        {"status": "REQUESTED"},
+                        {"status": "DRIVER_ASSIGNED"},
+                        {"status": "DRIVER_ARRIVED"},
+                        {"status": "IN_PROGRESS"},
+                    ]
+                },
+            ]
+        }
+        if in_progress is not None
+        else {"driverId": userId}
+    )
 
     trips = database["trips"].find(filters).skip(skip).limit(limit).sort("start", -1)
     if trips is not None:
