@@ -199,14 +199,13 @@ def trips_by_passenger_id(
         {
             "$and": [
                 {"passengerId": userId},
-                # {"status": {"$in": ["REQUESTED", "DRIVER_ASSIGNED", "DRIVER_ARRIVED", "IN_PROGRESS"]}},
-                {"status": "REQUESTED"},
+                {"status": {"$in": ["REQUESTED", "DRIVER_ASSIGNED", "DRIVER_ARRIVED", "IN_PROGRESS"]}},
             ]
         }
-        if in_progress is not None
+        if in_progress
         else {"passengerId": userId}
     )
-
+    print(filters)
     trips = database["trips"].find(filters).skip(skip).limit(limit).sort("start", -1)
     if trips is not None:
         return list(trips)
@@ -253,7 +252,7 @@ def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = F
                 },
             ]
         }
-        if in_progress is not None
+        if in_progress
         else {"driverId": userId}
     )
 
