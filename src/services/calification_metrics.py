@@ -6,12 +6,7 @@ from os import environ
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
-router = APIRouter()
-
-
-@router.get("/passenger/min", response_description="Get passenger min calification")
-def get_calification_passenger_min(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_calification_passenger_min(mongo_client):
     database = mongo_client.mongodb_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
@@ -32,12 +27,10 @@ def get_calification_passenger_min(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_stars"]
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/passenger/max", response_description="Get passenger max calification")
-def get_calification_passenger_max(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_calification_passenger_max(mongo_client):
     database = mongo_client.mongodb_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
@@ -58,12 +51,10 @@ def get_calification_passenger_max(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_stars"]
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/passenger/avg", response_description="Get passenger avg calification")
-def get_calification_passenger_avg(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_calification_passenger_avg(mongo_client):
     database = mongo_client.mongodb_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
@@ -86,12 +77,10 @@ def get_calification_passenger_avg(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_stars_avg"]
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/driver/min", response_description="Get driver min calification")
-def get_calification_driver_min(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_calification_driver_min(mongo_client):
     database = mongo_client.mongodb_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
@@ -112,12 +101,10 @@ def get_calification_driver_min(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_stars"]
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/driver/max", response_description="Get driver max calification")
-def get_calification_driver_max(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_calification_driver_max(mongo_client):
     database = mongo_client.mongodb_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
@@ -138,12 +125,10 @@ def get_calification_driver_max(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_stars"]
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/driver/avg", response_description="Get driver avg calification")
-def get_calification_driver_avg(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_calification_driver_avg(mongo_client):
     database = mongo_client.mongodb_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
@@ -166,4 +151,4 @@ def get_calification_driver_avg(request: Request):
     data = database["calification"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_stars_avg"]
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
