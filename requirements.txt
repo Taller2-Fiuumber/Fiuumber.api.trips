@@ -9,3 +9,5 @@ pytest
 black
 uvicorn
 geopy
+coverage
+mongomock
