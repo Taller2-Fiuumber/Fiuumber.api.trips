@@ -1,23 +1,29 @@
 # Fiuumber.api.trips
 
-## Run app locally with docker
+## Instalación y configuración
 
-Start services:
+Start service locally for development:
+
+Create containers:
 
 ``` bash
-make start-services
+➜  docker-compose up --force-recreate -d
+
+Recreating fiuumberapitrips_database_1 ... done
+Recreating fiuumberapitrips_web_1      ... done
 ```
 
-Start FastAPI server
+Enter containers:
 
 ``` bash
-➜  Fiuumber.api.trip: make exec
-/app # python -m uvicorn main:app --reload --host 0.0.0.0 --port 8080
-INFO:     Will watch for changes in these directories: ['/app']
-INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
-INFO:     Started reloader process [25] using StatReload
-INFO:     Started server process [27]
-INFO:     Waiting for application startup.
+➜  docker exec -it fiuumberapiusers_web_1 bash
+root@95d8af8d82d6:/app#
+```
+
+Start FastAPI server:
+
+``` bash
+root@abbc8e9b0781:/app# bash ./scripts/local-entrypoint.sh
 ```
 
 See swagger
@@ -26,10 +32,20 @@ See swagger
 http://localhost:8080/docs
 ```
 
-For more info: https://www.mongodb.com/languages/python/pymongo-tutorial
-
-Stop services:
+Run tests:
 
 ``` bash
-make stop-services
+make test
+```
+
+Run format:
+
+``` bash
+make format
+```
+
+Run coverage:
+
+``` bash
+make coverage
 ```

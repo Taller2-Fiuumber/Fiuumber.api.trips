@@ -2,14 +2,14 @@ all: format test start-services exec
 
 test:
 	pip install pytest --quiet
-	pytest test
+	pytest tests
 
 format:
 	pip install black --quiet
 	black **.py
 	black src/*/*.py
-	black test/*/*.py
-	black test/*/*/*.py
+	black tests/*/*.py
+	black tests/*/*/*.py
 
 	pip install flake8 --quiet
 	flake8
