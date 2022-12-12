@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from src.controllers.calification_metrics import router as calification_metrics_router
 
-from src.services.calification import router as calification_router
+from src.controllers.calification import router as calification_router
 
 from src.controllers.fare_metrics import router as fare_metrics_router
 
