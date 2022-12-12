@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 
 from src.services.trips import router as trip_router
-from src.services.trips_metrics import router as trips_metrics_router
+from src.controllers.trips_metrics import router as trips_metrics_router
 
 from src.services.trips_status import router as trips_status_router
 
