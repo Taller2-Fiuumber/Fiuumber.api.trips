@@ -3,10 +3,13 @@ from mongomock import helpers
 from mongomock import read_concern
 from fastapi.encoders import jsonable_encoder
 from src.domain.trip import Trip
-import src.services.fare_metrics as service
+import src.services.trips_metrics as service
+from datetime import datetime, timedelta
+
 
 from os import environ
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 
 class TestTripMetrics:
@@ -25,8 +28,8 @@ class TestTripMetrics:
             "finalPrice": 500,
             "from_address": "Calle Falsa 123",
             "to_address": "Calle Falsa 666",
-            "start": "2022-09-09T02:00:00",
-            "finish": "2022-09-10T09:00:00",
+            "start": datetime.now(),
+            "finish": datetime.now()
         }
         trip1 = Trip(**external_data_1)
 
@@ -43,13 +46,13 @@ class TestTripMetrics:
             "finalPrice": 1000,
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
-            "start": "2022-09-09T02:00:00",
-            "finish": "2022-09-10T02:10:00",
+            "start": datetime.now(),
+            "finish": datetime.now()
         }
         trip2 = Trip(**external_data_2)
 
         external_data_3 = {
-            "id": "2",
+            "id": "3",
             "passengerId": "0771de609-b04a-4b30-b46c-32537c7f1f6e",
             "driverId": "22209330329-b04a-4b30-b46c-fsdfwefwefw",
             "from_latitude": -19.603683,
@@ -61,13 +64,13 @@ class TestTripMetrics:
             "finalPrice": 1000,
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
-            "start": "2022-09-09T02:00:00",
-            "finish": "2022-09-10T02:01:00",
+            "start": datetime.now(),
+            "finish": datetime.now()
         }
         trip3 = Trip(**external_data_3)
 
         external_data_4 = {
-            "id": "2",
+            "id": "4",
             "passengerId": "087de609-b04a-4b30-b46c-32537c7f1f6e",
             "driverId": "22202930329-b04a-4b30-b46c-fsdfwefwefw",
             "from_latitude": -39.603683,
@@ -79,8 +82,8 @@ class TestTripMetrics:
             "finalPrice": 1000,
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
-            "start": "2022-09-09T02:00:00",
-            "finish": "2022-09-10T07:00:00",
+            "start": datetime.now(),
+            "finish": datetime.now()
         }
         trip4 = Trip(**external_data_4)
 
@@ -90,10 +93,17 @@ class TestTripMetrics:
         self.trip4 = jsonable_encoder(trip4)
 
 
-    def test_find_fare_avg(self):
-        self.setUp()
-        mongo_client = mongomock.MongoClient()
-        mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
-        mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
 
-        assert service.find_fare_avg(mongo_client) == 750
+    # def test_get_trip_duration_min(self):
+    #     self.setUp()
+    #     mongo_client = mongomock.MongoClient()
+
+    #     mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
+    #     mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
+    #     mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
+    #     mongo_client[DB_NAME]["trips"].insert_one(self.trip4)
+
+    #     print("_____type_______", type(datetime.today().replace(hour=1, minute=0, second=0, microsecond=0)))
+    #     print("_____datetime_______", datetime.today().replace(hour=1, minute=0, second=0, microsecond=0)) 
+    #     print("____Start____", self.trip1['start'])
+    #     assert service.get_trip_duration_min(mongo_client) == 750

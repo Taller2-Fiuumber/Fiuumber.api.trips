@@ -36,7 +36,7 @@ def get_trip_fare_final(
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        database = mongo_client.mongodb_client[DB_NAME]
+        database = mongo_client[DB_NAME]
         fare_rule = database["fare_rules"].find_one({"selected": True})
 
         if (fare_rule) is not None:
@@ -88,7 +88,7 @@ def get_trip_fare_to_test_fare_rule(
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        database = mongo_client.mongodb_client[DB_NAME]
+        database = mongo_client[DB_NAME]
         fare_rule = database["fare_rules"].find_one({"_id": fare_id})
         if (fare_rule) is not None:
             fare = fare_calculator.calculate_test(

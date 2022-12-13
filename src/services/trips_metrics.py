@@ -5,15 +5,15 @@ from os import environ
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 
 # Duration----------------------------------------------------------------------
 
 
 def get_trip_duration_min(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration = {
@@ -36,7 +36,7 @@ def get_trip_duration_min(mongo_client):
 
 
 def get_trip_duration_max(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration = {
@@ -58,7 +58,7 @@ def get_trip_duration_max(mongo_client):
 
 
 def get_trip_duration_avg(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration = {
@@ -80,7 +80,7 @@ def get_trip_duration_avg(mongo_client):
 
 
 def count_trips_duration_last_n_months_range(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_month = {
@@ -109,7 +109,7 @@ def count_trips_duration_last_n_months_range(amount: int, mongo_client):
 def count_trips_duration_last_n_years_and_m_months_range(
     years: int, months: int, mongo_client
 ):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_years_month = {
@@ -140,7 +140,7 @@ def count_trips_duration_last_n_years_and_m_months_range(
 
 
 def count_trips_duration_last_n_years_range(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_years = {
@@ -167,7 +167,7 @@ def count_trips_duration_last_n_years_range(amount: int, mongo_client):
 
 
 def count_trips_duration_last_n_days_range(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_days = {
@@ -197,7 +197,7 @@ def count_trips_duration_last_n_days_range(amount: int, mongo_client):
 
 
 def count_trips_by_status(status: str, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": status}}
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
@@ -214,7 +214,7 @@ def count_trips_by_status(status: str, mongo_client):
 
 
 def count_trips(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
     pipeline = [stage_trip_count]
@@ -226,7 +226,7 @@ def count_trips(mongo_client):
 
 
 def count_trips_new_count_today(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_today = {"$match": {"start": {"$gte": datetime.today()}}}
@@ -240,7 +240,7 @@ def count_trips_new_count_today(mongo_client):
 
 
 def count_trips_new_countlast_n_days(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_days = {
@@ -261,7 +261,7 @@ def count_trips_new_countlast_n_days(amount: int, mongo_client):
 
 
 def count_trips_new_countlast_n_days_range(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_days = {
@@ -286,7 +286,7 @@ def count_trips_new_countlast_n_days_range(amount: int, mongo_client):
 
 
 def count_trips_new_count_last_n_months(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -308,7 +308,7 @@ def count_trips_new_count_last_n_months(amount: int, mongo_client):
 
 
 def count_trips_new_count_last_n_months_range(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -334,7 +334,7 @@ def count_trips_new_count_last_n_months_range(amount: int, mongo_client):
 
 
 def count_trips_new_count_last_n_years_range(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -363,7 +363,7 @@ def count_trips_new_count_last_n_years_range(amount: int, mongo_client):
 def count_trips_new_count_last_n_years_and_m_months_range(
     years: int, months: int, mongo_client
 ):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -393,7 +393,7 @@ def count_trips_new_count_last_n_years_and_m_months_range(
 
 
 def count_trips_new_count_last_n_years(amount: int, mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 

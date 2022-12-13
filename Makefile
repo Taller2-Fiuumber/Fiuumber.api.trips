@@ -16,7 +16,7 @@ format:
 
 coverage:
 	pip install coverage --quiet
-	coverage report --fail-under=75
+	coverage report --fail-under=75 -m
 
 start-services:
 	docker-compose up --build --force-recreate -d

@@ -17,7 +17,7 @@ router = APIRouter()
 )
 def find_trip_status(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     if (trip := database["trips"].find_one({"_id": id})) is not None:
         return trip["status"]
@@ -30,7 +30,7 @@ def find_trip_status(id: str, request: Request):
 def update_trip_status(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        database = mongo_client.mongodb_client[DB_NAME]
+        database = mongo_client[DB_NAME]
 
         database["trips"].update_one(
             {"_id": id},
@@ -51,7 +51,7 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
 def update_trip_to_next_status(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        database = mongo_client.mongodb_client[DB_NAME]
+        database = mongo_client[DB_NAME]
 
         trip = database["trips"].find_one({"_id": id})
 
@@ -98,7 +98,7 @@ def update_trip_to_next_status(id: str, request: Request, body=Body(...)):
 def cancel_trip(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        database = mongo_client.mongodb_client[DB_NAME]
+        database = mongo_client[DB_NAME]
 
         trip = database["trips"].find_one({"_id": id})
         if trip is not None:

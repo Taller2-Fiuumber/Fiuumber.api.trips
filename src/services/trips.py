@@ -20,7 +20,7 @@ router = APIRouter()
 )
 def create_trip(request: Request, trip: Trip = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     trip = jsonable_encoder(trip)
     new_trip = database["trips"].insert_one(trip)
@@ -36,7 +36,7 @@ def create_trip(request: Request, trip: Trip = Body(...)):
 @router.get("/trips", response_description="List all trips")
 def list_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     _trips = database["trips"].find()
     trips = list(_trips)
@@ -46,7 +46,7 @@ def list_trips(request: Request):
 @router.get("/trip/{id}", response_description="Get a single trip by id")
 def find_trip_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     if (trip := database["trips"].find_one({"_id": id})) is not None:
         return trip
@@ -60,7 +60,7 @@ def find_trip_by_id(id: str, request: Request):
 )
 def duration_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
     trip = database["trips"].find_one({"_id": id})
     if trip is not None:
         status = trip_status.StatusFactory(trip["status"])
@@ -78,7 +78,7 @@ def duration_by_id(id: str, request: Request):
 @router.put("/trip/{id}", response_description="Update a trip")
 def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     trip = {k: v for k, v in trip.dict().items() if v is not None}
     if len(trip) >= 1:
@@ -101,7 +101,7 @@ def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
 @router.delete("/trip/{id}", response_description="Delete a trip")
 def delete_trip(id: str, request: Request, response: Response):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     delete_result = database["trips"].delete_one({"_id": id})
 
@@ -117,7 +117,7 @@ def delete_trip(id: str, request: Request, response: Response):
 @router.delete("/trips", response_description="Delete all trips")
 def delete_all_trip(id: str, request: Request, response: Response):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     delete_result = database["trips"].delete()
     if not delete_result:
@@ -133,7 +133,7 @@ def delete_all_trip(id: str, request: Request, response: Response):
 )
 def find_trip_status(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     if (trip := database["trips"].find_one({"_id": id})) is not None:
         return trip["status"]
@@ -145,7 +145,7 @@ def find_trip_status(id: str, request: Request):
 @router.patch("/trip/{id}")
 async def patch_item(id: str, body=Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
     stored_trip = database["trips"].find_one({"_id": id})
     if (stored_trip) is not None:
         update_data = body.dict(exclude_unset=True)
@@ -166,7 +166,7 @@ async def patch_item(id: str, body=Body(...)):
 def assign_driver(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        database = mongo_client.mongodb_client[DB_NAME]
+        database = mongo_client[DB_NAME]
 
         stored_trip = database["trips"].find_one({"_id": id})
 
@@ -190,7 +190,7 @@ def assign_driver(id: str, request: Request, body=Body(...)):
 @router.get("/passenger/{userId}", response_description="Get trips by passenger id")
 def trips_by_passenger_id(userId: str, skip: int, limit: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
     trips = database["trips"].find({"passengerId": userId}).skip(skip).limit(limit)
     if trips is not None:
         return list(trips)
@@ -203,7 +203,7 @@ def trips_by_passenger_id(userId: str, skip: int, limit: int, request: Request):
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
 def trips_by_driver_id(userId: str, skip: int, limit: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
     trips = database["trips"].find({"driverId": userId}).skip(skip).limit(limit)
     if trips is not None:
         return list(trips)

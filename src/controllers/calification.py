@@ -89,13 +89,13 @@ def find_califications_of_driver_by_tripId(
     "/calification/passenger/{passengerId}/tripId/{tripId}",
     response_description="Get califications",
 )
-def find_califications_of_passenger_by_tripId_and_by_driver(
+def find_califications_of_passenger_by_tripId_and_by_passengerId(
     passengerId: str, tripId: str, skip: int, limit: int, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
    
 
-    data = services.find_califications_of_passenger_by_tripId_and_by_driver(passengerId,tripId,skip,limit,mongo_client)
+    data = services.find_califications_of_passenger_by_tripId_and_by_passengerId(passengerId,tripId,skip,limit,mongo_client)
     if data is not None:
         return data
 
