@@ -9,8 +9,6 @@ from os import environ
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
-
-
 def get_selected_fare(mongo_client):
     database = mongo_client[DB_NAME]
 
@@ -20,11 +18,8 @@ def get_selected_fare(mongo_client):
         return selected_rule
     return None
 
-
-
-def create_fare_rule(mongo_client, rule):
+def create_fare_rule(mongo_client, fare_rule):
     database = mongo_client[DB_NAME]
-
 
     new_fare_rule = database["fare_rules"].insert_one(fare_rule)
     created_new_fare_rule = database["fare_rules"].find_one(
@@ -35,14 +30,11 @@ def create_fare_rule(mongo_client, rule):
         return created_new_fare_rule
     return None
 
-
 def list_fare_rules(mongo_client):
     database = mongo_client[DB_NAME]
 
     fare_rules = database["fare_rules"].find()
     return list(fare_rules)
-
-
 
 def find_fare_rules_by_id(id: str, mongo_client):
     database = mongo_client[DB_NAME]
@@ -50,8 +42,6 @@ def find_fare_rules_by_id(id: str, mongo_client):
     if (fare_rule := database["fare_rules"].find_one({"_id": id})) is not None:
         return fare_rule
     return None
-
-
 
 def select_a_fare_rule(id: str, mongo_client):
     database = mongo_client[DB_NAME]

@@ -17,11 +17,9 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
             float(from_longitude),
             float(to_longitude),
         )
-        return Response(content=str(fare), media_type="application/json")
+        return fare
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
-
-
 
 def get_trip_fare_final(
     mongo_client,
@@ -29,9 +27,9 @@ def get_trip_fare_final(
     driver_id: str = 1,
     distance: float = 12,
     duration: float = 26,
-    
+
 ):
-   
+
         database = mongo_client[DB_NAME]
         fare_rule = database["fare_rules"].find_one({"selected": True})
 
@@ -103,7 +101,7 @@ def get_trip_fare_to_test_fare_rule(
             )
             return fare
         return None
-    
+
 
 
 def get_trip_fare_to_test_new_fare_rule(
