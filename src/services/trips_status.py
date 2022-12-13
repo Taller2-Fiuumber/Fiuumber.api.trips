@@ -9,48 +9,33 @@ from os import environ
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
-router = APIRouter()
 
-
-@router.get(
-    "/trip/{id}/status", response_description="Get a single trip's status by id"
-)
-def find_trip_status(id: str, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def find_trip_status(id: str, mongo_client):
     database = mongo_client[DB_NAME]
 
     if (trip := database["trips"].find_one({"_id": id})) is not None:
         return trip["status"]
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
-    )
+    return None
 
 
-@router.put("/trip/{id}/status", response_description="Update a trip status")
-def update_trip_status(id: str, request: Request, body=Body(...)):
-    try:
-        mongo_client = MongoClient(MONGODB_URL, connect=False)
+def update_trip_status(id: str, mongo_client, status):
+    
         database = mongo_client[DB_NAME]
 
         database["trips"].update_one(
             {"_id": id},
-            {"$set": {"status": body.get("status")}},
+            {"$set": {"status": status}},
         )
 
         stored_trip = database["trips"].find_one({"_id": id})
+        if stored_trip is not None:
+            return stored_trip
 
-        return stored_trip
-
-    except Exception as ex:
-        raise HTTPException(
-            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
-        )
+        return None
 
 
-@router.put("/trip/{id}/status/next", response_description="Update a trip status")
-def update_trip_to_next_status(id: str, request: Request, body=Body(...)):
-    try:
-        mongo_client = MongoClient(MONGODB_URL, connect=False)
+def update_trip_to_next_status(id: str, mongo_client):
+   
         database = mongo_client[DB_NAME]
 
         trip = database["trips"].find_one({"_id": id})
@@ -85,19 +70,14 @@ def update_trip_to_next_status(id: str, request: Request, body=Body(...)):
                 )
 
         stored_trip = database["trips"].find_one({"_id": id})
+        if stored_trip is not None:
+            return stored_trip
 
-        return stored_trip
-
-    except Exception as ex:
-        raise HTTPException(
-            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
-        )
+        return None
 
 
-@router.put("/trip/{id}/status/cancel", response_description="Update a trip status")
-def cancel_trip(id: str, request: Request, body=Body(...)):
-    try:
-        mongo_client = MongoClient(MONGODB_URL, connect=False)
+def cancel_trip(id: str, mongo_client, body):
+   
         database = mongo_client[DB_NAME]
 
         trip = database["trips"].find_one({"_id": id})
@@ -111,9 +91,7 @@ def cancel_trip(id: str, request: Request, body=Body(...)):
 
         stored_trip = database["trips"].find_one({"_id": id})
 
-        return stored_trip
+        if stored_trip is not None:
+            return stored_trip
 
-    except Exception as ex:
-        raise HTTPException(
-            status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
-        )
+        return None
