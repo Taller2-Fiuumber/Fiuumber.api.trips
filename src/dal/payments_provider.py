@@ -7,7 +7,7 @@ from src.domain.payment import Payment
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
-MAX_ETH_TEST = 0.00005
+MAX_ETH_TEST = 0.0005
 
 mongo_client = MongoClient(MONGODB_URL, connect=False)
 database = mongo_client.mongodb_client[DB_NAME]

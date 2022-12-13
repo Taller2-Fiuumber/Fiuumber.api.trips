@@ -6,7 +6,7 @@ import src.dal.payments_provider as payments_provider
 
 URL_USERS = "https://fiuumber-api-users.herokuapp.com/api/users-service"
 URL_PAYMENTS = "https://fiuumber-api-payments.herokuapp.com/api/wallets-service"
-MAX_ETH_TEST = 0.00005
+MAX_ETH_TEST = 0.0005
 HEADERS = {"Content-type": "application/json", "Accept": "application/json"}
 
 
