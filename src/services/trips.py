@@ -7,8 +7,8 @@ import src.domain.status as trip_status
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 
 
@@ -57,7 +57,7 @@ def duration_by_id(id: str, mongo_client):
 def update_trip(id: str,mongo_client, trip):
     database = mongo_client[DB_NAME]
 
-    trip = {k: v for k, v in trip.dict().items() if v is not None}
+    trip = {k: v for k, v in trip.items() if v is not None}
     if len(trip) >= 1:
         update_result = database["trips"].update_one({"_id": id}, {"$set": trip})
 
@@ -75,19 +75,18 @@ def delete_trip(id: str, mongo_client):
     database = mongo_client[DB_NAME]
 
     delete_result = database["trips"].delete_one({"_id": id})
-
-    return delete_result
+    return delete_result.deleted_count
 
 
 
 def delete_all_trip( mongo_client, response: Response):
     database = mongo_client[DB_NAME]
 
-    delete_result = database["trips"].delete()
+    delete_result = database["trips"].delete_many({})
     if not delete_result:
         return response
 
-    return None
+    return delete_result.deleted_count
 
 
 
@@ -112,7 +111,6 @@ def assign_driver(id: str,driver_id,mongo_client):
         database = mongo_client[DB_NAME]
 
         stored_trip = database["trips"].find_one({"_id": id})
-
         if stored_trip["status"] != "REQUESTED":
             raise Exception("Cannot assign driver to a non pending trip")
 
@@ -122,6 +120,7 @@ def assign_driver(id: str,driver_id,mongo_client):
         )
 
         stored_trip = database["trips"].find_one({"_id": id})
+
         if stored_trip is not None:
             return stored_trip
         return None

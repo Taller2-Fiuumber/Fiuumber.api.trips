@@ -6,8 +6,8 @@ import datetime
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 
 def find_trip_status(id: str, mongo_client):
@@ -76,7 +76,7 @@ def update_trip_to_next_status(id: str, mongo_client):
         return None
 
 
-def cancel_trip(id: str, mongo_client, body):
+def cancel_trip(id: str, mongo_client):
    
         database = mongo_client[DB_NAME]
 
@@ -85,7 +85,7 @@ def cancel_trip(id: str, mongo_client, body):
             status = trip_status.StatusFactory(trip["status"])
             database["trips"].update_one(
                 {"_id": id},
-                {"$set": {"status": status.cancel()}},
+                {"$set": {"status": status.cancel().name()}},
             )
             # TO-DO
 
