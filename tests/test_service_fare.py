@@ -1,56 +1,84 @@
-# import mongomock
-# from mongomock import helpers
-# from mongomock import read_concern
-# from fastapi.encoders import jsonable_encoder
-# from src.domain.fare_rule import FareRule
-# import src.services.fare as service
-# from datetime import datetime, timedelta
+import mongomock
+from mongomock import helpers
+from mongomock import read_concern
+from fastapi.encoders import jsonable_encoder
+from src.domain.fare_rule import FareRule
+from src.domain.trip import Trip
+import src.services.fare as service
+from datetime import datetime, timedelta
 
 
-# from os import environ
-# # DB_NAME = environ["DB_NAME"]
-# DB_NAME = "Fiuumber"
+from os import environ
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
-# class TestFareService:
-#     # def setUp(self):
-#     #     external_data_1 = {
-#     #         "id": "1",
-#     #         "passengerId": "10",
-#     #         "driverId": "50",
-#     #         "from_latitude": -34.603683,
-#     #         "from_longitude": -58.381557,
-#     #         "to_latitude": -34.6175841,
-#     #         "to_longitude": -58.3682286,
-#     #         "subscription": "REGULAR",
-#     #         "status": "TERMINATED",
-#     #         "finalPrice": 500,
-#     #         "from_address": "Calle Falsa 123",
-#     #         "to_address": "Calle Falsa 666",
-#     #         "start": datetime.now(),
-#     #         "finish": datetime.now()
-#     #     }
-#     #     fare_rule1 = FareRule(**external_data_1)
+class TestFareService:
+    def setUp(self):
+        external_data_1 = {
+                "_id": "1",
+                "selected": True,
+                "createdAt": datetime(2022, 9, 9, 2),
+                "updatedAt": datetime(2022, 9, 9, 2),
+                "minimum": 200.0,
+                "duration": 5,
+                "distance": 6,
+                "dailyTripAmountDriver": 0.7,
+                "dailyTripAmountPassenger": -0.7,
+                "monthlyTripAmountDrive": 0.8,
+                "monthlyTripAmountPassenger": -0.8,
+                "seniorityDriver": 0.5,
+                "seniorityPassenger": -0.25,
+                "recentTripAmount": -0.2,
+            }
+        fare_rule1 = FareRule(**external_data_1)
 
-#     #     external_data_2 = {
-#     #         "id": "2",
-#     #         "passengerId": "10",
-#     #         "driverId": "50",
-#     #         "from_latitude": -39.603683,
-#     #         "from_longitude": -50.381557,
-#     #         "to_latitude": -31.6175841,
-#     #         "to_longitude": -55.3682286,
-#     #         "subscription": "REGULAR",
-#     #         "status": "REQUESTED",
-#     #         "finalPrice": 1000,
-#     #         "from_address": "Calle Real 123",
-#     #         "to_address": "Calle Real 111",
-#     #         "start": datetime.now(),
-#     #         "finish": datetime.now()
-#     #     }
-#     #     fare_rule2 = FareRule(**external_data_2)
+        self.fare_rule1 = jsonable_encoder(fare_rule1)
     
-#     #     self.fare_rule1 = jsonable_encoder(fare_rule1)
-#     #     self.fare_rule2 = jsonable_encoder(fare_rule2)
+        external_data_1 = {
+                "_id": "2",
+                "selected": False,
+                "createdAt": datetime(2022, 9, 9, 2),
+                "updatedAt": datetime(2022, 9, 9, 2),
+                "minimum": 200.0,
+                "duration": 5,
+                "distance": 6,
+                "dailyTripAmountDriver": 0.7,
+                "dailyTripAmountPassenger": -0.7,
+                "monthlyTripAmountDrive": 0.8,
+                "monthlyTripAmountPassenger": -0.8,
+                "seniorityDriver": 0.5,
+                "seniorityPassenger": -0.25,
+                "recentTripAmount": -0.2,
+            }
+        fare_rule2 = FareRule(**external_data_1)
+        self.fare_rule2 = jsonable_encoder(fare_rule2)
+
+        external_data_3 = {
+            "id": "1",
+            "passengerId": "10",
+            "driverId": "50",
+            "from_latitude": -34.603683,
+            "from_longitude": -58.381557,
+            "to_latitude": -34.6175841,
+            "to_longitude": -58.3682286,
+            "subscription": "REGULAR",
+            "status": "TERMINATED",
+            "finalPrice": 500,
+            "from_address": "Calle Falsa 123",
+            "to_address": "Calle Falsa 666",
+            "start": datetime.now(),
+            "finish": datetime.now()
+        }
+        trip1 = Trip(**external_data_3)
+        self.trip1 = jsonable_encoder(trip1)
     
-#     def test_get_trip_fare(self):
-#         assert service.get_trip_fare(-39.603683, -31.6175841, -50.381557, -55.3682286) == 40067.74
+    def test_get_trip_fare(self):
+        assert service.get_trip_fare(-39.603683, -31.6175841, -50.381557, -55.3682286) == 40067.74
+
+    def test_get_trip_fare_final(self):
+        self.setUp()
+        
+        mongo_client = mongomock.MongoClient()
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
+        mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
+        assert service.get_trip_fare_final(mongo_client,"10","50", 10,15 ) == 0
