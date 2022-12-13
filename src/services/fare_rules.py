@@ -6,14 +6,9 @@ from src.domain.fare_rule import FareRule
 
 from os import environ
 
-<<<<<<< HEAD
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
 
-=======
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
->>>>>>> a39593c6ece210e5d6e0f2de82463cea957f705a
 
 def get_selected_fare(mongo_client):
     database = mongo_client[DB_NAME]
