@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, HTTPException, status
 
-import src.domain.fare_calculator as fare_calculator
+import src.services.fare_calculator as fare_calculator
 from pymongo import MongoClient
 
 from os import environ
@@ -47,13 +47,13 @@ def get_trip_fare_final(
                 fare_rule["recentTripAmount"],
                 duration,
                 distance,
-                fare_calculator.daily_trip_amount_driver(driver_id),
-                fare_calculator.daily_trip_amount_passenger(passenger_id),
-                fare_calculator.monthly_trip_amount_driver(driver_id),
-                fare_calculator.monthly_trip_amount_passenger(passenger_id),
-                fare_calculator.get_driver_seniority(driver_id),
-                fare_calculator.get_passenger_seniority(passenger_id),
-                fare_calculator.get_recent_trip_amount(passenger_id),
+                fare_calculator.daily_trip_amount_driver(mongo_client, driver_id),
+                fare_calculator.daily_trip_amount_passenger(mongo_client, passenger_id),
+                fare_calculator.monthly_trip_amount_driver(mongo_client, driver_id),
+                fare_calculator.monthly_trip_amount_passenger(mongo_client, passenger_id),
+                fare_calculator.get_driver_seniority(mongo_client, driver_id),
+                fare_calculator.get_passenger_seniority(mongo_client, passenger_id),
+                fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
             )
             return fare
         else:
