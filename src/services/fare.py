@@ -51,6 +51,7 @@ def get_trip_fare_final(
                 fare_rule["seniorityDriver"],
                 fare_rule["seniorityPassenger"],
                 fare_rule["recentTripAmount"],
+                fare_rule["nightShift"],
                 duration,
                 distance,
                 fare_calculator.daily_trip_amount_driver(driver_id),
@@ -60,6 +61,7 @@ def get_trip_fare_final(
                 fare_calculator.get_driver_seniority(driver_id),
                 fare_calculator.get_passenger_seniority(passenger_id),
                 fare_calculator.get_recent_trip_amount(passenger_id),
+                fare_calculator.is_night_shift(),
             )
             return Response(content=str(fare), media_type="application/json")
         else:
@@ -85,6 +87,7 @@ def get_trip_fare_to_test_fare_rule(
     seniorityDriver: float = 2,
     seniorityPassenger: float = 1,
     recentTripAmount: float = 2,
+    nightShift: float = 1,
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -102,6 +105,7 @@ def get_trip_fare_to_test_fare_rule(
                 fare_rule["seniorityDriver"],
                 fare_rule["seniorityPassenger"],
                 fare_rule["recentTripAmount"],
+                fare_rule["nightShift"],
                 duration,
                 distance,
                 dailyTripAmountDriver,
@@ -111,6 +115,7 @@ def get_trip_fare_to_test_fare_rule(
                 seniorityDriver,
                 seniorityPassenger,
                 recentTripAmount,
+                nightShift,
             )
         return Response(content=str(fare), media_type="application/json")
     except Exception as ex:
@@ -131,6 +136,7 @@ def get_trip_fare_to_test_new_fare_rule(
     seniorityDriver_fare: float = -0.6,
     seniorityPassenger_fare: float = -0.3,
     recentTripAmount_fare: float = 0.2,
+    nightShift_fare: float = 0.2,
     duration: float = 20,
     distance: float = 12,
     dailyTripAmountDriver: float = 15,
@@ -140,6 +146,7 @@ def get_trip_fare_to_test_new_fare_rule(
     seniorityDriver: float = 2,
     seniorityPassenger: float = 1,
     recentTripAmount: float = 2,
+    nightShift: float = 1,
 ):
 
     fare = fare_calculator.calculate_test(
@@ -153,6 +160,7 @@ def get_trip_fare_to_test_new_fare_rule(
         seniorityDriver_fare,
         seniorityPassenger_fare,
         recentTripAmount_fare,
+        nightShift_fare,
         duration,
         distance,
         dailyTripAmountDriver,
@@ -162,5 +170,6 @@ def get_trip_fare_to_test_new_fare_rule(
         seniorityDriver,
         seniorityPassenger,
         recentTripAmount,
+        nightShift,
     )
     return Response(content=str(fare), media_type="application/json")

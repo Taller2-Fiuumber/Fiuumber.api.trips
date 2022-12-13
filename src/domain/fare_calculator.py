@@ -28,6 +28,7 @@ def calculate_final(
     seniorityDriver_fare,
     seniorityPassenger_fare,
     recentTripAmount_fare,
+    nightShift_fare,
     duration,
     distance,
     dailyTripAmountDriver,
@@ -37,6 +38,7 @@ def calculate_final(
     seniorityDriver,
     seniorityPassenger,
     recentTripAmount,
+    nightShift,
 ):
 
     return (
@@ -50,6 +52,7 @@ def calculate_final(
         + seniorityDriver_fare * seniorityDriver
         + seniorityPassenger_fare * seniorityPassenger
         + recentTripAmount_fare * recentTripAmount
+        + nightShift_fare * nightShift
     )
 
 
@@ -64,6 +67,7 @@ def calculate_test(
     seniorityDriver_fare,
     seniorityPassenger_fare,
     recentTripAmount_fare,
+    nightShift_fare,
     duration,
     distance,
     dailyTripAmountDriver,
@@ -73,6 +77,7 @@ def calculate_test(
     seniorityDriver,
     seniorityPassenger,
     recentTripAmount,
+    nightShift,
 ):
 
     return (
@@ -86,6 +91,7 @@ def calculate_test(
         + seniorityDriver_fare * seniorityDriver
         + seniorityPassenger_fare * seniorityPassenger
         + recentTripAmount_fare * recentTripAmount
+        + nightShift_fare * nightShift
     )
 
 
@@ -269,3 +275,12 @@ def get_recent_trip_amount(passengerId):
     if data is None:
         return 0
     return list(data)[0]["count"]
+
+
+def is_night_shift():
+
+    now = datetime.now()
+
+    if now.hour > 18 and now.hour < 6:
+        return 1
+    return 0

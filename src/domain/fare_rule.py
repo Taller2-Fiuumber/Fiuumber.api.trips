@@ -18,6 +18,7 @@ class FareRule(BaseModel):
     seniorityDriver: float = (0,)
     seniorityPassenger: float = (0,)
     recentTripAmount: float = (0,)
+    nightShift: float = (0,)
 
     class Config:
         allow_population_by_field_name = True
@@ -36,6 +37,7 @@ class FareRule(BaseModel):
                 "seniorityDriver": 0.5,
                 "seniorityPassenger": -0.25,
                 "recentTripAmount": -0.2,
+                "nightShift": 0.1,
             }
         }
         orm_mode = True
@@ -66,6 +68,7 @@ class FareRuleUpdate(BaseModel):
                 "recentTripAmount": -0.2,
                 "price_per_minute": 0.3,
                 "price_per_km": 0.5,
+                "nightShift": 0.1,
             }
         }
         orm_mode = True

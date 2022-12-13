@@ -199,7 +199,16 @@ def trips_by_passenger_id(
         {
             "$and": [
                 {"passengerId": userId},
-                {"status": {"$in": ["REQUESTED", "DRIVER_ASSIGNED", "DRIVER_ARRIVED", "IN_PROGRESS"]}},
+                {
+                    "status": {
+                        "$in": [
+                            "REQUESTED",
+                            "DRIVER_ASSIGNED",
+                            "DRIVER_ARRIVED",
+                            "IN_PROGRESS",
+                        ]
+                    }
+                },
             ]
         }
         if in_progress
