@@ -5,8 +5,8 @@ from pymongo import MongoClient
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
@@ -17,7 +17,9 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
             float(from_longitude),
             float(to_longitude),
         )
-        return Response(content=str(fare), media_type="application/json")
+        response = Response(content=str(fare), media_type="application/json")
+        print("_______response_______", response.json())
+        return response
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 

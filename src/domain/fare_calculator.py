@@ -6,8 +6,9 @@ from pymongo import MongoClient
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
+
 
 
 def calculate(from_latitude, to_latitude, from_longitude, to_longitude):

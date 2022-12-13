@@ -6,9 +6,8 @@ from src.domain.fare_rule import FareRule
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
-
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 
 def get_selected_fare(mongo_client):
@@ -26,7 +25,7 @@ def create_fare_rule(mongo_client, rule):
     database = mongo_client[DB_NAME]
 
 
-    new_fare_rule = database["fare_rules"].insert_one(fare_rule)
+    new_fare_rule = database["fare_rules"].insert_one(rule)
     created_new_fare_rule = database["fare_rules"].find_one(
         {"_id": new_fare_rule.inserted_id}
     )
