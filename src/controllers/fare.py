@@ -15,12 +15,7 @@ router = APIRouter()
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     try:
-        fare = fare_calculator.lineal(
-            float(from_latitude),
-            float(to_latitude),
-            float(from_longitude),
-            float(to_longitude),
-        )
+        fare =  services.get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude)
         return Response(content=str(fare), media_type="application/json")
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
@@ -35,7 +30,7 @@ def get_trip_fare_final(
     driver_id: str = 1,
     distance: float = 12,
     duration: float = 26,
-    
+
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
@@ -111,26 +106,29 @@ def get_trip_fare_to_test_new_fare_rule(
     seniorityPassenger: float = 1,
     recentTripAmount: float = 2,
 ):
-
-    fare = services.get_trip_fare_to_test_new_fare_rule(
-        minimum_fare,
-        duration_fare,
-        distance_fare,
-        dailyTripAmountDriver_fare,
-        dailyTripAmountPassenger_fare,
-        monthlyTripAmountDrive_fare,
-        monthlyTripAmountPassenger_fare,
-        seniorityDriver_fare,
-        seniorityPassenger_fare,
-        recentTripAmount_fare,
-        duration,
-        distance,
-        dailyTripAmountDriver,
-        dailyTripAmountPassenger,
-        monthlyTripAmountDrive,
-        monthlyTripAmountPassenger,
-        seniorityDriver,
-        seniorityPassenger,
-        recentTripAmount,
-    )
-    return Response(content=str(fare), media_type="application/json")
+    try:
+        fare = services.get_trip_fare_to_test_new_fare_rule(
+            minimum_fare,
+            duration_fare,
+            distance_fare,
+            dailyTripAmountDriver_fare,
+            dailyTripAmountPassenger_fare,
+            monthlyTripAmountDrive_fare,
+            monthlyTripAmountPassenger_fare,
+            seniorityDriver_fare,
+            seniorityPassenger_fare,
+            recentTripAmount_fare,
+            duration,
+            distance,
+            dailyTripAmountDriver,
+            dailyTripAmountPassenger,
+            monthlyTripAmountDrive,
+            monthlyTripAmountPassenger,
+            seniorityDriver,
+            seniorityPassenger,
+            recentTripAmount,
+        )
+        if fare:
+            return Response(content=str(fare), media_type="application/json")
+    except Exception as ex:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))

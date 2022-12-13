@@ -2,13 +2,10 @@ from math import radians, cos, sin, asin, sqrt
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from pymongo import MongoClient
-
 from os import environ
 
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
-
 
 
 def calculate(from_latitude, to_latitude, from_longitude, to_longitude):
@@ -121,8 +118,7 @@ def __distance(lat1, lat2, lon1, lon2):
     return c * r
 
 
-def daily_trip_amount_driver(driverId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def daily_trip_amount_driver(mongo_client, driverId):
     database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -138,8 +134,7 @@ def daily_trip_amount_driver(driverId):
     return list(data)[0]["count"]
 
 
-def daily_trip_amount_passenger(passengerId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def daily_trip_amount_passenger(mongo_client, passengerId):
     database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -155,8 +150,7 @@ def daily_trip_amount_passenger(passengerId):
     return list(data)[0]["count"]
 
 
-def monthly_trip_amount_driver(driverId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def monthly_trip_amount_driver(mongo_client, driverId):
     database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -179,8 +173,7 @@ def monthly_trip_amount_driver(driverId):
     return list(data)[0]["count"]
 
 
-def monthly_trip_amount_passenger(passengerId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def monthly_trip_amount_passenger(mongo_client, passengerId):
     database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -203,8 +196,7 @@ def monthly_trip_amount_passenger(passengerId):
     return list(data)[0]["count"]
 
 
-def get_driver_seniority(driverId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_driver_seniority(mongo_client, driverId):
     database = mongo_client[DB_NAME]
 
     stage_match_driver = {"$match": {"driverId": driverId}}
@@ -224,8 +216,7 @@ def get_driver_seniority(driverId):
     return 0
 
 
-def get_passenger_seniority(passengerId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_passenger_seniority(mongo_client, passengerId):
     database = mongo_client[DB_NAME]
 
     stage_match_passenger = {"$match": {"passengerId": passengerId}}
@@ -245,8 +236,7 @@ def get_passenger_seniority(passengerId):
     return 0
 
 
-def get_recent_trip_amount(passengerId):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
+def get_recent_trip_amount(mongo_client, passengerId):
     database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)

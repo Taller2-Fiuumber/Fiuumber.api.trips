@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, HTTPException, status
 
-import src.domain.fare_calculator as fare_calculator
+import src.services.fare_calculator as fare_calculator
 from pymongo import MongoClient
 
 from os import environ
@@ -17,13 +17,9 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
             float(from_longitude),
             float(to_longitude),
         )
-        response = Response(content=str(fare), media_type="application/json")
-        print("_______response_______", response.json())
-        return response
+        return fare
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
-
-
 
 def get_trip_fare_final(
     mongo_client,
@@ -31,9 +27,9 @@ def get_trip_fare_final(
     driver_id: str = 1,
     distance: float = 12,
     duration: float = 26,
-    
+
 ):
-   
+
         database = mongo_client[DB_NAME]
         fare_rule = database["fare_rules"].find_one({"selected": True})
 
@@ -51,13 +47,13 @@ def get_trip_fare_final(
                 fare_rule["recentTripAmount"],
                 duration,
                 distance,
-                fare_calculator.daily_trip_amount_driver(driver_id),
-                fare_calculator.daily_trip_amount_passenger(passenger_id),
-                fare_calculator.monthly_trip_amount_driver(driver_id),
-                fare_calculator.monthly_trip_amount_passenger(passenger_id),
-                fare_calculator.get_driver_seniority(driver_id),
-                fare_calculator.get_passenger_seniority(passenger_id),
-                fare_calculator.get_recent_trip_amount(passenger_id),
+                fare_calculator.daily_trip_amount_driver(mongo_client, driver_id),
+                fare_calculator.daily_trip_amount_passenger(mongo_client, passenger_id),
+                fare_calculator.monthly_trip_amount_driver(mongo_client, driver_id),
+                fare_calculator.monthly_trip_amount_passenger(mongo_client, passenger_id),
+                fare_calculator.get_driver_seniority(mongo_client, driver_id),
+                fare_calculator.get_passenger_seniority(mongo_client, passenger_id),
+                fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
             )
             return fare
         else:
@@ -105,7 +101,7 @@ def get_trip_fare_to_test_fare_rule(
             )
             return fare
         return None
-    
+
 
 
 def get_trip_fare_to_test_new_fare_rule(
