@@ -2,7 +2,7 @@ all: format test start-services exec
 
 test:
 	pip install pytest --quiet
-	pytest tests
+	pytest --cov=src/domain --cov=src/services tests/
 
 format:
 	pip install black --quiet
@@ -16,7 +16,7 @@ format:
 
 coverage:
 	pip install coverage --quiet
-	python -m coverage report --fail-under=75
+	coverage report --fail-under=75 -m
 
 start-services:
 	docker-compose up --build --force-recreate -d

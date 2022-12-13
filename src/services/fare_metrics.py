@@ -3,11 +3,11 @@ from pymongo import MongoClient
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# MONGODB_URL = environ["MONGODB_URL"]
+DB_NAME = "Fiuumber"
 
 def find_fare_avg(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration_avg = {
@@ -22,7 +22,7 @@ def find_fare_avg(mongo_client):
         
 def find_fare_min(mongo_client):
 
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration_min = {
@@ -38,8 +38,7 @@ def find_fare_min(mongo_client):
 
 def find_fare_max(mongo_client):
 
-    database = mongo_client.mongodb_client[DB_NAME]
-
+    database = mongo_client[DB_NAME]
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration_max = {
         "$group": {"_id": None, "max_final_price": {"$max": "$finalPrice"}}

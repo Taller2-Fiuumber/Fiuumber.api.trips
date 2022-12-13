@@ -101,13 +101,7 @@ def find_trip_status(id: str, mongo_client):
 
 async def patch_item(id: str, body, mongo_client):
     database = mongo_client[DB_NAME]
-    stored_trip = database["trips"].find_one({"_id": id})
     if (stored_trip) is not None:
-        update_data = body.dict(exclude_unset=True)
-        updated_item = stored_trip.copy(update=update_data)
-        update_result = database["trips"].update_one(
-            {"_id": id}, {"$set": jsonable_encoder(updated_item)}
-        )
         return update_result
     return None
 

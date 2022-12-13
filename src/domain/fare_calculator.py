@@ -122,7 +122,7 @@ def __distance(lat1, lat2, lon1, lon2):
 
 def daily_trip_amount_driver(driverId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -139,7 +139,7 @@ def daily_trip_amount_driver(driverId):
 
 def daily_trip_amount_passenger(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -156,7 +156,7 @@ def daily_trip_amount_passenger(passengerId):
 
 def monthly_trip_amount_driver(driverId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -180,7 +180,7 @@ def monthly_trip_amount_driver(driverId):
 
 def monthly_trip_amount_passenger(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -204,7 +204,7 @@ def monthly_trip_amount_passenger(passengerId):
 
 def get_driver_seniority(driverId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_driver = {"$match": {"driverId": driverId}}
     stage_sort_trip = {"$sort": {"start": 1}}
@@ -225,7 +225,7 @@ def get_driver_seniority(driverId):
 
 def get_passenger_seniority(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_passenger = {"$match": {"passengerId": passengerId}}
     stage_sort_trip = {"$sort": {"start": 1}}
@@ -246,7 +246,7 @@ def get_passenger_seniority(passengerId):
 
 def get_recent_trip_amount(passengerId):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 

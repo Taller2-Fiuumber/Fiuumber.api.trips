@@ -3,17 +3,17 @@ from pymongo import MongoClient
 
 from os import environ
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
+# DB_NAME = environ["DB_NAME"]
+DB_NAME = "Fiuumber"
 
 def get_calification_passenger_min(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
-    stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
+    stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
     stage_trip_avg = {
         "$group": {
             "_id": "$_id",
-            "driverId": {"$first": "$driverId"},
+            "passengerId": {"$first": "$passengerId"},
             "avg_stars": {"$avg": "$stars"},
         }
     }
@@ -31,13 +31,13 @@ def get_calification_passenger_min(mongo_client):
 
 
 def get_calification_passenger_max(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
-    stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
+    stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
     stage_trip_avg = {
         "$group": {
             "_id": "$_id",
-            "driverId": {"$first": "$driverId"},
+            "passengerId": {"$first": "$passengerId"},
             "avg_stars": {"$avg": "$stars"},
         }
     }
@@ -55,13 +55,13 @@ def get_calification_passenger_max(mongo_client):
 
 
 def get_calification_passenger_avg(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
-    stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
+    stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
     stage_trip_avg = {
         "$group": {
             "_id": "$_id",
-            "driverId": {"$first": "$driverId"},
+            "passengerId": {"$first": "$passengerId"},
             "avg_stars": {"$avg": "$stars"},
         }
     }
@@ -81,9 +81,9 @@ def get_calification_passenger_avg(mongo_client):
 
 
 def get_calification_driver_min(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
-    stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
+    stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
     stage_trip_avg = {
         "$group": {
             "_id": "$_id",
@@ -105,9 +105,9 @@ def get_calification_driver_min(mongo_client):
 
 
 def get_calification_driver_max(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
-    stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
+    stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
     stage_trip_avg = {
         "$group": {
             "_id": "$_id",
@@ -129,9 +129,9 @@ def get_calification_driver_max(mongo_client):
 
 
 def get_calification_driver_avg(mongo_client):
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
-    stage_match_terminated_status = {"$match": {"reviewer": "DRIVER"}}
+    stage_match_terminated_status = {"$match": {"reviewer": "PASSENGER"}}
     stage_trip_avg = {
         "$group": {
             "_id": "$_id",

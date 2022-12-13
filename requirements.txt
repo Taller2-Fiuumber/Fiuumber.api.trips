@@ -9,5 +9,7 @@ pytest
 black
 uvicorn
 geopy
-coverage
 mongomock
+pytest-cov
+pytest-xdist
+coverage

@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("/fare-rule/selected", response_description="Get selected fare")
 def get_selected_fare(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     selected_rule = database["fare_rules"].find_one({"selected": True})
 
@@ -34,7 +34,7 @@ def get_selected_fare(request: Request):
 )
 def create_fare_rule(request: Request, rule: FareRule = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     fare_rule = jsonable_encoder(rule)
     new_fare_rule = database["fare_rules"].insert_one(fare_rule)
@@ -52,7 +52,7 @@ def create_fare_rule(request: Request, rule: FareRule = Body(...)):
 @router.get("/fare-rules", response_description="List all fare rules")
 def list_fare_rules(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     fare_rules = database["fare_rules"].find()
     return list(fare_rules)
@@ -61,7 +61,7 @@ def list_fare_rules(request: Request):
 @router.get("/fare-rule/{id}", response_description="Get a single fare rule by id")
 def find_fare_rules_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     if (fare_rule := database["fare_rules"].find_one({"_id": id})) is not None:
         return fare_rule
@@ -74,7 +74,7 @@ def find_fare_rules_by_id(id: str, request: Request):
 @router.post("/fare-rule/select/{id}", response_description="Select a fare rule")
 def select_a_fare_rule(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     old_selected_fare_rule = database["fare_rules"].find_one({"selected": True})
     new_selected_fare_rule = database["fare_rules"].update_one(
