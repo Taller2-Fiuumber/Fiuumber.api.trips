@@ -12,10 +12,11 @@ def get_trip_by_id(trip_id):
     trip = database["trips"].find_one({"_id": trip_id})
     return trip
 
-def get_trips_driver(driver_id, skip=0, limit=1000, only_in_progress = False):
+
+def get_trips_driver(driver_id, skip=0, limit=1000, only_in_progress=False):
 
     # No debería haber más de uno en progreso
-    if (only_in_progress):
+    if only_in_progress:
         skip = 0
         limit = 1
 
@@ -43,10 +44,11 @@ def get_trips_driver(driver_id, skip=0, limit=1000, only_in_progress = False):
 
     return list(trips)
 
-def get_trips_passenger(passenger_id, skip=0, limit=1000, only_in_progress = False):
+
+def get_trips_passenger(passenger_id, skip=0, limit=1000, only_in_progress=False):
 
     # No debería haber más de uno en progreso
-    if (only_in_progress):
+    if only_in_progress:
         skip = 0
         limit = 1
 

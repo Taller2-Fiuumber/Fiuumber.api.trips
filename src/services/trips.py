@@ -194,11 +194,13 @@ def trips_by_passenger_id(
     userId: str, skip: int, limit: int, in_progress: bool = False
 ):
     try:
-        return trips_provider.get_trips_passenger(userId, skip=skip, limit=limit, only_in_progress=in_progress)
-    except:
+        return trips_provider.get_trips_passenger(
+            userId, skip=skip, limit=limit, only_in_progress=in_progress
+        )
+    except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Trips with passenger id {userId} not found",
+            detail=f"Trips with passenger id {userId} not found: {str(ex)}",
         )
 
 
@@ -221,11 +223,13 @@ def total_trips_by_passenger_id(userId: str):
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
 def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = False):
     try:
-        return trips_provider.get_trips_driver(userId, skip=skip, limit=limit, only_in_progress=in_progress)
-    except:
+        return trips_provider.get_trips_driver(
+            userId, skip=skip, limit=limit, only_in_progress=in_progress
+        )
+    except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Trips with driver id {userId} not found",
+            detail=f"Trips with driver id {userId} not found: {str(ex)}",
         )
 
 

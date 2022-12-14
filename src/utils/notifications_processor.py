@@ -42,6 +42,7 @@ def get_notification_token(user_id):
         print("[ERROR] Error in get_notification_token: " + str(ex))
         raise ex
 
+
 def get_available_drivers():
     try:
         url = f"{URL_USERS}/driver"
@@ -69,6 +70,32 @@ def notify_for_assigned_driver(trip_id):
         print("[ERROR] Error in notify_for_assigned_driver: " + str(ex))
         raise ex
 
+
+def notify_driver_for_new_trip(driver_id, price):
+    try:
+        trips_in_progress = trips_provider.get_trips_driver(
+            driver_id, only_in_progress=True
+        )
+
+        if len(trips_in_progress) > 0:
+            print(f"Driver with id={driver_id} is busy")
+            return
+
+        notifications_token = get_notification_token(driver_id)
+        if notifications_token is None:
+            raise Exception(
+                f"Driver with id={driver_id} has not setted notifications token"
+            )
+
+        send_notification(
+            f"Possible trip ETH {price}",
+            "A new trip is available, hurry up!",
+            notifications_token,
+        )
+    except Exception as ex:
+        raise ex
+
+
 def notify_for_new_trip(trip_id):
     try:
         trip = trips_provider.get_trip_by_id(trip_id)
@@ -76,21 +103,8 @@ def notify_for_new_trip(trip_id):
         for driver in drivers:
             try:
                 driver_id = driver.get("userId")
-                trips_in_progress = trips_provider.get_trips_driver(driver_id, only_in_progress=True)
-                
-                if (len(trips_in_progress) > 0): 
-                    print(f"Driver with id={driver_id} is busy")
-                    continue
-
-                notifications_token = get_notification_token(driver_id)
-                if notifications_token is None:
-                    raise Exception(
-                        f"Driver with id={driver_id} has not setted notifications token"
-                    )
-                trip_price = str(trip.get("finalPrice"))
-                send_notification(
-                    f"Possible trip ETH {trip_price}", "A new trip is available, hurry up!", notifications_token
-                )
+                price = str(trip.get("finalPrice"))
+                notify_driver_for_new_trip(driver_id, price)
             except Exception as ex:
                 print(ex)
                 pass

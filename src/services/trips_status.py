@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
-from src.utils.notifications_processor import notify_for_assigned_driver, notify_for_new_trip
+from src.utils.notifications_processor import (
+    notify_for_assigned_driver,
+    notify_for_new_trip,
+)
 
 from src.utils.payments_processor import create_trip_payments, process_payment
 
