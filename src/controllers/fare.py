@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Response, HTTPException, status
 
-import src.domain.fare_calculator as fare_calculator
 import src.services.fare as services
 from pymongo import MongoClient
 
@@ -15,7 +14,9 @@ router = APIRouter()
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     try:
-        fare =  services.get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude)
+        fare = services.get_trip_fare(
+            from_latitude, to_latitude, from_longitude, to_longitude
+        )
         return Response(content=str(fare), media_type="application/json")
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
@@ -30,14 +31,15 @@ def get_trip_fare_final(
     driver_id: str = 1,
     distance: float = 12,
     duration: float = 26,
-
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        fare_rule = services.get_trip_fare_final(passenger_id,driver_id,distance,duration,mongo_client)
+        fare_rule = services.get_trip_fare_final(
+            passenger_id, driver_id, distance, duration, mongo_client
+        )
 
         if (fare_rule) is not None:
-          return Response(content=str(fare_rule), media_type="application/json")
+            return Response(content=str(fare_rule), media_type="application/json")
         else:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -65,7 +67,8 @@ def get_trip_fare_to_test_fare_rule(
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        fare_rule = services.get_trip_fare_to_test_fare_rule(mongo_client,
+        fare_rule = services.get_trip_fare_to_test_fare_rule(
+            mongo_client,
             fare_id,
             duration,
             distance,
@@ -75,7 +78,8 @@ def get_trip_fare_to_test_fare_rule(
             monthlyTripAmountPassenger,
             seniorityDriver,
             seniorityPassenger,
-            recentTripAmount)
+            recentTripAmount,
+        )
         if (fare_rule) is not None:
             return Response(content=str(fare_rule), media_type="application/json")
     except Exception as ex:

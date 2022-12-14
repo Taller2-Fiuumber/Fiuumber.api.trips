@@ -1,10 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException
-from pymongo import MongoClient
-
-from os import environ
-
 # MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = "Fiuumber"
+
 
 def find_fare_avg(mongo_client):
     database = mongo_client[DB_NAME]
@@ -15,11 +11,12 @@ def find_fare_avg(mongo_client):
     }
     pipeline = [stage_match_terminated_status, stage_trip_duration_avg]
 
-    data =database["trips"].aggregate(pipeline)
+    data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_final_price"]
     return None
-        
+
+
 def find_fare_min(mongo_client):
 
     database = mongo_client[DB_NAME]

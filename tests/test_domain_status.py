@@ -1,6 +1,14 @@
-from src.domain.status import *
-from datetime import datetime, timedelta
-from fastapi.encoders import jsonable_encoder
+from src.domain.status import (
+    Invalid,
+    Canceled,
+    Terminated,
+    DriverArrived,
+    DriverAssigned,
+    InProgress,
+    Requested,
+    StatusFactory,
+)
+
 
 class TestStatusDomain:
     def test_invalid_status(self):
@@ -32,7 +40,7 @@ class TestStatusDomain:
         assert status.name() == "DRIVER_ARRIVED"
         assert status.next() == InProgress()
         assert status.cancel() == Canceled()
-    
+
     def test_in_progress_status(self):
         status = InProgress()
         assert status.name() == "IN_PROGRESS"

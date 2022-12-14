@@ -1,14 +1,13 @@
 import mongomock
-from mongomock import helpers
-from mongomock import read_concern
 from fastapi.encoders import jsonable_encoder
 from src.domain.trip import Trip
 import src.services.fare_metrics as service
 
-from os import environ
-DB_NAME = "Fiuumber"
-class TestFareCalculator:
 
+DB_NAME = "Fiuumber"
+
+
+class TestFareCalculator:
     def setUp(self):
         external_data_1 = {
             "id": "1",
@@ -45,7 +44,6 @@ class TestFareCalculator:
         self.trip1 = jsonable_encoder(trip1)
         self.trip2 = jsonable_encoder(trip2)
 
-
     def test_find_fare_avg(self):
         self.setUp()
         mongo_client = mongomock.MongoClient()
@@ -68,8 +66,3 @@ class TestFareCalculator:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         assert service.find_fare_max(mongo_client) == 1000
-
-
-
-
-

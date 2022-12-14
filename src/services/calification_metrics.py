@@ -1,10 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException
-from pymongo import MongoClient
-
-from os import environ
-
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
+
 
 def get_calification_passenger_min(mongo_client):
     database = mongo_client[DB_NAME]

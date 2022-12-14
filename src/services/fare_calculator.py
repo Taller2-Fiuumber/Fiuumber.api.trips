@@ -2,7 +2,6 @@ from math import radians, cos, sin, asin, sqrt
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from os import environ
 
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
@@ -202,7 +201,7 @@ def get_driver_seniority(mongo_client, driverId):
     stage_match_driver = {"$match": {"driverId": driverId}}
     stage_sort_trip = {"$sort": {"start": 1}}
 
-    pipeline = [stage_match_driver] #, stage_sort_trip]
+    pipeline = [stage_match_driver, stage_sort_trip]
 
     data = database["trips"].aggregate(pipeline)
     if data is None:

@@ -1,15 +1,11 @@
-from fastapi import APIRouter, Body, Request, Response, HTTPException, status
-from fastapi.encoders import jsonable_encoder
-from pymongo import MongoClient
+from fastapi import Response
 
-from src.domain.trip import Trip, TripUpdate
+
 import src.domain.status as trip_status
 
-from os import environ
 
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
-
 
 
 def create_trip(mongo_client, trip):
@@ -21,7 +17,6 @@ def create_trip(mongo_client, trip):
     if created_trip is not None:
         return created_trip
     return None
-
 
 
 def list_trips(mongo_client):
@@ -40,7 +35,6 @@ def find_trip_by_id(id: str, mongo_client):
     return None
 
 
-
 def duration_by_id(id: str, mongo_client):
     database = mongo_client[DB_NAME]
     trip = database["trips"].find_one({"_id": id})
@@ -53,8 +47,7 @@ def duration_by_id(id: str, mongo_client):
     return None
 
 
-
-def update_trip(id: str,mongo_client, trip):
+def update_trip(id: str, mongo_client, trip):
     database = mongo_client[DB_NAME]
 
     trip = {k: v for k, v in trip.items() if v is not None}
@@ -70,7 +63,6 @@ def update_trip(id: str,mongo_client, trip):
     return None
 
 
-
 def delete_trip(id: str, mongo_client):
     database = mongo_client[DB_NAME]
 
@@ -78,8 +70,7 @@ def delete_trip(id: str, mongo_client):
     return delete_result.deleted_count
 
 
-
-def delete_all_trip( mongo_client, response: Response):
+def delete_all_trip(mongo_client, response: Response):
     database = mongo_client[DB_NAME]
 
     delete_result = database["trips"].delete_many({})
@@ -87,7 +78,6 @@ def delete_all_trip( mongo_client, response: Response):
         return response
 
     return delete_result.deleted_count
-
 
 
 def find_trip_status(id: str, mongo_client):
@@ -98,37 +88,27 @@ def find_trip_status(id: str, mongo_client):
     return None
 
 
-async def patch_item(id: str, body, mongo_client):
+def assign_driver(id: str, driver_id, mongo_client):
+
     database = mongo_client[DB_NAME]
-    if (stored_trip) is not None:
-        return update_result
+
+    stored_trip = database["trips"].find_one({"_id": id})
+    if stored_trip["status"] != "REQUESTED":
+        raise Exception("Cannot assign driver to a non pending trip")
+
+    database["trips"].update_one(
+        {"_id": id},
+        {"$set": {"driverId": driver_id, "status": "DRIVER_ASSIGNED"}},
+    )
+
+    stored_trip = database["trips"].find_one({"_id": id})
+
+    if stored_trip is not None:
+        return stored_trip
     return None
 
 
-
-def assign_driver(id: str,driver_id,mongo_client):
-   
-        database = mongo_client[DB_NAME]
-
-        stored_trip = database["trips"].find_one({"_id": id})
-        if stored_trip["status"] != "REQUESTED":
-            raise Exception("Cannot assign driver to a non pending trip")
-
-        database["trips"].update_one(
-            {"_id": id},
-            {"$set": {"driverId": driver_id, "status": "DRIVER_ASSIGNED"}},
-        )
-
-        stored_trip = database["trips"].find_one({"_id": id})
-
-        if stored_trip is not None:
-            return stored_trip
-        return None
-    
-
-
-
-def trips_by_passenger_id(userId: str, skip: int, limit: int,mongo_client):
+def trips_by_passenger_id(userId: str, skip: int, limit: int, mongo_client):
     database = mongo_client[DB_NAME]
     trips = database["trips"].find({"passengerId": userId}).skip(skip).limit(limit)
     if trips is not None:

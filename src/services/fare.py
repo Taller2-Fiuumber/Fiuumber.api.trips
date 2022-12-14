@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Response, HTTPException, status
+from fastapi import HTTPException, status
 
 import src.services.fare_calculator as fare_calculator
-from pymongo import MongoClient
 
-from os import environ
 
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
@@ -21,45 +19,43 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
+
 def get_trip_fare_final(
     mongo_client,
     passenger_id: str = 2,
     driver_id: str = 1,
     distance: float = 12,
     duration: float = 26,
-
 ):
 
-        database = mongo_client[DB_NAME]
-        fare_rule = database["fare_rules"].find_one({"selected": True})
+    database = mongo_client[DB_NAME]
+    fare_rule = database["fare_rules"].find_one({"selected": True})
 
-        if (fare_rule) is not None:
-            fare = fare_calculator.calculate_final(
-                fare_rule["minimum"],
-                fare_rule["duration"],
-                fare_rule["distance"],
-                fare_rule["dailyTripAmountDriver"],
-                fare_rule["dailyTripAmountPassenger"],
-                fare_rule["monthlyTripAmountDrive"],
-                fare_rule["monthlyTripAmountPassenger"],
-                fare_rule["seniorityDriver"],
-                fare_rule["seniorityPassenger"],
-                fare_rule["recentTripAmount"],
-                duration,
-                distance,
-                fare_calculator.daily_trip_amount_driver(mongo_client, driver_id),
-                fare_calculator.daily_trip_amount_passenger(mongo_client, passenger_id),
-                fare_calculator.monthly_trip_amount_driver(mongo_client, driver_id),
-                fare_calculator.monthly_trip_amount_passenger(mongo_client, passenger_id),
-                fare_calculator.get_driver_seniority(mongo_client, driver_id),
-                fare_calculator.get_passenger_seniority(mongo_client, passenger_id),
-                fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
-            )
-            return fare
-        else:
-            return None
-
-
+    if (fare_rule) is not None:
+        fare = fare_calculator.calculate_final(
+            fare_rule["minimum"],
+            fare_rule["duration"],
+            fare_rule["distance"],
+            fare_rule["dailyTripAmountDriver"],
+            fare_rule["dailyTripAmountPassenger"],
+            fare_rule["monthlyTripAmountDrive"],
+            fare_rule["monthlyTripAmountPassenger"],
+            fare_rule["seniorityDriver"],
+            fare_rule["seniorityPassenger"],
+            fare_rule["recentTripAmount"],
+            duration,
+            distance,
+            fare_calculator.daily_trip_amount_driver(mongo_client, driver_id),
+            fare_calculator.daily_trip_amount_passenger(mongo_client, passenger_id),
+            fare_calculator.monthly_trip_amount_driver(mongo_client, driver_id),
+            fare_calculator.monthly_trip_amount_passenger(mongo_client, passenger_id),
+            fare_calculator.get_driver_seniority(mongo_client, driver_id),
+            fare_calculator.get_passenger_seniority(mongo_client, passenger_id),
+            fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
+        )
+        return fare
+    else:
+        return None
 
 
 def get_trip_fare_to_test_fare_rule(
@@ -75,33 +71,32 @@ def get_trip_fare_to_test_fare_rule(
     seniorityPassenger: float = 1,
     recentTripAmount: float = 2,
 ):
-        database = mongo_client[DB_NAME]
-        fare_rule = database["fare_rules"].find_one({"_id": fare_id})
-        if (fare_rule) is not None:
-            fare = fare_calculator.calculate_test(
-                fare_rule["minimum"],
-                fare_rule["duration"],
-                fare_rule["distance"],
-                fare_rule["dailyTripAmountDriver"],
-                fare_rule["dailyTripAmountPassenger"],
-                fare_rule["monthlyTripAmountDrive"],
-                fare_rule["monthlyTripAmountPassenger"],
-                fare_rule["seniorityDriver"],
-                fare_rule["seniorityPassenger"],
-                fare_rule["recentTripAmount"],
-                duration,
-                distance,
-                dailyTripAmountDriver,
-                dailyTripAmountPassenger,
-                monthlyTripAmountDrive,
-                monthlyTripAmountPassenger,
-                seniorityDriver,
-                seniorityPassenger,
-                recentTripAmount,
-            )
-            return fare
-        return None
-
+    database = mongo_client[DB_NAME]
+    fare_rule = database["fare_rules"].find_one({"_id": fare_id})
+    if (fare_rule) is not None:
+        fare = fare_calculator.calculate_test(
+            fare_rule["minimum"],
+            fare_rule["duration"],
+            fare_rule["distance"],
+            fare_rule["dailyTripAmountDriver"],
+            fare_rule["dailyTripAmountPassenger"],
+            fare_rule["monthlyTripAmountDrive"],
+            fare_rule["monthlyTripAmountPassenger"],
+            fare_rule["seniorityDriver"],
+            fare_rule["seniorityPassenger"],
+            fare_rule["recentTripAmount"],
+            duration,
+            distance,
+            dailyTripAmountDriver,
+            dailyTripAmountPassenger,
+            monthlyTripAmountDrive,
+            monthlyTripAmountPassenger,
+            seniorityDriver,
+            seniorityPassenger,
+            recentTripAmount,
+        )
+        return fare
+    return None
 
 
 def get_trip_fare_to_test_new_fare_rule(
