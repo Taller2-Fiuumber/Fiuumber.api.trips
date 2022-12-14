@@ -212,3 +212,16 @@ def count_trips_new_count_last_n_years(amount: int, request: Request):
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
+
+@router.get(
+    "/status/passenger/{id}/count", response_description="Count trips by status"
+)
+def count_trips_of_passenger_by_status(id: str, status: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    return services.count_trips_of_passenger_by_status(id, status, mongo_client)
+
+
+@router.get("/status/driver/{id}/count", response_description="Count trips by status")
+def count_trips_of_driver_by_status(id: str, status: str, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    return services.count_trips_of_driver_by_status(id, status, mongo_client)

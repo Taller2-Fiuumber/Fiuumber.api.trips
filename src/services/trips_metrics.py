@@ -196,10 +196,50 @@ def count_trips_by_status(status: str, mongo_client):
     pipeline = [stage_match_terminated_status, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
-    if data is not None:
-        return list(data)[0]["count"]
-        # return 0 if len(data) == 0 else list(data)[0]["count"]
-    return None
+
+    try:
+        if data is not None:
+            return list(data)[0]["count"]
+        return 0
+    except Exception as ex:
+        print(ex)
+        return 0
+
+
+def count_trips_of_passenger_by_status(id: str, status: str,  mongo_client):
+    database = mongo_client[DB_NAME]
+
+    stage_match_terminated_status = {"$match": {"status": status, "passengerId": id}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    pipeline = [stage_match_terminated_status, stage_trip_count]
+
+    data = database["trips"].aggregate(pipeline)
+
+    try:
+        if data is not None:
+            return list(data)[0]["count"]
+        return 0
+    except Exception as ex:
+        print(ex)
+        return 0
+
+
+def count_trips_of_driver_by_status(id: str, status: str, mongo_client):
+    database = mongo_client[DB_NAME]
+
+    stage_match_terminated_status = {"$match": {"status": status, "driverId": id}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    pipeline = [stage_match_terminated_status, stage_trip_count]
+
+    data = database["trips"].aggregate(pipeline)
+
+    try:
+        if data is not None:
+            return list(data)[0]["count"]
+        return 0
+    except Exception as ex:
+        print(ex)
+        return 0
 
 
 # Count------------------------------------------------------------------------

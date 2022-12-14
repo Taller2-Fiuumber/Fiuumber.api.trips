@@ -1,3 +1,12 @@
+from fastapi import APIRouter, Body, Request, HTTPException, status
+from pymongo import MongoClient
+from src.utils.notifications_processor import (
+    notify_for_assigned_driver,
+    notify_for_new_trip,
+)
+
+from src.utils.payments_processor import create_trip_payments, process_payment
+
 import src.domain.status as trip_status
 import datetime
 
@@ -16,14 +25,41 @@ def find_trip_status(id: str, mongo_client):
 
 
 def update_trip_status(id: str, mongo_client, status):
-
     database = mongo_client[DB_NAME]
-
     database["trips"].update_one(
         {"_id": id},
         {"$set": {"status": status}},
     )
 
+    if status == trip_status.Terminated().name():
+        try:
+            (passenger_payment, driver_payment) = create_trip_payments(id)
+            process_payment(passenger_payment)
+            process_payment(driver_payment)
+        except Exception as ex:
+            print(
+                f"[ERROR -> Continue] cannot create or process payments for trip {id} reason: {str(ex)}"
+            )
+            pass
+
+    if status == trip_status.DriverAssigned().name():
+        try:
+            notify_for_assigned_driver(id)
+        except Exception as ex:
+            print(
+                f"[ERROR -> Continue] send notification for driver assigned {id} reason: {str(ex)}"
+            )
+            pass
+
+    if status == trip_status.Requested().name():
+        try:
+            notify_for_new_trip(id)
+        except Exception as ex:
+            print(
+                f"[ERROR -> Continue] send notification for trip requested {id} reason: {str(ex)}"
+            )
+            pass
+        
     stored_trip = database["trips"].find_one({"_id": id})
     if stored_trip is not None:
         return stored_trip

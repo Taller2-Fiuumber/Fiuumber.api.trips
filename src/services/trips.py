@@ -1,6 +1,11 @@
 import src.domain.status as trip_status
 from fastapi.encoders import jsonable_encoder
 from os import environ
+import src.dal.trips_provider as trips_provider
+from src.utils.notifications_processor import (
+    notify_for_assigned_driver,
+    notify_for_new_trip,
+)
 
 DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
@@ -10,6 +15,14 @@ def create_trip(mongo_client, trip):
 
     new_trip = database["trips"].insert_one(trip)
     created_trip = database["trips"].find_one({"_id": new_trip.inserted_id})
+
+    try:
+        notify_for_new_trip(new_trip.inserted_id)
+    except Exception as ex:
+        print(
+            f"[ERROR -> Continue] send notification for trip requested {id} reason: {str(ex)}"
+        )
+        pass
 
     if created_trip is not None:
         return created_trip
@@ -111,6 +124,14 @@ def assign_driver(id: str, driver_id, mongo_client):
         {"$set": {"driverId": driver_id, "status": "DRIVER_ASSIGNED"}},
     )
 
+    try:
+        notify_for_assigned_driver(id)
+    except Exception as ex:
+        print(
+            f"[ERROR -> Continue] send notification for driver assigned {id} reason: {str(ex)}"
+        )
+        pass
+
     stored_trip = database["trips"].find_one({"_id": id})
 
     if stored_trip is not None:
@@ -118,17 +139,37 @@ def assign_driver(id: str, driver_id, mongo_client):
     return None
 
 
-def trips_by_passenger_id(userId: str, skip: int, limit: int, mongo_client):
+def trips_by_passenger_id(
+    userId: str, skip: int, limit: int, in_progress: bool = False
+):
+    try:
+        return trips_provider.get_trips_passenger(
+            userId, skip=skip, limit=limit, only_in_progress=in_progress
+        )
+    except Exception as ex:
+        return None
+
+def total_trips_by_passenger_id(userId: str, mongo_client):
     database = mongo_client[DB_NAME]
-    trips = database["trips"].find({"passengerId": userId}).skip(skip).limit(limit)
+
+    trips = database["trips"].find({"passengerId": userId})
     if trips is not None:
-        return list(trips)
-    return None
+        return len(list(trips))
+    return -1
 
 
-def trips_by_driver_id(userId: str, skip: int, limit: int, mongo_client):
+def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = False):
+    try:
+        return trips_provider.get_trips_driver(
+            userId, skip=skip, limit=limit, only_in_progress=in_progress
+        )
+    except Exception as ex:
+        return None
+
+
+def total_trips_by_driver_id(userId: str, mongo_client):
     database = mongo_client[DB_NAME]
-    trips = database["trips"].find({"driverId": userId}).skip(skip).limit(limit)
+    trips = database["trips"].find({"driverId": userId})
     if trips is not None:
-        return list(trips)
-    return None
+        return len(list(trips))
+    return -1
