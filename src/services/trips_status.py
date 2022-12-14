@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
+from src.utils.notifications_processor import notify_for_assigned_driver
 
 from src.utils.payments_processor import create_trip_payments, process_payment
 
@@ -48,6 +49,15 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
             except Exception as ex:
                 print(
                     f"[ERROR -> Continue] cannot create or process payments for trip {id} reason: {str(ex)}"
+                )
+                pass
+
+        if status == trip_status.DriverAssigned().name():
+            try:
+                notify_for_assigned_driver(id)
+            except Exception as ex:
+                print(
+                    f"[ERROR -> Continue] send notification for trip {id} reason: {str(ex)}"
                 )
                 pass
 
