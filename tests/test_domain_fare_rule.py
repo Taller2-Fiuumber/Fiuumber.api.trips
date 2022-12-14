@@ -8,6 +8,7 @@ class TestFareRuleDomain:
         createdAt = datetime(2022, 9, 9, 2)
         updatedAt = datetime(2022, 9, 9, 2)
         external_data_1 = {
+            "time": 1,
             "selected": False,
             "createdAt": createdAt,
             "updatedAt": updatedAt,
@@ -25,6 +26,7 @@ class TestFareRuleDomain:
         fare_rule = FareRule(**external_data_1)
         fare_rule = jsonable_encoder(fare_rule)
 
+        assert fare_rule["time"] == 1
         assert fare_rule["selected"] is False
         assert fare_rule["createdAt"] == str(createdAt).replace(" ", "T")
         assert fare_rule["updatedAt"] == str(updatedAt).replace(" ", "T")

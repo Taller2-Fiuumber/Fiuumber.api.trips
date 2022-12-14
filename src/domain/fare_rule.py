@@ -5,6 +5,7 @@ import datetime
 
 class FareRule(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    time: float = (0,)
     selected: bool = (False,)
     createdAt: datetime.datetime = Field(...)
     updatedAt: datetime.datetime = Field(...)
@@ -23,6 +24,7 @@ class FareRule(BaseModel):
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
+                "time" : 1,
                 "selected": False,
                 "createdAt": datetime.datetime(2022, 9, 9, 2),
                 "updatedAt": datetime.datetime(2022, 9, 9, 2),

@@ -12,6 +12,7 @@ DB_NAME = "Fiuumber"
 class TestFareRulesService:
     def setUp(self):
         external_data_1 = {
+            "time": 1,
             "_id": "1",
             "selected": True,
             "createdAt": datetime(2022, 9, 9, 2),
@@ -31,6 +32,7 @@ class TestFareRulesService:
         self.fare_rule1 = jsonable_encoder(fare_rule1)
 
         external_data_1 = {
+            "time": 1,
             "_id": "2",
             "selected": False,
             "createdAt": datetime(2022, 9, 9, 2),
