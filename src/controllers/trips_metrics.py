@@ -2,8 +2,6 @@ from fastapi import APIRouter, Request, HTTPException
 from pymongo import MongoClient
 
 from os import environ
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 import src.services.trips_metrics as services
 
 MONGODB_URL = environ["MONGODB_URL"]
@@ -18,7 +16,7 @@ router = APIRouter()
 )
 def get_trip_duration_min(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
+
     data = services.get_trip_duration_min(mongo_client)
     if data is not None:
         return data
@@ -30,7 +28,7 @@ def get_trip_duration_min(request: Request):
 )
 def get_trip_duration_max(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
+
     data = services.get_trip_duration_max(mongo_client)
     if data is not None:
         return data
@@ -42,7 +40,7 @@ def get_trip_duration_max(request: Request):
 )
 def get_trip_duration_avg(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
+
     data = services.get_trip_duration_avg(mongo_client)
     if data is not None:
         return data
@@ -54,9 +52,8 @@ def get_trip_duration_avg(request: Request):
 )
 def count_trips_duration_last_n_months_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
-    data = services.count_trips_duration_last_n_months_range(amount,mongo_client)
+    data = services.count_trips_duration_last_n_months_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -70,9 +67,10 @@ def count_trips_duration_last_n_years_and_m_months_range(
     years: int, months: int, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
-    data = services.count_trips_duration_last_n_years_and_m_months_range(years,months,mongo_client)
+    data = services.count_trips_duration_last_n_years_and_m_months_range(
+        years, months, mongo_client
+    )
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -83,9 +81,8 @@ def count_trips_duration_last_n_years_and_m_months_range(
 )
 def count_trips_duration_last_n_years_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-  
 
-    data = services.count_trips_duration_last_n_years_range(amount,mongo_client)
+    data = services.count_trips_duration_last_n_years_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -94,9 +91,8 @@ def count_trips_duration_last_n_years_range(amount: int, request: Request):
 @router.get("/duration/days/range", response_description="Count new trips last n days")
 def count_trips_duration_last_n_days_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
 
-    data = services.count_trips_duration_last_n_days_range(amount,mongo_client)
+    data = services.count_trips_duration_last_n_days_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -108,8 +104,8 @@ def count_trips_duration_last_n_days_range(amount: int, request: Request):
 @router.get("/status/count", response_description="Count trips by status")
 def count_trips_by_status(status: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
-    data = services.count_trips_by_status(status,mongo_client)
+
+    data = services.count_trips_by_status(status, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -121,7 +117,7 @@ def count_trips_by_status(status: str, request: Request):
 @router.get("/count", response_description="Count trips")
 def count_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
+
     data = services.count_trips(mongo_client)
     if data is not None:
         return data
@@ -131,7 +127,7 @@ def count_trips(request: Request):
 @router.get("/new/count/today", response_description="Count new trips by date")
 def count_trips_new_count_today(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
+
     data = services.count_trips_new_count_today(mongo_client)
     if data is not None:
         return data
@@ -141,9 +137,8 @@ def count_trips_new_count_today(request: Request):
 @router.get("/new/count/days", response_description="Count new trips last n days")
 def count_trips_new_countlast_n_days(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
-    data = services.count_trips_new_countlast_n_days(amount,mongo_client)
+    data = services.count_trips_new_countlast_n_days(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -152,9 +147,8 @@ def count_trips_new_countlast_n_days(amount: int, request: Request):
 @router.get("/new/count/days/range", response_description="Count new trips last n days")
 def count_trips_new_countlast_n_days_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
 
-    data = services.count_trips_new_countlast_n_days_range(amount,mongo_client)
+    data = services.count_trips_new_countlast_n_days_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -163,9 +157,8 @@ def count_trips_new_countlast_n_days_range(amount: int, request: Request):
 @router.get("/new/count/months", response_description="Count new trips last n months")
 def count_trips_new_count_last_n_months(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
-    data = services.count_trips_new_count_last_n_months(amount,mongo_client)
+    data = services.count_trips_new_count_last_n_months(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -176,9 +169,8 @@ def count_trips_new_count_last_n_months(amount: int, request: Request):
 )
 def count_trips_new_count_last_n_months_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
 
-    data = services.count_trips_new_count_last_n_months_range(amount,mongo_client)
+    data = services.count_trips_new_count_last_n_months_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -189,9 +181,8 @@ def count_trips_new_count_last_n_months_range(amount: int, request: Request):
 )
 def count_trips_new_count_last_n_years_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
 
-    data = services.count_trips_new_count_last_n_years_range(amount,mongo_client)
+    data = services.count_trips_new_count_last_n_years_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
@@ -205,19 +196,20 @@ def count_trips_new_count_last_n_years_and_m_months_range(
     years: int, months: int, request: Request
 ):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
 
-    data = services.count_trips_new_count_last_n_years_and_m_months_range(years,months,mongo_client)
+    data = services.count_trips_new_count_last_n_years_and_m_months_range(
+        years, months, mongo_client
+    )
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
 
+
 @router.get("/new/count/year", response_description="Count new trips last n years")
 def count_trips_new_count_last_n_years(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
-    data = services.count_trips_new_count_last_n_years(amount,mongo_client)
+    data = services.count_trips_new_count_last_n_years(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")

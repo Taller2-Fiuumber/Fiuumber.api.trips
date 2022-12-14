@@ -1,13 +1,10 @@
 import mongomock
-from mongomock import helpers
-from mongomock import read_concern
 from fastapi.encoders import jsonable_encoder
 from src.domain.trip import Trip
 import src.services.trips as service
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
-from os import environ
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
 
@@ -28,7 +25,7 @@ class TestTrips:
             "from_address": "Calle Falsa 123",
             "to_address": "Calle Falsa 666",
             "start": datetime.now(),
-            "finish": datetime.now()
+            "finish": datetime.now(),
         }
         trip1 = Trip(**external_data_1)
 
@@ -46,7 +43,7 @@ class TestTrips:
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
             "start": datetime.now(),
-            "finish": datetime.now()
+            "finish": datetime.now(),
         }
         trip2 = Trip(**external_data_2)
 
@@ -64,7 +61,7 @@ class TestTrips:
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
             "start": datetime.now(),
-            "finish": datetime.now()
+            "finish": datetime.now(),
         }
         trip3 = Trip(**external_data_3)
 
@@ -82,7 +79,7 @@ class TestTrips:
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
             "start": datetime.now(),
-            "finish": datetime.now()
+            "finish": datetime.now(),
         }
         trip4 = Trip(**external_data_4)
 
@@ -100,7 +97,7 @@ class TestTrips:
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
             "start": datetime.now(),
-            "finish": datetime.now()
+            "finish": datetime.now(),
         }
 
         trip5 = Trip(**external_data_5)
@@ -118,11 +115,10 @@ class TestTrips:
             "from_address": "Calle Real 123",
             "to_address": "Calle Real 111",
             "start": datetime.now(),
-            "finish": datetime.now()
+            "finish": datetime.now(),
         }
 
         trip6 = Trip(**external_data_6)
-
 
         self.trip1 = jsonable_encoder(trip1)
         self.trip2 = jsonable_encoder(trip2)
@@ -135,8 +131,8 @@ class TestTrips:
         self.setUp()
         mongo_client = mongomock.MongoClient()
 
-        result = self.trip1 
-        result['_id'] = 1
+        result = self.trip1
+        result["_id"] = 1
         assert service.create_trip(mongo_client, self.trip1) == result
 
     def test_list_trips(self):
@@ -156,7 +152,7 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
 
-        assert service.find_trip_by_id('1', mongo_client) == self.trip1
+        assert service.find_trip_by_id("1", mongo_client) == self.trip1
 
     def test_find_trip_by_id_is_none(self):
         self.setUp()
@@ -165,8 +161,7 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
 
-        assert service.find_trip_by_id('1000', mongo_client) == None
-
+        assert service.find_trip_by_id("1000", mongo_client) is None
 
     def test_duration_by_id_not_terminated_trip(self):
         self.setUp()
@@ -174,10 +169,9 @@ class TestTrips:
 
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
 
-        assert service.duration_by_id('2', mongo_client) == -1
+        assert service.duration_by_id("2", mongo_client) == -1
 
-    
-    # TEST QUE NO PUEDO TESTEAR POR EL TEMA DE LAS FECHAS: 
+    # TEST QUE NO PUEDO TESTEAR POR EL TEMA DE LAS FECHAS:
 
     # def test_duration_by_id(self):
     #     self.setUp()
@@ -185,23 +179,23 @@ class TestTrips:
 
     #     mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
 
-    #     assert service.duration_by_id('1', mongo_client) == 
+    #     assert service.duration_by_id('1', mongo_client) ==
 
     def test_update_trip(self):
         self.setUp()
         mongo_client = mongomock.MongoClient()
 
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
-        modified = self.trip1 
-        modified['finalPrice'] = 10 
-        assert service.update_trip('1', mongo_client, modified) == modified
+        modified = self.trip1
+        modified["finalPrice"] = 10
+        assert service.update_trip("1", mongo_client, modified) == modified
 
     def test_delete_trip(self):
         self.setUp()
         mongo_client = mongomock.MongoClient()
 
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
-        assert service.delete_trip('1', mongo_client) ==  1
+        assert service.delete_trip("1", mongo_client) == 1
 
     def test_delete_all_trips(self):
         self.setUp()
@@ -217,9 +211,7 @@ class TestTrips:
         mongo_client = mongomock.MongoClient()
 
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
-        assert service.find_trip_status('1', mongo_client) ==  "TERMINATED"
-
-
+        assert service.find_trip_status("1", mongo_client) == "TERMINATED"
 
     # COMO TESTEAR EXCEPCIONES ?
 
@@ -238,9 +230,9 @@ class TestTrips:
 
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         result = self.trip2
-        result['driverId'] = '2'
-        result['status'] = "DRIVER_ASSIGNED"
-        assert service.assign_driver("2", "2", mongo_client) ==  result
+        result["driverId"] = "2"
+        result["status"] = "DRIVER_ASSIGNED"
+        assert service.assign_driver("2", "2", mongo_client) == result
 
     def test_trips_by_passenger_id(self):
         self.setUp()
@@ -249,7 +241,10 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
-        assert service.trips_by_passenger_id("10", 0, 5, mongo_client) ==  [self.trip1, self.trip2]
+        assert service.trips_by_passenger_id("10", 0, 5, mongo_client) == [
+            self.trip1,
+            self.trip2,
+        ]
 
     def test_trips_by_driver_id(self):
         self.setUp()
@@ -258,4 +253,7 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
-        assert service.trips_by_driver_id("50", 0, 5, mongo_client) ==  [self.trip1, self.trip2]
+        assert service.trips_by_driver_id("50", 0, 5, mongo_client) == [
+            self.trip1,
+            self.trip2,
+        ]

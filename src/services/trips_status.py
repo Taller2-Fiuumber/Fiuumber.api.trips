@@ -1,10 +1,6 @@
-from fastapi import APIRouter, Body, Request, HTTPException, status
-from pymongo import MongoClient
-
 import src.domain.status as trip_status
 import datetime
 
-from os import environ
 
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
@@ -19,79 +15,79 @@ def find_trip_status(id: str, mongo_client):
 
 
 def update_trip_status(id: str, mongo_client, status):
-    
-        database = mongo_client[DB_NAME]
 
-        database["trips"].update_one(
-            {"_id": id},
-            {"$set": {"status": status}},
-        )
+    database = mongo_client[DB_NAME]
 
-        stored_trip = database["trips"].find_one({"_id": id})
-        if stored_trip is not None:
-            return stored_trip
+    database["trips"].update_one(
+        {"_id": id},
+        {"$set": {"status": status}},
+    )
 
-        return None
+    stored_trip = database["trips"].find_one({"_id": id})
+    if stored_trip is not None:
+        return stored_trip
+
+    return None
 
 
 def update_trip_to_next_status(id: str, mongo_client):
-   
-        database = mongo_client[DB_NAME]
 
-        trip = database["trips"].find_one({"_id": id})
+    database = mongo_client[DB_NAME]
 
-        if trip is not None:
-            status = trip_status.StatusFactory(trip["status"])
+    trip = database["trips"].find_one({"_id": id})
 
-            if status.name() == trip_status.DriverAssigned().name():
-                database["trips"].update_one(
-                    {"_id": id},
-                    {
-                        "$set": {
-                            "status": status.next().name(),
-                            "start": datetime.datetime.now(),
-                        }
-                    },
-                )
-            elif status == trip_status.InProgress():
-                database["trips"].update_one(
-                    {"_id": id},
-                    {
-                        "$set": {
-                            "status": status.next().name(),
-                            "finish": datetime.datetime.now(),
-                        }
-                    },
-                )
-            else:
-                database["trips"].update_one(
-                    {"_id": id},
-                    {"$set": {"status": status.next().name()}},
-                )
+    if trip is not None:
+        status = trip_status.StatusFactory(trip["status"])
 
-        stored_trip = database["trips"].find_one({"_id": id})
-        if stored_trip is not None:
-            return stored_trip
+        if status.name() == trip_status.DriverAssigned().name():
+            database["trips"].update_one(
+                {"_id": id},
+                {
+                    "$set": {
+                        "status": status.next().name(),
+                        "start": datetime.datetime.now(),
+                    }
+                },
+            )
+        elif status == trip_status.InProgress():
+            database["trips"].update_one(
+                {"_id": id},
+                {
+                    "$set": {
+                        "status": status.next().name(),
+                        "finish": datetime.datetime.now(),
+                    }
+                },
+            )
+        else:
+            database["trips"].update_one(
+                {"_id": id},
+                {"$set": {"status": status.next().name()}},
+            )
 
-        return None
+    stored_trip = database["trips"].find_one({"_id": id})
+    if stored_trip is not None:
+        return stored_trip
+
+    return None
 
 
 def cancel_trip(id: str, mongo_client):
-   
-        database = mongo_client[DB_NAME]
 
-        trip = database["trips"].find_one({"_id": id})
-        if trip is not None:
-            status = trip_status.StatusFactory(trip["status"])
-            database["trips"].update_one(
-                {"_id": id},
-                {"$set": {"status": status.cancel().name()}},
-            )
-            # TO-DO
+    database = mongo_client[DB_NAME]
 
-        stored_trip = database["trips"].find_one({"_id": id})
+    trip = database["trips"].find_one({"_id": id})
+    if trip is not None:
+        status = trip_status.StatusFactory(trip["status"])
+        database["trips"].update_one(
+            {"_id": id},
+            {"$set": {"status": status.cancel().name()}},
+        )
+        # TO-DO
 
-        if stored_trip is not None:
-            return stored_trip
+    stored_trip = database["trips"].find_one({"_id": id})
 
-        return None
+    if stored_trip is not None:
+        return stored_trip
+
+    return None

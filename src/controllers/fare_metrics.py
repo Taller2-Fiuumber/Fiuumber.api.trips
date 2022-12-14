@@ -22,7 +22,6 @@ def find_fare_avg(request: Request):
 @router.get("/min", response_description="Get trips fare minimum")
 def find_fare_min(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
     data = services.find_fare_min(mongo_client)
     if data is not None:
@@ -33,7 +32,6 @@ def find_fare_min(request: Request):
 @router.get("/max", response_description="Get trips fare minimum")
 def find_fare_max(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    
 
     data = services.find_fare_max(mongo_client)
     if data is not None:

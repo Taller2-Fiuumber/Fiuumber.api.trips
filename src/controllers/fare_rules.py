@@ -36,7 +36,7 @@ def create_fare_rule(request: Request, rule: FareRule = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
     fare_rule = jsonable_encoder(rule)
-    new_fare_rule = services.create_fare_rule(mongo_client,fare_rule)
+    new_fare_rule = services.create_fare_rule(mongo_client, fare_rule)
 
     if new_fare_rule is not None:
         return new_fare_rule
@@ -58,8 +58,8 @@ def list_fare_rules(request: Request):
 @router.get("/fare-rule/{id}", response_description="Get a single fare rule by id")
 def find_fare_rules_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    fare_rule =services.find_fare_rules_by_id(id, mongo_client)
-    if fare_rule  is not None:
+    fare_rule = services.find_fare_rules_by_id(id, mongo_client)
+    if fare_rule is not None:
         return fare_rule
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -71,7 +71,7 @@ def find_fare_rules_by_id(id: str, request: Request):
 def select_a_fare_rule(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    new_selected_fare_rule=services.select_a_fare_rule(id, mongo_client)
+    new_selected_fare_rule = services.select_a_fare_rule(id, mongo_client)
 
     if new_selected_fare_rule is not None:
         return new_selected_fare_rule

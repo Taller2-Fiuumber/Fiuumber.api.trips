@@ -1,6 +1,7 @@
 from src.domain.calification import Calification
-from datetime import datetime, timedelta
+from datetime import datetime
 from fastapi.encoders import jsonable_encoder
+
 
 class TestCalificationDomain:
     def test_create_calification_domain(self):
@@ -20,7 +21,7 @@ class TestCalificationDomain:
         calification1 = Calification(**external_data_1)
         calification1 = jsonable_encoder(calification1)
 
-        assert calification1['_id'] == "1"
+        assert calification1["_id"] == "1"
         assert calification1["passengerId"] == "5"
         assert calification1["driverId"] == "6"
         assert calification1["tripId"] == "100"
@@ -29,5 +30,3 @@ class TestCalificationDomain:
         assert calification1["stars"] == 3
         assert calification1["comments"] == "Nice driver. Love the scene."
         assert calification1["reviewer"] == "PASSENGER"
-        
-

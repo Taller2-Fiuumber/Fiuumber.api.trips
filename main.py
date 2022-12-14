@@ -19,17 +19,6 @@ from src.controllers.trips_status import router as trips_status_router
 from src.controllers.trips import router as trip_router
 
 
-
-
-
-
-
-
-
-
-
-
-
 app = FastAPI()
 
 

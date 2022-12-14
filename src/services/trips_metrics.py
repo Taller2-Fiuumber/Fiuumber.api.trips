@@ -1,7 +1,3 @@
-from fastapi import APIRouter, Request, HTTPException
-from pymongo import MongoClient
-
-from os import environ
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -32,7 +28,6 @@ def get_trip_duration_min(mongo_client):
     if data is not None:
         return list(data)[0]["min_duration"] / 60000
     return None
-
 
 
 def get_trip_duration_max(mongo_client):
@@ -105,7 +100,6 @@ def count_trips_duration_last_n_months_range(amount: int, mongo_client):
     return None
 
 
-
 def count_trips_duration_last_n_years_and_m_months_range(
     years: int, months: int, mongo_client
 ):
@@ -138,7 +132,6 @@ def count_trips_duration_last_n_years_and_m_months_range(
     return None
 
 
-
 def count_trips_duration_last_n_years_range(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
@@ -163,7 +156,6 @@ def count_trips_duration_last_n_years_range(amount: int, mongo_client):
     if data is not None:
         return list(data)
     return None
-
 
 
 def count_trips_duration_last_n_days_range(amount: int, mongo_client):
@@ -195,33 +187,32 @@ def count_trips_duration_last_n_days_range(amount: int, mongo_client):
 # Status------------------------------------------------------------------------
 
 
-
 def count_trips_by_status(status: str, mongo_client):
     database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": status}}
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_terminated_status, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["count"]
+        # return 0 if len(data) == 0 else list(data)[0]["count"]
     return None
 
 
 # Count------------------------------------------------------------------------
 
 
-
 def count_trips(mongo_client):
     database = mongo_client[DB_NAME]
 
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
+        return list(data)[0]["count"]
     return None
 
 
@@ -230,7 +221,7 @@ def count_trips_new_count_today(mongo_client):
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_today = {"$match": {"start": {"$gte": datetime.today()}}}
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_terminated_status, stage_match_today, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
@@ -246,7 +237,7 @@ def count_trips_new_countlast_n_days(amount: int, mongo_client):
     stage_match_last_n_days = {
         "$match": {"start": {"$gte": datetime.today() - timedelta(days=amount)}}
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [
         stage_match_terminated_status,
         stage_match_last_n_days,
@@ -255,9 +246,8 @@ def count_trips_new_countlast_n_days(amount: int, mongo_client):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
+        return list(data)[0]["count"]
     return None
-
 
 
 def count_trips_new_countlast_n_days_range(amount: int, mongo_client):
@@ -293,7 +283,7 @@ def count_trips_new_count_last_n_months(amount: int, mongo_client):
     stage_match_last_n_month = {
         "$match": {"start": {"$gte": datetime.today() - relativedelta(months=+amount)}}
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [
         stage_match_terminated_status,
         stage_match_last_n_month,
@@ -302,9 +292,8 @@ def count_trips_new_count_last_n_months(amount: int, mongo_client):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
+        return list(data)[0]["count"]
     return None
-
 
 
 def count_trips_new_count_last_n_months_range(amount: int, mongo_client):
@@ -359,7 +348,6 @@ def count_trips_new_count_last_n_years_range(amount: int, mongo_client):
     return None
 
 
-
 def count_trips_new_count_last_n_years_and_m_months_range(
     years: int, months: int, mongo_client
 ):
@@ -400,7 +388,7 @@ def count_trips_new_count_last_n_years(amount: int, mongo_client):
     stage_match_last_n_month = {
         "$match": {"start": {"$gte": datetime.today() - relativedelta(years=+amount)}}
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [
         stage_match_terminated_status,
         stage_match_last_n_month,
@@ -409,5 +397,5 @@ def count_trips_new_count_last_n_years(amount: int, mongo_client):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
+        return list(data)[0]["count"]
     return None

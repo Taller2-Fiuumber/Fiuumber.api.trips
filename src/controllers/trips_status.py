@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
 
-import src.domain.status as trip_status
-import datetime
 import src.services.trips_status as services
 
 from os import environ
@@ -32,8 +30,7 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         status = body.get("status")
 
-        
-        stored_trip = services.update_trip_status(id, mongo_client,status)
+        stored_trip = services.update_trip_status(id, mongo_client, status)
 
         return stored_trip
 
@@ -59,7 +56,8 @@ def update_trip_to_next_status(id: str, request: Request):
             status_code=500, detail=f"Error updating status {id} trip: {str(ex)}"
         )
 
-#//////////////////la quede aca
+
+# //////////////////la quede aca
 @router.put("/trip/{id}/status/cancel", response_description="Update a trip status")
 def cancel_trip(id: str, request: Request, body=Body(...)):
     try:

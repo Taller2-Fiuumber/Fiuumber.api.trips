@@ -1,21 +1,9 @@
-from fastapi import APIRouter, Body, Request, status
-from fastapi.encoders import jsonable_encoder
-from pymongo import MongoClient
-
-from src.domain.calification import Calification
-
-from os import environ
-
 # DB_NAME = environ["DB_NAME"]
 DB_NAME = "Fiuumber"
 
 
-
-def create_calification_passenger(
-    mongo_client, calification
-):
+def create_calification_passenger(mongo_client, calification):
     database = mongo_client[DB_NAME]
-
 
     new_calification = database["calification"].insert_one(calification)
     created_calification = database["calification"].find_one(
@@ -27,14 +15,14 @@ def create_calification_passenger(
     return None
 
 
-def find_califications(skip: int, limit: int,mongo_client):
+def find_califications(skip: int, limit: int, mongo_client):
     database = mongo_client[DB_NAME]
 
     _califications = database["calification"].find().skip(skip).limit(limit)
     return list(_califications)
 
 
-def find_califications_of_passenger(skip: int, limit: int,mongo_client):
+def find_califications_of_passenger(skip: int, limit: int, mongo_client):
     database = mongo_client[DB_NAME]
 
     _califications = (
@@ -52,7 +40,6 @@ def find_califications_of_driver(skip: int, limit: int, mongo_client):
     return list(_califications)
 
 
-
 def find_califications_of_passenger_by_tripId(
     tripId: str, skip: int, limit: int, mongo_client
 ):
@@ -65,7 +52,6 @@ def find_califications_of_passenger_by_tripId(
         .limit(limit)
     )
     return list(_califications)
-
 
 
 def find_califications_of_driver_by_tripId(
@@ -96,7 +82,6 @@ def find_califications_of_passenger_by_tripId_and_by_passengerId(
     return list(_califications)
 
 
-
 def find_califications_of_driver_by_tripId_and_by_driverId(
     driverId: str, tripId: str, skip: int, limit: int, mongo_client
 ):
@@ -109,7 +94,6 @@ def find_califications_of_driver_by_tripId_and_by_driverId(
         .limit(limit)
     )
     return list(_califications)
-
 
 
 def find_califications_of_passenger_by_passengerId(
@@ -126,7 +110,6 @@ def find_califications_of_passenger_by_passengerId(
     return list(_califications)
 
 
-
 def find_califications_of_driver_by_driverId(
     driverId: str, skip: int, limit: int, mongo_client
 ):
@@ -141,8 +124,7 @@ def find_califications_of_driver_by_driverId(
     return list(_califications)
 
 
-
-def find_califications_mean_of_driver_by_driverId(driverId: str,mongo_client):
+def find_califications_mean_of_driver_by_driverId(driverId: str, mongo_client):
     database = mongo_client[DB_NAME]
 
     pipeline = [
@@ -156,14 +138,12 @@ def find_califications_mean_of_driver_by_driverId(driverId: str,mongo_client):
     ]
     data = database["calification"].aggregate(pipeline)
 
-    if data == None:
+    if data is None:
         return None
     return list(data)[0]["avg_stars"]
 
 
-def find_califications_mean_of_driver_by_passengerId(
-    passengerId: str, mongo_client
-):
+def find_califications_mean_of_driver_by_passengerId(passengerId: str, mongo_client):
     database = mongo_client[DB_NAME]
 
     pipeline = [
@@ -176,6 +156,6 @@ def find_califications_mean_of_driver_by_passengerId(
         },
     ]
     data = database["calification"].aggregate(pipeline)
-    if data == None:
+    if data is None:
         return None
     return list(data)[0]["avg_stars"]
