@@ -78,6 +78,7 @@ class TestCalification:
         result = self.calification1 
         result['_id'] = 1
         assert service.create_calification_passenger(mongo_client, self.calification1) == result
+    
 
     def test_find_califications(self):
         self.setUp()

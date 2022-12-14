@@ -125,7 +125,7 @@ def daily_trip_amount_driver(mongo_client, driverId):
 
     stage_match_driver = {"$match": {"driverId": driverId}}
     stage_match_today_trips = {"$match": {"start": {"$gte": today}}}
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_driver, stage_match_today_trips, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
@@ -141,7 +141,7 @@ def daily_trip_amount_passenger(mongo_client, passengerId):
 
     stage_match_passenger = {"$match": {"passengerId": passengerId}}
     stage_match_today_trips = {"$match": {"start": {"$gte": today}}}
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_passenger, stage_match_today_trips, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
@@ -164,7 +164,7 @@ def monthly_trip_amount_driver(mongo_client, driverId):
             }
         }
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_driver, stage_match_monthly_trips, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
@@ -187,7 +187,7 @@ def monthly_trip_amount_passenger(mongo_client, passengerId):
             }
         }
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_passenger, stage_match_monthly_trips, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
@@ -202,7 +202,7 @@ def get_driver_seniority(mongo_client, driverId):
     stage_match_driver = {"$match": {"driverId": driverId}}
     stage_sort_trip = {"$sort": {"start": 1}}
 
-    pipeline = [stage_match_driver, stage_sort_trip]
+    pipeline = [stage_match_driver] #, stage_sort_trip]
 
     data = database["trips"].aggregate(pipeline)
     if data is None:
@@ -249,7 +249,7 @@ def get_recent_trip_amount(mongo_client, passengerId):
             }
         }
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_passenger, stage_match_monthly_trips, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)

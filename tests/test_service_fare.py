@@ -75,10 +75,25 @@ class TestFareService:
     def test_get_trip_fare(self):
         assert service.get_trip_fare(-39.603683, -31.6175841, -50.381557, -55.3682286) == 40067.74
 
-    def test_get_trip_fare_final(self):
-        self.setUp()
+    # def test_get_trip_fare_final(self):
+    #     self.setUp()
         
+    #     mongo_client = mongomock.MongoClient()
+    #     mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
+    #     mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
+    #     assert service.get_trip_fare_final(mongo_client,"10","50", 10, 15) == 0
+
+    def test_get_trip_fare_final_is_none(self):
+        self.setUp()
+        mongo_client = mongomock.MongoClient()
+        assert service.get_trip_fare_to_test_fare_rule(mongo_client) == None
+
+    def test_get_trip_fare_to_test_fare_rule(self):
+        self.setUp()
         mongo_client = mongomock.MongoClient()
         mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
-        mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
-        assert service.get_trip_fare_final(mongo_client,"10","50", 10,15 ) == 0
+        assert round(service.get_trip_fare_to_test_fare_rule(mongo_client, "1"), 2) == 457.45
+
+    def test_get_trip_fare_to_test_new_fare_rule(self):
+        self.setUp()
+        assert service.get_trip_fare_to_test_new_fare_rule() == 224.95
