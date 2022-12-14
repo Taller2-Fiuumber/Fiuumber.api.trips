@@ -9,6 +9,8 @@ import src.dal.trips_provider as trips_provider
 
 from os import environ
 
+from src.utils.notifications_processor import notify_for_new_trip
+
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
 
@@ -27,6 +29,14 @@ def create_trip(request: Request, trip: Trip = Body(...)):
     trip = jsonable_encoder(trip)
     new_trip = database["trips"].insert_one(trip)
     created_trip = database["trips"].find_one({"_id": new_trip.inserted_id})
+
+    try:
+        notify_for_new_trip(new_trip.inserted_id)
+    except Exception as ex:
+        print(
+            f"[ERROR -> Continue] send notification for trip requested {id} reason: {str(ex)}"
+        )
+        pass
 
     if created_trip is not None:
         return created_trip
