@@ -51,6 +51,7 @@ def calculate_final(
 
 
 def calculate_test(
+    time,
     minimum_fare,
     duration_fare,
     distance_fare,
@@ -83,6 +84,7 @@ def calculate_test(
         + seniorityDriver_fare * seniorityDriver
         + seniorityPassenger_fare * seniorityPassenger
         + recentTripAmount_fare * recentTripAmount
+        # + time*
     )
 
 

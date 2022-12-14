@@ -47,7 +47,7 @@ class TestFareCalculatorService:
     def test_calculate_test(self):
         assert (
             service.calculate_test(
-                1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 50, 1, 2, 3, 1, 0, 9, 8, 9
+                1, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 50, 1, 2, 3, 1, 0, 9, 8, 9
             )
             == 206
         )

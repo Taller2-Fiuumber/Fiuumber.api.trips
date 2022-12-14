@@ -61,6 +61,7 @@ def get_trip_fare_final(
 def get_trip_fare_to_test_fare_rule(
     mongo_client,
     fare_id: str = "3f000f2c-334d-4480-8ff2-d2cf5cdd235e",
+    time: float = 1,
     duration: float = 20,
     distance: float = 12,
     dailyTripAmountDriver: float = 15,
@@ -75,6 +76,7 @@ def get_trip_fare_to_test_fare_rule(
     fare_rule = database["fare_rules"].find_one({"_id": fare_id})
     if (fare_rule) is not None:
         fare = fare_calculator.calculate_test(
+            time,
             fare_rule["minimum"],
             fare_rule["duration"],
             fare_rule["distance"],
@@ -100,6 +102,7 @@ def get_trip_fare_to_test_fare_rule(
 
 
 def get_trip_fare_to_test_new_fare_rule(
+    time: float = 1,
     minimum_fare: float = 200,
     duration_fare: float = 0.1,
     distance_fare: float = 0.1,
@@ -122,6 +125,7 @@ def get_trip_fare_to_test_new_fare_rule(
 ):
 
     fare = fare_calculator.calculate_test(
+        time,
         minimum_fare,
         duration_fare,
         distance_fare,
