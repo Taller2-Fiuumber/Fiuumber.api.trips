@@ -7,7 +7,6 @@ import src.services.calification as services
 from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
 

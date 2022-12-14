@@ -5,8 +5,9 @@ import src.services.trips as service
 from datetime import datetime
 
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 class TestTrips:
@@ -204,7 +205,7 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
-        assert service.delete_all_trip(mongo_client) ==  3
+        assert service.delete_all_trip(mongo_client) == 3
 
     def test_find_trip_status(self):
         self.setUp()

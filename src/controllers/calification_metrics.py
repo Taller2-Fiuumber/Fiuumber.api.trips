@@ -4,7 +4,6 @@ import src.services.calification_metrics as services
 from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
 

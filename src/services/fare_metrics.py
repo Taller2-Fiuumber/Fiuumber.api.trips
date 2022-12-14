@@ -1,5 +1,6 @@
-# MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def find_fare_avg(mongo_client):

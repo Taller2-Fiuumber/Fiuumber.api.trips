@@ -3,8 +3,9 @@ from fastapi.encoders import jsonable_encoder
 from src.domain.trip import Trip
 import src.services.fare_metrics as service
 
+from os import environ
 
-DB_NAME = "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 class TestFareCalculator:

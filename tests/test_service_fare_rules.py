@@ -4,9 +4,9 @@ from src.domain.fare_rule import FareRule
 import src.services.fare_rules as service
 from datetime import datetime
 
+from os import environ
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 class TestFareRulesService:

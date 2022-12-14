@@ -8,7 +8,6 @@ import src.services.trips as services
 from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
 
@@ -34,7 +33,7 @@ def create_trip(request: Request, trip: Trip = Body(...)):
 @router.get("/trips", response_description="List all trips")
 def list_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-   
+
     trips = services.list_trips(mongo_client)
     return trips
 
@@ -75,7 +74,7 @@ def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     trip = {k: v for k, v in trip.dict().items() if v is not None}
 
     updated_trip = services.update_trip(id, mongo_client, trip)
-    if (updated_trip is not None) :
+    if updated_trip is not None:
         return updated_trip
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
@@ -124,8 +123,9 @@ def find_trip_status(id: str, request: Request):
 @router.patch("/trip/{id}")
 async def patch_item(id: str, body=Body(...)):
     _body = body.dict(exclude_unset=True)
-    stored_trip = services.patch_item(id,_body, mongo_client)
-  
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+    stored_trip = services.patch_item(id, _body, mongo_client)
+
     if stored_trip is not None:
         return stored_trip
     raise HTTPException(

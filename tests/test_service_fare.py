@@ -6,8 +6,9 @@ import src.services.fare as service
 from datetime import datetime
 
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 class TestFareService:
@@ -49,7 +50,6 @@ class TestFareService:
             "seniorityPassenger": -0.25,
             "recentTripAmount": -0.2,
             "nightShift": 0,
-
         }
         fare_rule2 = FareRule(**external_data_1)
         self.fare_rule2 = jsonable_encoder(fare_rule2)
@@ -69,7 +69,6 @@ class TestFareService:
             "to_address": "Calle Falsa 666",
             "start": datetime.now(),
             "finish": datetime.now(),
-
         }
         trip1 = Trip(**external_data_3)
         self.trip1 = jsonable_encoder(trip1)

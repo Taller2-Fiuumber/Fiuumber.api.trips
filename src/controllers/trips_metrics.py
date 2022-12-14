@@ -5,7 +5,6 @@ from os import environ
 import src.services.trips_metrics as services
 
 MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
 router = APIRouter()
 
 # Duration----------------------------------------------------------------------

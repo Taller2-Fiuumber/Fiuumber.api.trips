@@ -1,11 +1,8 @@
-from fastapi import Response
-
-
 import src.domain.status as trip_status
+from fastapi.encoders import jsonable_encoder
+from os import environ
 
-
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def create_trip(mongo_client, trip):
@@ -47,7 +44,6 @@ def duration_by_id(id: str, mongo_client):
     return None
 
 
-
 async def patch_item(id: str, body, mongo_client):
     database = mongo_client[DB_NAME]
     stored_trip = database["trips"].find_one({"_id": id})
@@ -61,7 +57,7 @@ async def patch_item(id: str, body, mongo_client):
     return None
 
 
-def update_trip(id: str,mongo_client, trip):
+def update_trip(id: str, mongo_client, trip):
     database = mongo_client[DB_NAME]
 
     trip = {k: v for k, v in trip.items() if v is not None}
@@ -84,8 +80,7 @@ def delete_trip(id: str, mongo_client):
     return delete_result.deleted_count
 
 
-
-def delete_all_trip( mongo_client):
+def delete_all_trip(mongo_client):
     database = mongo_client[DB_NAME]
 
     delete_result = database["trips"].delete_many({})

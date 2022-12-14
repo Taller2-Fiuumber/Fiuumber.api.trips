@@ -3,8 +3,9 @@ from fastapi import HTTPException, status
 import src.services.fare_calculator as fare_calculator
 
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
@@ -31,7 +32,6 @@ def get_trip_fare_final(
     database = mongo_client[DB_NAME]
     fare_rule = database["fare_rules"].find_one({"selected": True})
 
-
     if fare_rule is not None:
         fare = fare_calculator.calculate_final(
             fare_rule["minimum"],
@@ -53,7 +53,7 @@ def get_trip_fare_final(
             fare_calculator.monthly_trip_amount_passenger(mongo_client, passenger_id),
             fare_calculator.get_driver_seniority(mongo_client, driver_id),
             fare_calculator.get_passenger_seniority(mongo_client, passenger_id),
-            fare_calculator.get_recent_trip_amount(mongo_client, passenger_id), 
+            fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
             fare_calculator.is_night_shift(),
         )
         return fare

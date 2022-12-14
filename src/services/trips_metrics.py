@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 # Duration----------------------------------------------------------------------
@@ -74,7 +75,7 @@ def get_trip_duration_avg(mongo_client):
     return None
 
 
-def count_trips_duration_last_n_months_range(amount: int, mongo_client): 
+def count_trips_duration_last_n_months_range(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}

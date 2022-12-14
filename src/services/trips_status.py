@@ -2,8 +2,9 @@ import src.domain.status as trip_status
 import datetime
 
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def find_trip_status(id: str, mongo_client):

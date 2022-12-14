@@ -3,8 +3,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-# DB_NAME = environ["DB_NAME"]
-DB_NAME = "Fiuumber"
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def calculate(from_latitude, to_latitude, from_longitude, to_longitude):
@@ -35,7 +36,7 @@ def calculate_final(
     seniorityDriver,
     seniorityPassenger,
     recentTripAmount,
-    nightShift
+    nightShift,
 ):
 
     return (
@@ -74,7 +75,7 @@ def calculate_test(
     seniorityDriver,
     seniorityPassenger,
     recentTripAmount,
-    nightShift
+    nightShift,
 ):
 
     return (
@@ -135,7 +136,7 @@ def daily_trip_amount_driver(mongo_client, driverId):
 
     data = database["trips"].aggregate(pipeline)
     data_list = list(data)
-    if data is None or len(data_list)==0:
+    if data is None or len(data_list) == 0:
         return 0
     return data_list[0]["count"]
 
@@ -152,7 +153,7 @@ def daily_trip_amount_passenger(mongo_client, passengerId):
 
     data = database["trips"].aggregate(pipeline)
     data_list = list(data)
-    if data is None or len(data_list)==0:
+    if data is None or len(data_list) == 0:
         return 0
     return data_list[0]["count"]
 
@@ -176,7 +177,7 @@ def monthly_trip_amount_driver(mongo_client, driverId):
 
     data = database["trips"].aggregate(pipeline)
     data_list = list(data)
-    if data is None or len(data_list)==0:
+    if data is None or len(data_list) == 0:
         return 0
     return data_list[0]["count"]
 
@@ -200,7 +201,7 @@ def monthly_trip_amount_passenger(mongo_client, passengerId):
 
     data = database["trips"].aggregate(pipeline)
     data_list = list(data)
-    if data is None or len(data_list)==0:
+    if data is None or len(data_list) == 0:
         return 0
     return data_list[0]["count"]
 
@@ -219,9 +220,7 @@ def get_driver_seniority(mongo_client, driverId):
     for d in list(data):
         if d["start"] is not None:
             today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-            return (
-                today - d["start"]
-            ).total_seconds() / 60
+            return (today - d["start"]).total_seconds() / 60
     return 0
 
 
@@ -239,9 +238,7 @@ def get_passenger_seniority(mongo_client, passengerId):
     for d in list(data):
         if d["start"] is not None:
             today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-            return (
-                today - d["start"]
-            ).total_seconds() / 60
+            return (today - d["start"]).total_seconds() / 60
     return 0
 
 
@@ -263,12 +260,13 @@ def get_recent_trip_amount(mongo_client, passengerId):
 
     data = database["trips"].aggregate(pipeline)
     data_list = list(data)
-    if data is None or len(data_list)==0:
+    if data is None or len(data_list) == 0:
         return 0
     return data_list[0]["count"]
 
+
 def is_night_shift():
     now = datetime.now()
-    if now.hour>18 and now.hour<6:
+    if now.hour > 18 and now.hour < 6:
         return 1
     return 0

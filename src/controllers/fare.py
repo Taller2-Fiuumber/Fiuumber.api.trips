@@ -1,13 +1,11 @@
 from fastapi import APIRouter, Response, HTTPException, status
 
-import src.services.fare_calculator as fare_calculator
 import src.services.fare as services
 from pymongo import MongoClient
 
 from os import environ
 
 MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
 
 router = APIRouter()
 
@@ -34,8 +32,8 @@ def get_trip_fare_final(
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        fare_rule = services.get_trip_fare_final(mongo_client,
-            passenger_id, driver_id, distance, duration
+        fare_rule = services.get_trip_fare_final(
+            mongo_client, passenger_id, driver_id, distance, duration
         )
 
         if (fare_rule) is not None:
