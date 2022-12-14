@@ -49,7 +49,7 @@ def create_fare_rule(request: Request, rule: FareRule = Body(...)):
 def list_fare_rules(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    fare_rules = list_fare_rules(mongo_client)
+    fare_rules = services.list_fare_rules(mongo_client)
     if fare_rules is not None:
         return list(fare_rules)
     return None

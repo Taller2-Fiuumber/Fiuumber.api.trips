@@ -22,8 +22,8 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
 
 def get_trip_fare_final(
     mongo_client,
-    passenger_id: str = 2,
-    driver_id: str = 1,
+    passenger_id: str = "2",
+    driver_id: str = "1",
     distance: float = 12,
     duration: float = 26,
 ):

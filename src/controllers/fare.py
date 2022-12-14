@@ -27,16 +27,15 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     "/fare/final", response_description="Get a calculated fare from coordinates"
 )
 def get_trip_fare_final(
-    mongo_client,
-    passenger_id: str = 2,
-    driver_id: str = 1,
+    passenger_id: str = "2",
+    driver_id: str = "1",
     distance: float = 12,
     duration: float = 26,
 ):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
-        fare_rule = services.get_trip_fare_final(
-            passenger_id, driver_id, distance, duration, mongo_client
+        fare_rule = services.get_trip_fare_final(mongo_client,
+            passenger_id, driver_id, distance, duration
         )
 
         if (fare_rule) is not None:
@@ -54,7 +53,6 @@ def get_trip_fare_final(
     "/fare/test", response_description="Get a calculated fare to test fare rule"
 )
 def get_trip_fare_to_test_fare_rule(
-    mongo_client,
     fare_id: str = "3f000f2c-334d-4480-8ff2-d2cf5cdd235e",
     duration: float = 20,
     distance: float = 12,
