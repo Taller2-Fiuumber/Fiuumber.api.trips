@@ -39,7 +39,17 @@ def get_notification_token(user_id):
         notifications_token = r_user["notificationsToken"]
         return notifications_token
     except Exception as ex:
-        print("[ERROR] Error in get_wallet_address: " + str(ex))
+        print("[ERROR] Error in get_notification_token: " + str(ex))
+        raise ex
+
+def get_available_drivers():
+    try:
+        url = f"{URL_USERS}/driver"
+        r = requests.get(url)
+        r_drivers = r.json()
+        return r_drivers
+    except Exception as ex:
+        print("[ERROR] Error in get_available_drivers: " + str(ex))
         raise ex
 
 
@@ -55,6 +65,36 @@ def notify_for_assigned_driver(trip_id):
         send_notification(
             "Assigned driver", "Your Fiuumber is on the way ;)", notifications_token
         )
+    except Exception as ex:
+        print("[ERROR] Error in notify_for_assigned_driver: " + str(ex))
+        raise ex
+
+def notify_for_new_trip(trip_id):
+    try:
+        trip = trips_provider.get_trip_by_id(trip_id)
+        drivers = get_available_drivers()
+        for driver in drivers:
+            try:
+                driver_id = driver.get("userId")
+                trips_in_progress = trips_provider.get_trips_driver(driver_id, only_in_progress=True)
+                
+                if (len(trips_in_progress) > 0): 
+                    print(f"Driver with id={driver_id} is busy")
+                    continue
+
+                notifications_token = get_notification_token(driver_id)
+                if notifications_token is None:
+                    raise Exception(
+                        f"Driver with id={driver_id} has not setted notifications token"
+                    )
+                trip_price = str(trip.get("finalPrice"))
+                send_notification(
+                    f"Possible trip ETH {trip_price}", "A new trip is available, hurry up!", notifications_token
+                )
+            except Exception as ex:
+                print(ex)
+                pass
+
     except Exception as ex:
         print("[ERROR] Error in notify_for_assigned_driver: " + str(ex))
         raise ex

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
-from src.utils.notifications_processor import notify_for_assigned_driver
+from src.utils.notifications_processor import notify_for_assigned_driver, notify_for_new_trip
 
 from src.utils.payments_processor import create_trip_payments, process_payment
 
@@ -57,7 +57,16 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
                 notify_for_assigned_driver(id)
             except Exception as ex:
                 print(
-                    f"[ERROR -> Continue] send notification for trip {id} reason: {str(ex)}"
+                    f"[ERROR -> Continue] send notification for driver assigned {id} reason: {str(ex)}"
+                )
+                pass
+
+        if status == trip_status.Requested().name():
+            try:
+                notify_for_new_trip(id)
+            except Exception as ex:
+                print(
+                    f"[ERROR -> Continue] send notification for trip requested {id} reason: {str(ex)}"
                 )
                 pass
 
