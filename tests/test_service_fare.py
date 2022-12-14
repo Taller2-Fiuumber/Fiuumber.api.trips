@@ -76,7 +76,7 @@ class TestFareService:
     def test_get_trip_fare(self):
         assert (
             service.get_trip_fare(-39.603683, -31.6175841, -50.381557, -55.3682286)
-            == 40067.74
+            == 0.013982
         )
 
     def test_get_trip_fare_final_is_none(self):

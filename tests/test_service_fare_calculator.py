@@ -55,7 +55,7 @@ class TestFareCalculatorService:
 
     def test_lineal(self):
         assert (
-            service.lineal(-39.603683, -31.6175841, -50.381557, -55.3682286) == 40067.74
+            service.lineal(-39.603683, -31.6175841, -50.381557, -55.3682286) == 0.013982
         )
 
     def test_daily_trip_amount_driver(self):

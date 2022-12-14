@@ -213,6 +213,7 @@ def count_trips_new_count_last_n_years(amount: int, request: Request):
         return data
     raise HTTPException(status_code=500, detail="Internal error")
 
+
 @router.get(
     "/status/passenger/{id}/count", response_description="Count trips by status"
 )

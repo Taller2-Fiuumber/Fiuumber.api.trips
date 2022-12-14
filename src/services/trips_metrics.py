@@ -206,7 +206,7 @@ def count_trips_by_status(status: str, mongo_client):
         return 0
 
 
-def count_trips_of_passenger_by_status(id: str, status: str,  mongo_client):
+def count_trips_of_passenger_by_status(id: str, status: str, mongo_client):
     database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": status, "passengerId": id}}

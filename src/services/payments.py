@@ -1,71 +1,114 @@
-from fastapi import APIRouter, Body, HTTPException
+from datetime import datetime, timedelta
+from os import environ
 
-import src.dal.payments_provider as payments_provider
-from src.domain.payment import Payment
-from src.utils.payments_processor import process_payments, create_trip_payments
+from fastapi.encoders import jsonable_encoder
 
-from pydantic import BaseModel, Field
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
+MAX_ETH_TEST = 0.0005
 
 
-class TripId(BaseModel):
-    trip_id: str = Field(...)
+def get_pending_payments(mongo_client):
+    database = mongo_client[DB_NAME]
 
-    class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
-            "example": {
-                "trip_id": "15576e35-390a-478b-bd05-0572c023bdee",
-            }
+    processing_date = datetime.now() - timedelta(seconds=20)
+    # Traigo los payments que no se hayan procesado y que no se estén procesando
+    # o bien se hayan colgado procesando
+    pending_payments = database["payments"].find(
+        {
+            "$and": [
+                {"processedAt": None},
+                {
+                    "$or": [
+                        {"startedProcessing": None},
+                        {"startedProcessing": {"$lte": processing_date}},
+                    ]
+                },
+            ]
         }
-        orm_mode = True
+    )
+    return list(pending_payments)
 
 
-router = APIRouter()
+def create_payment(payment, mongo_client):
+    database = mongo_client[DB_NAME]
 
-
-@router.get(
-    "/process",
-    response_description="Process all pending payments for trips",
-)
-def process():
     try:
-        return process_payments()
-    except Exception as ex:
-        detail = f"Cannot process payments: {str(ex)}"
-        raise HTTPException(status_code=500, detail=detail)
+        payment = jsonable_encoder(payment)
+        if payment["amount"] > MAX_ETH_TEST:
+            raise Exception("ETH value provided is too large for testing purposes")
 
-
-@router.post(
-    "/create-for-trip",
-    response_description="Generate payments from proccessed trip",
-)
-def create_for_trip(params: TripId = Body(...)):
-    try:
-        return create_trip_payments(params.trip_id)
-    except Exception as ex:
-        raise HTTPException(
-            status_code=500, detail=f"Cannot create payments for trip: {str(ex)}"
+        existing_payment = database["payments"].find_one(
+            {"$and": [{"tripId": payment["tripId"]}, {"type": payment["type"]}]}
         )
 
+        if payment["tripId"] is not None and existing_payment is not None:
+            raise Exception(
+                f'Cannot create another {payment["type"]} payment for this trip'
+            )
 
-# TODO: eliminar este endpoint, no debería exponerse
-@router.post(
-    "",
-    response_description="Creates a new payment",
-)
-def create(payment: Payment = Body(...)):
-    try:
-        return payments_provider.create_payment(payment)
+        new_payment = database["payments"].insert_one(payment)
+        created_payment = database["payments"].find_one(
+            {"_id": new_payment.inserted_id}
+        )
+        return created_payment
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=f"Cannot create payment: {str(ex)}")
+        print("[ERROR] Error in create_payment: " + str(ex))
+        raise ex
 
 
-@router.get(
-    "",
-    response_description="Get all payments",
-)
-def get():
+def get_incomplete_payments(mongo_client):
     try:
-        return payments_provider.get_all_payments()
+        database = mongo_client[DB_NAME]
+        payments = database["payments"].aggregate(
+            [
+                {
+                    "$group": {
+                        "_id": {"tripId": "$tripId"},
+                        "count": {"$sum": 1},
+                        "data": {"$addToSet": "$$ROOT"},
+                    },
+                },
+                {"$match": {"count": {"$eq": 1}}},
+            ]
+        )
+        return list(payments)
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=f"Cannot get payments: {str(ex)}")
+        print("[ERROR] Error in get_all_payments: " + str(ex))
+        raise ex
+
+
+def get_all_payments(mongo_client):
+    try:
+        database = mongo_client[DB_NAME]
+        # database["payments"].delete_many({})
+        payments = database["payments"].find()
+        return list(payments)
+    except Exception as ex:
+        print("[ERROR] Error in get_all_payments: " + str(ex))
+        raise ex
+
+
+def mark_payment_as_processing(id: str, mongo_client):
+    try:
+        database = mongo_client[DB_NAME]
+        database["payments"].update_one(
+            {"_id": id},
+            {"$set": {"startedProcessing": datetime.now()}},
+        )
+        return database["payments"].find_one({"_id": id})
+    except Exception as ex:
+        print("[ERROR] Error in mark_payment_as_processing: " + str(ex))
+        raise ex
+
+
+def mark_payment_as_processed(id: str, hash: str, mongo_client):
+    try:
+        database = mongo_client[DB_NAME]
+        database["payments"].update_one(
+            {"_id": id},
+            {"$set": {"processedAt": datetime.now(), "hash": hash}},
+        )
+        return database["payments"].find_one({"_id": id})
+    except Exception as ex:
+        print("[ERROR] Error in mark_payment_as_processing: " + str(ex))
+        raise ex

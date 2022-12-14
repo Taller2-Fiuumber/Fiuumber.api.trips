@@ -154,9 +154,15 @@ def assign_driver(id: str, request: Request, body=Body(...)):
 
 
 @router.get("/passenger/{userId}", response_description="Get trips by passenger id")
-def trips_by_passenger_id(userId: str, skip: int, limit: int, in_progress: bool, request: Request):
+def trips_by_passenger_id(
+    userId: str, skip: int, limit: int, in_progress: bool, request: Request
+):
 
-    trips = services.trips_by_passenger_id(userId, skip, limit, in_progress)
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+    trips = services.trips_by_passenger_id(
+        mongo_client, userId, skip, limit, in_progress
+    )
     if trips is not None:
         return trips
     raise HTTPException(
@@ -166,15 +172,19 @@ def trips_by_passenger_id(userId: str, skip: int, limit: int, in_progress: bool,
 
 
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
-def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool, request: Request):
-    
-    trips = services.trips_by_driver_id(userId, skip, limit, in_progress)
+def trips_by_driver_id(
+    userId: str, skip: int, limit: int, in_progress: bool, request: Request
+):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+    trips = services.trips_by_driver_id(mongo_client, userId, skip, limit, in_progress)
     if trips is not None:
         return trips
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Trips with driver id {userId} not found",
     )
+
 
 @router.get(
     "/passenger/{userId}/count", response_description="Count trips by passenger id"
@@ -187,11 +197,10 @@ def total_trips_by_passenger_id(userId: str):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Trips with passenger id {userId} not found",
-   )
+    )
 
-@router.get(
-    "/driver/{userId}/count", response_description="Count trips by driver id"
-)
+
+@router.get("/driver/{userId}/count", response_description="Count trips by driver id")
 def total_trips_by_driver_id(userId: str):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     trips = services.total_trips_by_driver_id(userId, mongo_client)
@@ -200,4 +209,4 @@ def total_trips_by_driver_id(userId: str):
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Trips with driver id {userId} not found",
-   )
+    )

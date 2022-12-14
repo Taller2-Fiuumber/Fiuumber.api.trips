@@ -12,7 +12,7 @@ class Payment(BaseModel):
     updatedAt: datetime.datetime = datetime.datetime.now()
     processedAt: datetime.datetime = None
     startedProcessing: datetime.datetime = None
-    ammount: float = Field(...)
+    amount: float = Field(...)
     tx_hash: str = None
     wallet_address: str = Field(
         ...
@@ -27,8 +27,9 @@ class Payment(BaseModel):
                 "tripId": "ddfdsfsdf-b04a-4b30-b4sdf6c-fsdtjkjj",
                 "createdAt": datetime.datetime.now(),
                 "updatedAt": datetime.datetime.now(),
+                "startedProcessing": datetime.datetime.now(),
                 "processedAt": datetime.datetime.now(),
-                "ammount": 0.00000001,
+                "amount": 0.00000001,
                 "tx_hash": "0x030d20dab0b53c123a12f2696a5c8bd23f449789d677a1571e1cdea6eacf0285",
                 "type": "FROM_SENDER",
                 "wallet_address": "",
@@ -43,18 +44,19 @@ class PaymentUpdate(BaseModel):
     createdAt: datetime.datetime = datetime.datetime.now()
     updatedAt: datetime.datetime = datetime.datetime.now()
     processedAt: datetime.datetime = None
-    ammount: float = Field(...)
+    amount: float = Field(...)
     tx_hash: str = None
     type: str = Field(...)
 
     class Config:
         schema_extra = {
             "example": {
+                "id": "ddfdsfsdf-b04a-4b30-b4sdf6c-fsdtjkjj",
                 "tripId": "ddfdsfsdf-b04a-4b30-b4sdf6c-fsdtjkjj",
                 "createdAt": datetime.datetime.now(),
                 "updatedAt": datetime.datetime.now(),
                 "processedAt": datetime.datetime.now(),
-                "ammount": 0.00000001,
+                "amount": 0.00000001,
                 "tx_hash": "0x030d20dab0b53c123a12f2696a5c8bd23f449789d677a1571e1cdea6eacf0285",
                 "type": "TO_RECEIVER",
                 "wallet_address": "",

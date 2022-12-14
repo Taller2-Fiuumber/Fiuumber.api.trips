@@ -1,6 +1,6 @@
 import requests
 
-import src.dal.trips_provider as trips_provider
+import src.services.trips_provider as trips_provider
 from src.utils.payments_processor import URL_USERS
 
 URL_EXPO = "https://api.expo.dev/v2"

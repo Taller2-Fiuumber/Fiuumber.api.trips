@@ -242,9 +242,9 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
-        assert service.trips_by_passenger_id("10", 0, 5, mongo_client) == [
-            self.trip1,
+        assert service.trips_by_passenger_id(mongo_client, "10", 0, 5, False) == [
             self.trip2,
+            self.trip1,
         ]
 
     def test_trips_by_driver_id(self):
@@ -254,7 +254,7 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
-        assert service.trips_by_driver_id("50", 0, 5, mongo_client) == [
-            self.trip1,
+        assert service.trips_by_driver_id(mongo_client, "50", 0, 5, False) == [
             self.trip2,
+            self.trip1,
         ]

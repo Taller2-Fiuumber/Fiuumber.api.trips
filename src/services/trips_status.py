@@ -1,5 +1,3 @@
-from fastapi import APIRouter, Body, Request, HTTPException, status
-from pymongo import MongoClient
 from src.utils.notifications_processor import (
     notify_for_assigned_driver,
     notify_for_new_trip,
@@ -59,7 +57,7 @@ def update_trip_status(id: str, mongo_client, status):
                 f"[ERROR -> Continue] send notification for trip requested {id} reason: {str(ex)}"
             )
             pass
-        
+
     stored_trip = database["trips"].find_one({"_id": id})
     if stored_trip is not None:
         return stored_trip

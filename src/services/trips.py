@@ -1,7 +1,7 @@
 import src.domain.status as trip_status
 from fastapi.encoders import jsonable_encoder
 from os import environ
-import src.dal.trips_provider as trips_provider
+import src.services.trips_provider as trips_provider
 from src.utils.notifications_processor import (
     notify_for_assigned_driver,
     notify_for_new_trip,
@@ -140,14 +140,15 @@ def assign_driver(id: str, driver_id, mongo_client):
 
 
 def trips_by_passenger_id(
-    userId: str, skip: int, limit: int, in_progress: bool = False
+    mongo_client, userId: str, skip: int, limit: int, in_progress: bool = False
 ):
     try:
         return trips_provider.get_trips_passenger(
-            userId, skip=skip, limit=limit, only_in_progress=in_progress
+            mongo_client, userId, skip=skip, limit=limit, only_in_progress=in_progress
         )
-    except Exception as ex:
+    except Exception:
         return None
+
 
 def total_trips_by_passenger_id(userId: str, mongo_client):
     database = mongo_client[DB_NAME]
@@ -158,17 +159,20 @@ def total_trips_by_passenger_id(userId: str, mongo_client):
     return -1
 
 
-def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = False):
+def trips_by_driver_id(
+    mongo_client, userId: str, skip: int, limit: int, in_progress: bool = False
+):
     try:
         return trips_provider.get_trips_driver(
-            userId, skip=skip, limit=limit, only_in_progress=in_progress
+            mongo_client, userId, skip=skip, limit=limit, only_in_progress=in_progress
         )
-    except Exception as ex:
+    except Exception:
         return None
 
 
 def total_trips_by_driver_id(userId: str, mongo_client):
     database = mongo_client[DB_NAME]
+
     trips = database["trips"].find({"driverId": userId})
     if trips is not None:
         return len(list(trips))
