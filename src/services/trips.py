@@ -4,6 +4,7 @@ from pymongo import MongoClient
 
 from src.domain.trip import Trip, TripUpdate
 import src.domain.status as trip_status
+import src.dal.trips_provider as trips_provider
 
 
 from os import environ
@@ -192,27 +193,15 @@ def assign_driver(id: str, request: Request, body=Body(...)):
 def trips_by_passenger_id(
     userId: str, skip: int, limit: int, in_progress: bool = False
 ):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
-
-    filters = (
-        {
-            "$and": [
-                {"passengerId": userId},
-                {"status": {"$in": ["REQUESTED", "DRIVER_ASSIGNED", "DRIVER_ARRIVED", "IN_PROGRESS"]}},
-            ]
-        }
-        if in_progress
-        else {"passengerId": userId}
-    )
-    print(filters)
-    trips = database["trips"].find(filters).skip(skip).limit(limit).sort("start", -1)
-    if trips is not None:
-        return list(trips)
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Trips with passenger id {userId} not found",
-    )
+    try:
+        return trips_provider.get_trips_passenger(
+            userId, skip=skip, limit=limit, only_in_progress=in_progress
+        )
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Trips with passenger id {userId} not found: {str(ex)}",
+        )
 
 
 @router.get(
@@ -233,36 +222,15 @@ def total_trips_by_passenger_id(userId: str):
 
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
 def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = False):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
-
-    filters = (
-        {
-            "$and": [
-                {"driverId": userId},
-                {
-                    "status": {
-                        "$in": [
-                            "REQUESTED",
-                            "DRIVER_ASSIGNED",
-                            "DRIVER_ARRIVED",
-                            "IN_PROGRESS",
-                        ]
-                    }
-                },
-            ]
-        }
-        if in_progress
-        else {"driverId": userId}
-    )
-
-    trips = database["trips"].find(filters).skip(skip).limit(limit).sort("start", -1)
-    if trips is not None:
-        return list(trips)
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Trips with driver id {userId} not found",
-    )
+    try:
+        return trips_provider.get_trips_driver(
+            userId, skip=skip, limit=limit, only_in_progress=in_progress
+        )
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Trips with driver id {userId} not found: {str(ex)}",
+        )
 
 
 @router.get("/driver/{userId}/count", response_description="Count trips by driver id")
