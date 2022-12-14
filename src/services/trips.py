@@ -9,7 +9,10 @@ import src.dal.trips_provider as trips_provider
 
 from os import environ
 
-from src.utils.notifications_processor import notify_for_new_trip
+from src.utils.notifications_processor import (
+    notify_for_assigned_driver,
+    notify_for_new_trip,
+)
 
 MONGODB_URL = environ["MONGODB_URL"]
 DB_NAME = environ["DB_NAME"]
@@ -189,6 +192,14 @@ def assign_driver(id: str, request: Request, body=Body(...)):
             {"_id": id},
             {"$set": {"driverId": body.get("driverId"), "status": "DRIVER_ASSIGNED"}},
         )
+
+        try:
+            notify_for_assigned_driver(id)
+        except Exception as ex:
+            print(
+                f"[ERROR -> Continue] send notification for driver assigned {id} reason: {str(ex)}"
+            )
+            pass
 
         stored_trip = database["trips"].find_one({"_id": id})
 
