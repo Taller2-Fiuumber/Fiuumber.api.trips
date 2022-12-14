@@ -27,6 +27,7 @@ class TestFareService:
             "seniorityDriver": 0.5,
             "seniorityPassenger": -0.25,
             "recentTripAmount": -0.2,
+            "nightShift": 0,
         }
         fare_rule1 = FareRule(**external_data_1)
 
@@ -47,6 +48,8 @@ class TestFareService:
             "seniorityDriver": 0.5,
             "seniorityPassenger": -0.25,
             "recentTripAmount": -0.2,
+            "nightShift": 0,
+
         }
         fare_rule2 = FareRule(**external_data_1)
         self.fare_rule2 = jsonable_encoder(fare_rule2)
@@ -66,6 +69,7 @@ class TestFareService:
             "to_address": "Calle Falsa 666",
             "start": datetime.now(),
             "finish": datetime.now(),
+
         }
         trip1 = Trip(**external_data_3)
         self.trip1 = jsonable_encoder(trip1)
@@ -92,4 +96,4 @@ class TestFareService:
 
     def test_get_trip_fare_to_test_new_fare_rule(self):
         self.setUp()
-        assert service.get_trip_fare_to_test_new_fare_rule() == 224.95
+        assert round(service.get_trip_fare_to_test_new_fare_rule(), 2) == 225.15

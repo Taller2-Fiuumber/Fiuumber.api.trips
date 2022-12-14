@@ -39,17 +39,17 @@ class TestFareCalculatorService:
     def test_calculate_final(self):
         assert (
             service.calculate_final(
-                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 2, 3, 4, 5
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 8, 9, 2, 3, 4, 5
             )
-            == 311
+            == 374
         )
 
     def test_calculate_test(self):
         assert (
             service.calculate_test(
-                1, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 50, 1, 2, 3, 1, 0, 9, 8, 9
+                1, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 50, 1, 2, 3, 1, 0, 9, 8, 9, 1
             )
-            == 206
+            == 132
         )
 
     def test_lineal(self):

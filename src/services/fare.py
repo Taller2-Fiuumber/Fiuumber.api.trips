@@ -31,7 +31,8 @@ def get_trip_fare_final(
     database = mongo_client[DB_NAME]
     fare_rule = database["fare_rules"].find_one({"selected": True})
 
-    if (fare_rule) is not None:
+
+    if fare_rule is not None:
         fare = fare_calculator.calculate_final(
             fare_rule["minimum"],
             fare_rule["duration"],
@@ -43,6 +44,7 @@ def get_trip_fare_final(
             fare_rule["seniorityDriver"],
             fare_rule["seniorityPassenger"],
             fare_rule["recentTripAmount"],
+            fare_rule["nightShift"],
             duration,
             distance,
             fare_calculator.daily_trip_amount_driver(mongo_client, driver_id),
@@ -51,7 +53,8 @@ def get_trip_fare_final(
             fare_calculator.monthly_trip_amount_passenger(mongo_client, passenger_id),
             fare_calculator.get_driver_seniority(mongo_client, driver_id),
             fare_calculator.get_passenger_seniority(mongo_client, passenger_id),
-            fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
+            fare_calculator.get_recent_trip_amount(mongo_client, passenger_id), 
+            fare_calculator.is_night_shift(),
         )
         return fare
     else:
@@ -70,12 +73,12 @@ def get_trip_fare_to_test_fare_rule(
     seniorityDriver: float = 2,
     seniorityPassenger: float = 1,
     recentTripAmount: float = 2,
+    nightShift: float = 1,
 ):
     database = mongo_client[DB_NAME]
     fare_rule = database["fare_rules"].find_one({"_id": fare_id})
-    if (fare_rule) is not None:
+    if fare_rule is not None:
         fare = fare_calculator.calculate_test(
-            fare_rule["time"],
             fare_rule["minimum"],
             fare_rule["duration"],
             fare_rule["distance"],
@@ -86,6 +89,7 @@ def get_trip_fare_to_test_fare_rule(
             fare_rule["seniorityDriver"],
             fare_rule["seniorityPassenger"],
             fare_rule["recentTripAmount"],
+            fare_rule["nightShift"],
             duration,
             distance,
             dailyTripAmountDriver,
@@ -95,13 +99,13 @@ def get_trip_fare_to_test_fare_rule(
             seniorityDriver,
             seniorityPassenger,
             recentTripAmount,
+            nightShift,
         )
         return fare
     return None
 
 
 def get_trip_fare_to_test_new_fare_rule(
-    time_fare: float = 1,
     minimum_fare: float = 200,
     duration_fare: float = 0.1,
     distance_fare: float = 0.1,
@@ -112,6 +116,7 @@ def get_trip_fare_to_test_new_fare_rule(
     seniorityDriver_fare: float = -0.6,
     seniorityPassenger_fare: float = -0.3,
     recentTripAmount_fare: float = 0.2,
+    nightShift_fare: float = 0.2,
     duration: float = 20,
     distance: float = 12,
     dailyTripAmountDriver: float = 15,
@@ -121,10 +126,10 @@ def get_trip_fare_to_test_new_fare_rule(
     seniorityDriver: float = 2,
     seniorityPassenger: float = 1,
     recentTripAmount: float = 2,
+    nightShift: float = 1,
 ):
 
     fare = fare_calculator.calculate_test(
-        time_fare,
         minimum_fare,
         duration_fare,
         distance_fare,
@@ -135,6 +140,7 @@ def get_trip_fare_to_test_new_fare_rule(
         seniorityDriver_fare,
         seniorityPassenger_fare,
         recentTripAmount_fare,
+        nightShift_fare,
         duration,
         distance,
         dailyTripAmountDriver,
@@ -144,5 +150,6 @@ def get_trip_fare_to_test_new_fare_rule(
         seniorityDriver,
         seniorityPassenger,
         recentTripAmount,
+        nightShift,
     )
     return fare
