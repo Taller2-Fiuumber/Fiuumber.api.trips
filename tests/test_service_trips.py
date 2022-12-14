@@ -210,7 +210,7 @@ class TestTrips:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip2)
         mongo_client[DB_NAME]["trips"].insert_one(self.trip3)
-        assert service.delete_all_trip(mongo_client, None) ==  3
+        assert service.delete_all_trip(mongo_client) ==  3
 
     def test_find_trip_status(self):
         self.setUp()

@@ -36,9 +36,7 @@ def create_trip(request: Request, trip: Trip = Body(...)):
 def list_trips(request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
    
-
-   
-    trips = list_trips(mongo_client)
+    trips = services.list_trips(mongo_client)
     return trips
 
 
@@ -46,8 +44,8 @@ def list_trips(request: Request):
 def find_trip_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    trip = find_trip_by_id(id, mongo_client)
-    if (trip ) is not None:
+    trip = services.find_trip_by_id(id, mongo_client)
+    if trip is not None:
         return trip
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
@@ -77,7 +75,7 @@ def update_trip(id: str, request: Request, trip: TripUpdate = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     trip = {k: v for k, v in trip.dict().items() if v is not None}
 
-    updated_trip = services.update_trip(id, mongo_client)
+    updated_trip = services.update_trip(id, mongo_client, trip)
     if (updated_trip is not None) :
         return updated_trip
     raise HTTPException(
@@ -106,7 +104,7 @@ def delete_all_trip( request: Request, response: Response):
 
     delete_result = services.delete_all_trip( mongo_client)
     if not delete_result:
-        return delete_result
+        return None
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trips not found"
@@ -131,9 +129,9 @@ def find_trip_status(id: str, request: Request):
 async def patch_item(id: str, body=Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
     _body = body.dict(exclude_unset=True)
-    stored_trip = services.patch_item(id,_body)
+    stored_trip = services.patch_item(id,_body, mongo_client)
   
-    if (stored_trip) is not None:
+    if stored_trip is not None:
         return stored_trip
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip with ID {id} not found"
@@ -176,7 +174,7 @@ def trips_by_passenger_id(userId: str, skip: int, limit: int, request: Request):
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
 def trips_by_driver_id(userId: str, skip: int, limit: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    trips = services.trips_by_passenger_id(userId, skip, limit, mongo_client)
+    trips = services.trips_by_driver_id(userId, skip, limit, mongo_client)
     if trips is not None:
         return trips
     raise HTTPException(

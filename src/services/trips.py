@@ -54,6 +54,19 @@ def duration_by_id(id: str, mongo_client):
 
 
 
+async def patch_item(id: str, body, mongo_client):
+    database = mongo_client[DB_NAME]
+    stored_trip = database["trips"].find_one({"_id": id})
+    if stored_trip is not None:
+        update_data = body
+        updated_item = stored_trip.copy(update=update_data)
+        update_result = database["trips"].update_one(
+            {"_id": id}, {"$set": jsonable_encoder(updated_item)}
+        )
+        return update_result
+    return None
+
+
 def update_trip(id: str,mongo_client, trip):
     database = mongo_client[DB_NAME]
 
@@ -79,12 +92,12 @@ def delete_trip(id: str, mongo_client):
 
 
 
-def delete_all_trip( mongo_client, response: Response):
+def delete_all_trip( mongo_client):
     database = mongo_client[DB_NAME]
 
     delete_result = database["trips"].delete_many({})
     if not delete_result:
-        return response
+        return None
 
     return delete_result.deleted_count
 

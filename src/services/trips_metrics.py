@@ -79,7 +79,7 @@ def get_trip_duration_avg(mongo_client):
     return None
 
 
-def count_trips_duration_last_n_months_range(amount: int, mongo_client):
+def count_trips_duration_last_n_months_range(amount: int, mongo_client): 
     database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
@@ -205,7 +205,7 @@ def count_trips_by_status(status: str, mongo_client):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
+        return list(data)[0]["count"]
     return None
 
 
@@ -235,7 +235,7 @@ def count_trips_new_count_today(mongo_client):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
+        return list(data)[0]["count"]
     return None
 
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, HTTPException, status
 
-import src.domain.fare_calculator as fare_calculator
+import src.services.fare_calculator as fare_calculator
 import src.services.fare as services
 from pymongo import MongoClient
 
