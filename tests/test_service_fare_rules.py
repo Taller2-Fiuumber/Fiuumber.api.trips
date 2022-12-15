@@ -57,6 +57,11 @@ class TestFareRulesService:
         mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
         assert service.get_selected_fare(mongo_client) == self.fare_rule1
 
+    def test_get_selected_fare_is_none(self):
+        self.setUp()
+        mongo_client = mongomock.MongoClient()
+        assert service.get_selected_fare(mongo_client) is None
+
     def test_create_fare_rule(self):
         self.setUp()
         mongo_client = mongomock.MongoClient()
@@ -88,3 +93,34 @@ class TestFareRulesService:
         result = self.fare_rule2
         result["selected"] = True
         assert service.select_a_fare_rule("2", mongo_client) == self.fare_rule2
+
+    def test_count_fare_rules(self):
+        self.setUp()
+        mongo_client = mongomock.MongoClient()
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule2)
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
+        assert service.count_fare_rules(mongo_client) == 2
+
+    def test_count_fare_rules_zero(self):
+        self.setUp()
+        mongo_client = mongomock.MongoClient()
+        assert service.count_fare_rules(mongo_client) == 0
+
+    def test_get_page_fare_rules(self):
+        self.setUp()
+        mongo_client = mongomock.MongoClient()
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule2)
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
+        assert service.list_fare_rules_pagination(0, 1, mongo_client) == [
+            self.fare_rule2
+        ]
+
+    def test_get_page_fare_rules_different_limit(self):
+        self.setUp()
+        mongo_client = mongomock.MongoClient()
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule2)
+        mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
+        assert service.list_fare_rules_pagination(0, 2, mongo_client) == [
+            self.fare_rule2,
+            self.fare_rule1,
+        ]
