@@ -21,6 +21,7 @@ HEADERS = {"Content-type": "application/json", "Accept": "application/json"}
 
 mongo_client = MongoClient(MONGODB_URL, connect=False)
 
+
 def cancel_from_passenger(trip_id, latitude=None, longitude=None):
     try:
         trip = trips_provider.get_trip_by_id(trip_id)
@@ -49,7 +50,9 @@ def cancel_from_passenger(trip_id, latitude=None, longitude=None):
             return
 
         # setear el viaje en cancelado
-        return services.update_trip_status(id, mongo_client, trip_status.Canceled.name())
+        return services.update_trip_status(
+            id, mongo_client, trip_status.Canceled.name()
+        )
 
     except Exception as ex:
         raise ex

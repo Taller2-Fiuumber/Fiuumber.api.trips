@@ -6,14 +6,14 @@ import datetime
 class FareRule(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     selected: bool = (False,)
-    createdAt: datetime.datetime = Field(...)
-    updatedAt: datetime.datetime = Field(...)
+    createdAt: datetime.datetime = (datetime.datetime.now(),)
+    updatedAt: datetime.datetime = (datetime.datetime.now(),)
     minimum: float = (0,)
     duration: float = (0,)
     distance: float = (0,)
     dailyTripAmountDriver: float = (0,)
     dailyTripAmountPassenger: float = (0,)
-    monthlyTripAmountDrive: float = (0,)
+    monthlyTripAmountDriver: float = (0,)
     monthlyTripAmountPassenger: float = (0,)
     seniorityDriver: float = (0,)
     seniorityPassenger: float = (0,)
@@ -25,14 +25,12 @@ class FareRule(BaseModel):
         schema_extra = {
             "example": {
                 "selected": False,
-                "createdAt": datetime.datetime(2022, 9, 9, 2),
-                "updatedAt": datetime.datetime(2022, 9, 9, 2),
                 "minimum": 200.0,
                 "duration": 5,
                 "distance": 6,
                 "dailyTripAmountDriver": 0.7,
                 "dailyTripAmountPassenger": -0.7,
-                "monthlyTripAmountDrive": 0.8,
+                "monthlyTripAmountDriver": 0.8,
                 "monthlyTripAmountPassenger": -0.8,
                 "seniorityDriver": 0.5,
                 "seniorityPassenger": -0.25,
@@ -61,7 +59,7 @@ class FareRuleUpdate(BaseModel):
                 "distance": 6,
                 "dailyTripAmountDriver": 0.7,
                 "dailyTripAmountPassenger": -0.7,
-                "monthlyTripAmountDrive": 0.8,
+                "monthlyTripAmountDriver": 0.8,
                 "monthlyTripAmountPassenger": -0.8,
                 "seniorityDriver": 0.5,
                 "seniorityPassenger": -0.25,

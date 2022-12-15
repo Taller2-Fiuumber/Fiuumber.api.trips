@@ -1,6 +1,6 @@
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def get_selected_fare(mongo_client):
@@ -16,10 +16,15 @@ def get_selected_fare(mongo_client):
 def create_fare_rule(mongo_client, fare_rule):
     database = mongo_client[DB_NAME]
 
+    print("_____________fare_rules", fare_rule)
     new_fare_rule = database["fare_rules"].insert_one(fare_rule)
+    print("_____________new_fare_rules", new_fare_rule)
+
     created_new_fare_rule = database["fare_rules"].find_one(
         {"_id": new_fare_rule.inserted_id}
     )
+
+    print("_____________created_new_fare_rule", created_new_fare_rule)
 
     if created_new_fare_rule is not None:
         return created_new_fare_rule

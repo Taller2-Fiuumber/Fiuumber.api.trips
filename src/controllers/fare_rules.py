@@ -31,11 +31,10 @@ def get_selected_fare(request: Request):
     response_description="Create a fare rule",
     status_code=status.HTTP_201_CREATED,
 )
-def create_fare_rule(request: Request, rule: FareRule = Body(...)):
+def create_fare_rule(request: Request, fare_rule: FareRule = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    fare_rule = jsonable_encoder(rule)
-    new_fare_rule = services.create_fare_rule(mongo_client, fare_rule)
+    new_fare_rule = services.create_fare_rule(mongo_client, jsonable_encoder(fare_rule))
 
     if new_fare_rule is not None:
         return new_fare_rule

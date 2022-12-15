@@ -1,6 +1,6 @@
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def get_trip_by_id(mongo_client, trip_id):

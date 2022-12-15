@@ -8,7 +8,7 @@ from datetime import datetime
 
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 class TestFareService:
@@ -23,7 +23,7 @@ class TestFareService:
             "distance": 6,
             "dailyTripAmountDriver": 0.7,
             "dailyTripAmountPassenger": -0.7,
-            "monthlyTripAmountDrive": 0.8,
+            "monthlyTripAmountDriver": 0.8,
             "monthlyTripAmountPassenger": -0.8,
             "seniorityDriver": 0.5,
             "seniorityPassenger": -0.25,
@@ -44,7 +44,7 @@ class TestFareService:
             "distance": 6,
             "dailyTripAmountDriver": 0.7,
             "dailyTripAmountPassenger": -0.7,
-            "monthlyTripAmountDrive": 0.8,
+            "monthlyTripAmountDriver": 0.8,
             "monthlyTripAmountPassenger": -0.8,
             "seniorityDriver": 0.5,
             "seniorityPassenger": -0.25,

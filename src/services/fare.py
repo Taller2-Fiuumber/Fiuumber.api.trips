@@ -5,7 +5,7 @@ import src.services.fare_calculator as fare_calculator
 
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
@@ -39,7 +39,7 @@ def get_trip_fare_final(
             fare_rule["distance"],
             fare_rule["dailyTripAmountDriver"],
             fare_rule["dailyTripAmountPassenger"],
-            fare_rule["monthlyTripAmountDrive"],
+            fare_rule["monthlyTripAmountDriver"],
             fare_rule["monthlyTripAmountPassenger"],
             fare_rule["seniorityDriver"],
             fare_rule["seniorityPassenger"],
@@ -68,7 +68,7 @@ def get_trip_fare_to_test_fare_rule(
     distance: float = 12,
     dailyTripAmountDriver: float = 15,
     dailyTripAmountPassenger: float = 2,
-    monthlyTripAmountDrive: float = 100,
+    monthlyTripAmountDriver: float = 100,
     monthlyTripAmountPassenger: float = 5,
     seniorityDriver: float = 2,
     seniorityPassenger: float = 1,
@@ -84,7 +84,7 @@ def get_trip_fare_to_test_fare_rule(
             fare_rule["distance"],
             fare_rule["dailyTripAmountDriver"],
             fare_rule["dailyTripAmountPassenger"],
-            fare_rule["monthlyTripAmountDrive"],
+            fare_rule["monthlyTripAmountDriver"],
             fare_rule["monthlyTripAmountPassenger"],
             fare_rule["seniorityDriver"],
             fare_rule["seniorityPassenger"],
@@ -94,7 +94,7 @@ def get_trip_fare_to_test_fare_rule(
             distance,
             dailyTripAmountDriver,
             dailyTripAmountPassenger,
-            monthlyTripAmountDrive,
+            monthlyTripAmountDriver,
             monthlyTripAmountPassenger,
             seniorityDriver,
             seniorityPassenger,
@@ -121,7 +121,7 @@ def get_trip_fare_to_test_new_fare_rule(
     distance: float = 12,
     dailyTripAmountDriver: float = 15,
     dailyTripAmountPassenger: float = 2,
-    monthlyTripAmountDrive: float = 100,
+    monthlyTripAmountDriver: float = 100,
     monthlyTripAmountPassenger: float = 5,
     seniorityDriver: float = 2,
     seniorityPassenger: float = 1,
@@ -145,7 +145,7 @@ def get_trip_fare_to_test_new_fare_rule(
         distance,
         dailyTripAmountDriver,
         dailyTripAmountPassenger,
-        monthlyTripAmountDrive,
+        monthlyTripAmountDriver,
         monthlyTripAmountPassenger,
         seniorityDriver,
         seniorityPassenger,

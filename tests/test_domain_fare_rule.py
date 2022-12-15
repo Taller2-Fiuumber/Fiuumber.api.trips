@@ -16,7 +16,7 @@ class TestFareRuleDomain:
             "distance": 6,
             "dailyTripAmountDriver": 0.7,
             "dailyTripAmountPassenger": -0.7,
-            "monthlyTripAmountDrive": 0.8,
+            "monthlyTripAmountDriver": 0.8,
             "monthlyTripAmountPassenger": -0.8,
             "seniorityDriver": 0.5,
             "seniorityPassenger": -0.25,
@@ -34,7 +34,7 @@ class TestFareRuleDomain:
         assert fare_rule["distance"] == 6
         assert fare_rule["dailyTripAmountDriver"] == 0.7
         assert fare_rule["dailyTripAmountPassenger"] == -0.7
-        assert fare_rule["monthlyTripAmountDrive"] == 0.8
+        assert fare_rule["monthlyTripAmountDriver"] == 0.8
         assert fare_rule["monthlyTripAmountPassenger"] == -0.8
         assert fare_rule["seniorityDriver"] == 0.5
         assert fare_rule["seniorityPassenger"] == -0.25
