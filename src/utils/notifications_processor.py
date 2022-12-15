@@ -96,9 +96,9 @@ def notify_driver_for_new_trip(driver_id, price):
         raise ex
 
 
-def notify_for_new_trip(trip_id):
+def notify_for_new_trip(mongo_client, trip_id):
     try:
-        trip = trips_provider.get_trip_by_id(trip_id)
+        trip = trips_provider.get_trip_by_id(mongo_client, trip_id)
         drivers = get_available_drivers()
         for driver in drivers:
             try:

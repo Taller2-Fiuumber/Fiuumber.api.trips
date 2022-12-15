@@ -52,8 +52,6 @@ class FareRuleUpdate(BaseModel):
             "example": {
                 "_id": "066de609-b04a-4b30-b46c-32537c7f1f6e",
                 "selected": True,
-                "createdAt": datetime.datetime(2022, 9, 9, 2),
-                "updatedAt": datetime.datetime(2022, 11, 10, 2),
                 "minimum": 200.0,
                 "duration": 5,
                 "distance": 6,
