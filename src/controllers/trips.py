@@ -2,7 +2,11 @@ from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from pymongo import MongoClient
 
-from src.utils.cancelation_processor import cancel_from_driver, cancel_from_passenger
+from src.utils.cancelation_processor import (
+    cancel_all_requested,
+    cancel_from_driver,
+    cancel_from_passenger,
+)
 
 from src.domain.trip import Trip, TripUpdate
 import src.services.trips as services
@@ -214,7 +218,7 @@ def total_trips_by_driver_id(userId: str):
     )
 
 
-@router.get(
+@router.post(
     "/passenger/cancel-trip/{tripId}",
     response_description="Cancel a trip from passenger",
 )
@@ -222,7 +226,20 @@ def passenger_cancel_trip(tripId: str, body=Body(...)):
     try:
         latitude = body.get("latitude")
         longitude = body.get("longitude")
-        cancel_from_passenger(tripId, latitude=latitude, longitude=longitude)
+        return cancel_from_passenger(tripId, latitude=latitude, longitude=longitude)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cannot cancel {tripId}: {str(ex)}",
+        )
+
+
+@router.post(
+    "/driver/cancel-trip/{tripId}", response_description="Cancel a trip from driver"
+)
+def driver_cancel_trip(tripId: str):
+    try:
+        return cancel_from_driver(tripId)
     except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -231,15 +248,13 @@ def passenger_cancel_trip(tripId: str, body=Body(...)):
 
 
 @router.get(
-    "/driver/cancel-trip/{tripId}", response_description="Cancel a trip from driver"
+    "/trips/cancel-requested-trips", response_description="Cancel all requested trips"
 )
-def driver_cancel_trip(tripId: str, body=Body(...)):
+def cancel_all_trips_requested():
     try:
-        latitude = body.get("latitude")
-        longitude = body.get("longitude")
-        cancel_from_driver(tripId, latitude=latitude, longitude=longitude)
+        return cancel_all_requested()
     except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Cannot cancel {tripId}: {str(ex)}",
+            detail=f"Cannot cancel trips: {str(ex)}",
         )

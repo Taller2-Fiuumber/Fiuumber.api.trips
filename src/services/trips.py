@@ -177,3 +177,14 @@ def total_trips_by_driver_id(userId: str, mongo_client):
     if trips is not None:
         return len(list(trips))
     return -1
+
+
+def update_trip_fare(trip_id: str, price, mongo_client):
+    database = mongo_client[DB_NAME]
+
+    database["trips"].update_one(
+        {"_id": trip_id},
+        {"$set": {"finalPrice": price}},
+    )
+
+    return database["trips"].find_one({"_id": trip_id})

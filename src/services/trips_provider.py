@@ -3,6 +3,16 @@ from os import environ
 DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
+def get_trips(mongo_client, status=[]):
+    database = mongo_client[DB_NAME]
+
+    trips = database["trips"].find(
+        {"status": {"$in": status}},
+    )
+
+    return list(trips)
+
+
 def get_trip_by_id(mongo_client, trip_id):
     database = mongo_client[DB_NAME]
 
