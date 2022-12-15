@@ -35,6 +35,9 @@ jobs:
     - name: Test with pytest
       run: |
         make test
+    - name: Coverage 75%
+      run: |
+        make coverage
 
   build-and-push-image:
     needs: [unit-test]

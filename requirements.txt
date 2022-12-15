@@ -11,3 +11,7 @@ uvicorn
 
 requests
 geopy
+mongomock
+pytest-cov
+pytest-xdist
+coverage
