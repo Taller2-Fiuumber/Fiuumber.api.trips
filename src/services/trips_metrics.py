@@ -1,23 +1,16 @@
-from fastapi import APIRouter, Request, HTTPException
-from pymongo import MongoClient
-
-from os import environ
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-MONGODB_URL = environ["MONGODB_URL"]
-DB_NAME = environ["DB_NAME"]
-router = APIRouter()
+from os import environ
+
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+
 
 # Duration----------------------------------------------------------------------
 
 
-@router.get(
-    "/duration/min", response_description="Get trip duration minimum in minutes"
-)
-def get_trip_duration_min(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def get_trip_duration_min(mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration = {
@@ -35,15 +28,11 @@ def get_trip_duration_min(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["min_duration"] / 60000
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/duration/max", response_description="Get trip duration maximum in minutes"
-)
-def get_trip_duration_max(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def get_trip_duration_max(mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration = {
@@ -61,15 +50,11 @@ def get_trip_duration_max(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["max_duration"] / 60000
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/duration/avg", response_description="Get trip duration average in minutes"
-)
-def get_trip_duration_avg(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def get_trip_duration_avg(mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_trip_duration = {
@@ -87,15 +72,11 @@ def get_trip_duration_avg(request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)[0]["avg_duration"] / 60000
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/duration/months/range", response_description="Count new trips last n months"
-)
-def count_trips_duration_last_n_months_range(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_duration_last_n_months_range(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_month = {
@@ -117,18 +98,13 @@ def count_trips_duration_last_n_months_range(amount: int, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/duration/years-and-months/range",
-    response_description="Count duratoin of trips last n months and years",
-)
 def count_trips_duration_last_n_years_and_m_months_range(
-    years: int, months: int, request: Request
+    years: int, months: int, mongo_client
 ):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_years_month = {
@@ -154,15 +130,11 @@ def count_trips_duration_last_n_years_and_m_months_range(
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/duration/years/range", response_description="Count new trips last n years"
-)
-def count_trips_duration_last_n_years_range(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_duration_last_n_years_range(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_years = {
@@ -184,13 +156,11 @@ def count_trips_duration_last_n_years_range(amount: int, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/duration/days/range", response_description="Count new trips last n days")
-def count_trips_duration_last_n_days_range(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_duration_last_n_days_range(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_days = {
@@ -212,19 +182,17 @@ def count_trips_duration_last_n_days_range(amount: int, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
 # Status------------------------------------------------------------------------
 
 
-@router.get("/status/count", response_description="Count trips by status")
-def count_trips_by_status(status: str, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_by_status(status: str, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": status}}
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_terminated_status, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
@@ -238,12 +206,8 @@ def count_trips_by_status(status: str, request: Request):
         return 0
 
 
-@router.get(
-    "/status/passenger/{id}/count", response_description="Count trips by status"
-)
-def count_trips_of_passenger_by_status(id: str, status: str, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_of_passenger_by_status(id: str, status: str, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": status, "passengerId": id}}
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
@@ -260,10 +224,8 @@ def count_trips_of_passenger_by_status(id: str, status: str, request: Request):
         return 0
 
 
-@router.get("/status/driver/{id}/count", response_description="Count trips by status")
-def count_trips_of_driver_by_status(id: str, status: str, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_of_driver_by_status(id: str, status: str, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": status, "driverId": id}}
     stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
@@ -283,46 +245,40 @@ def count_trips_of_driver_by_status(id: str, status: str, request: Request):
 # Count------------------------------------------------------------------------
 
 
-@router.get("/count", response_description="Count trips")
-def count_trips(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips(mongo_client):
+    database = mongo_client[DB_NAME]
 
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail="Internal error")
+        return list(data)[0]["count"]
+    return None
 
 
-@router.get("/new/count/today", response_description="Count new trips by date")
-def count_trips_new_count_today(request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_count_today(mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_today = {"$match": {"start": {"$gte": datetime.today()}}}
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [stage_match_terminated_status, stage_match_today, stage_trip_count]
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail="Internal error")
+        return list(data)[0]["count"]
+    return None
 
 
-@router.get("/new/count/days", response_description="Count new trips last n days")
-def count_trips_new_countlast_n_days(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_countlast_n_days(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_days = {
         "$match": {"start": {"$gte": datetime.today() - timedelta(days=amount)}}
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [
         stage_match_terminated_status,
         stage_match_last_n_days,
@@ -331,14 +287,12 @@ def count_trips_new_countlast_n_days(amount: int, request: Request):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail="Internal error")
+        return list(data)[0]["count"]
+    return None
 
 
-@router.get("/new/count/days/range", response_description="Count new trips last n days")
-def count_trips_new_countlast_n_days_range(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_countlast_n_days_range(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
     stage_match_last_n_days = {
@@ -359,20 +313,18 @@ def count_trips_new_countlast_n_days_range(amount: int, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/new/count/months", response_description="Count new trips last n months")
-def count_trips_new_count_last_n_months(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_count_last_n_months(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
     stage_match_last_n_month = {
         "$match": {"start": {"$gte": datetime.today() - relativedelta(months=+amount)}}
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [
         stage_match_terminated_status,
         stage_match_last_n_month,
@@ -381,16 +333,12 @@ def count_trips_new_count_last_n_months(amount: int, request: Request):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail="Internal error")
+        return list(data)[0]["count"]
+    return None
 
 
-@router.get(
-    "/new/count/months/range", response_description="Count new trips last n months"
-)
-def count_trips_new_count_last_n_months_range(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_count_last_n_months_range(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -412,15 +360,11 @@ def count_trips_new_count_last_n_months_range(amount: int, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/new/count/years/range", response_description="Count new trips last n years"
-)
-def count_trips_new_count_last_n_years_range(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_count_last_n_years_range(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -442,18 +386,13 @@ def count_trips_new_count_last_n_years_range(amount: int, request: Request):
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get(
-    "/new/count/years-and-months/range",
-    response_description="Count new trips last n years",
-)
 def count_trips_new_count_last_n_years_and_m_months_range(
-    years: int, months: int, request: Request
+    years: int, months: int, mongo_client
 ):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
@@ -479,20 +418,18 @@ def count_trips_new_count_last_n_years_and_m_months_range(
     data = database["trips"].aggregate(pipeline)
     if data is not None:
         return list(data)
-    raise HTTPException(status_code=500, detail="Internal error")
+    return None
 
 
-@router.get("/new/count/year", response_description="Count new trips last n years")
-def count_trips_new_count_last_n_years(amount: int, request: Request):
-    mongo_client = MongoClient(MONGODB_URL, connect=False)
-    database = mongo_client.mongodb_client[DB_NAME]
+def count_trips_new_count_last_n_years(amount: int, mongo_client):
+    database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
     stage_match_last_n_month = {
         "$match": {"start": {"$gte": datetime.today() - relativedelta(years=+amount)}}
     }
-    stage_trip_count = {"$group": {"_id": None, "count": {"$count": {}}}}
+    stage_trip_count = {"$group": {"_id": None, "count": {"$sum": 1}}}
     pipeline = [
         stage_match_terminated_status,
         stage_match_last_n_month,
@@ -501,5 +438,5 @@ def count_trips_new_count_last_n_years(amount: int, request: Request):
 
     data = database["trips"].aggregate(pipeline)
     if data is not None:
-        return 0 if len(data) == 0 else list(data)[0]["count"]
-    raise HTTPException(status_code=500, detail="Internal error")
+        return list(data)[0]["count"]
+    return None

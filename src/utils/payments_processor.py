@@ -1,8 +1,8 @@
 import requests
 
 from src.domain.payment import Payment
-import src.dal.trips_provider as trips_provider
-import src.dal.payments_provider as payments_provider
+import src.services.trips_provider as trips_provider
+import src.services.payments as payments
 
 URL_USERS = "https://fiuumber-api-users.herokuapp.com/api/users-service"
 URL_PAYMENTS = "https://fiuumber-api-payments.herokuapp.com/api/wallets-service"
@@ -10,15 +10,15 @@ MAX_ETH_TEST = 0.0005
 HEADERS = {"Content-type": "application/json", "Accept": "application/json"}
 
 
-def process_payments():
+def process_payments(mongo_client):
     try:
-        pending_payments = payments_provider.get_pending_payments()
+        pending_payments = payments.get_pending_payments(mongo_client)
         for payment in pending_payments:
             try:
                 print("[INFO] processing payment: " + payment["_id"])
-                payments_provider.mark_payment_as_processing(payment["_id"])
+                payments.mark_payment_as_processing(payment["_id"])
                 hash = process_payment(payment)
-                payments_provider.mark_payment_as_processed(payment["_id"], hash)
+                payments.mark_payment_as_processed(payment["_id"], hash)
             except Exception as ex:
                 print(
                     "[INFO] error processing payment: "
@@ -49,11 +49,11 @@ def process_payment(payment):
     try:
         hash = None
         if payment["type"] == "FROM_SENDER":
-            hash = deposit_from_sender(payment["wallet_address"], payment["ammount"])
+            hash = deposit_from_sender(payment["wallet_address"], payment["amount"])
 
         if payment["type"] == "TO_RECEIVER":
             # TODO: descontar comisión de Fiuumber ;)
-            hash = deposit_to_receiver(payment["wallet_address"], payment["ammount"])
+            hash = deposit_to_receiver(payment["wallet_address"], payment["amount"])
 
         return hash
     except Exception as ex:
@@ -63,18 +63,18 @@ def process_payment(payment):
 
 # Realiza un depósito desde la wallet provista en sender_address a la wallet de Fiuumber (owner)
 # Retorna el hash de la transaccion
-def deposit_from_sender(sender_address, ammount):
-    if ammount > MAX_ETH_TEST:
+def deposit_from_sender(sender_address, amount):
+    if amount > MAX_ETH_TEST:
         raise Exception("ETH value provided is too large for testing purposes")
     try:
         url = f"{URL_PAYMENTS}/depositFromSender"
-        formatted_ammount = "{:.10f}".format(ammount)
+        formatted_amount = "{:.10f}".format(amount)
         req_body = {
             "senderAddress": sender_address,
-            "amountInEthers": formatted_ammount,
+            "amountInEthers": formatted_amount,
         }
         print(
-            f"[INFO] deposit_from_sender {url} -> ETH: {formatted_ammount} sender: {sender_address}"
+            f"[INFO] deposit_from_sender {url} -> ETH: {formatted_amount} sender: {sender_address}"
         )
 
         r = requests.post(url, json=req_body)
@@ -92,19 +92,19 @@ def deposit_from_sender(sender_address, ammount):
 
 # Realiza un depósito desde la wallet de Fiuumber (owner) a la sender_address provista
 # Retorna el hash de la transaccion
-def deposit_to_receiver(receiver_address, ammount):
-    if ammount > MAX_ETH_TEST:
+def deposit_to_receiver(receiver_address, amount):
+    if amount > MAX_ETH_TEST:
         raise Exception("ETH value provided is too large for testing purposes")
     try:
         url = f"{URL_PAYMENTS}/depositToReceiver"
-        formatted_ammount = "{:.10f}".format(ammount)
+        formatted_amount = "{:.10f}".format(amount)
         req_body = {
             "receiverAddress": receiver_address,
-            "amountInEthers": formatted_ammount,
+            "amountInEthers": formatted_amount,
         }
 
         print(
-            f"[INFO] deposit_from_sender {url} -> ETH: {formatted_ammount} sender: {receiver_address}"
+            f"[INFO] deposit_from_sender {url} -> ETH: {formatted_amount} sender: {receiver_address}"
         )
 
         r = requests.post(url, json=req_body)
@@ -137,10 +137,11 @@ def get_user_wallet(user_id):
         raise ex
 
 
-def create_trip_payments(trip_id):
+def create_trip_payments(mongo_client, trip_id):
 
+    print("____________trip_id", trip_id)
     try:
-        trip = trips_provider.get_trip_by_id(trip_id)
+        trip = trips_provider.get_trip_by_id(mongo_client, trip_id)
         if trip is None:
             raise Exception(f"Trip with id={trip_id} was not found")
 
@@ -164,14 +165,14 @@ def create_trip_payments(trip_id):
         raise ex
 
 
-def create_payment(trip_id, type, ammount, wallet_address, order):
+def create_payment(trip_id, type, amount, wallet_address, order, mongo_client):
     payment = Payment.parse_obj(
         {
             "tripId": trip_id,
             "type": type,
-            "ammount": ammount,
+            "amount": amount,
             "wallet_address": wallet_address,
             "order": order,
         }
     )
-    return payments_provider.create_payment(payment)
+    return payments.create_payment(payment, mongo_client)

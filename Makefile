@@ -2,23 +2,29 @@ all: format test start-services exec
 
 test:
 	pip install pytest --quiet
-	pytest test
+	pytest --cov=src/domain --cov=src/services tests/
 
 format:
 	pip install black --quiet
 	black **.py
 	black src/*/*.py
-	black test/*/*.py
-	black test/*/*/*.py
+	black tests/*.py
 
 	pip install flake8 --quiet
 	flake8
+
+coverage:
+	pip install coverage --quiet
+	coverage report --fail-under=75 -m
 
 start-services:
 	docker-compose up --build --force-recreate -d
 
 stop-services:
 	docker-compose down
+
+install:
+	pip install -r requirements.txt
 
 exec:
 	docker exec -it fiuumberapitrip_web_1 sh

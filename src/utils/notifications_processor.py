@@ -1,6 +1,6 @@
 import requests
 
-import src.dal.trips_provider as trips_provider
+import src.services.trips_provider as trips_provider
 from src.utils.payments_processor import URL_USERS
 
 URL_EXPO = "https://api.expo.dev/v2"
@@ -54,11 +54,11 @@ def get_available_drivers():
         raise ex
 
 
-def notify_for_assigned_driver(trip_id):
+def notify_for_assigned_driver(mongo_client, trip_id):
     try:
-        trip = trips_provider.get_trip_by_id(trip_id)
+        trip = trips_provider.get_trip_by_id(mongo_client, trip_id)
         passenger_id = trip.get("passengerId")
-        notifications_token = get_notification_token(passenger_id)
+        notifications_token = get_notification_token(mongo_client, passenger_id)
         if notifications_token is None:
             raise Exception(
                 f"Passenger with id={passenger_id} has not setted notifications token"
