@@ -8,6 +8,7 @@ import src.dal.trips_provider as trips_provider
 
 
 from os import environ
+from src.utils.cancelation_processor import cancel_from_driver, cancel_from_passenger
 
 from src.utils.notifications_processor import (
     notify_for_assigned_driver,
@@ -240,6 +241,35 @@ def total_trips_by_passenger_id(userId: str):
         detail=f"Trips with passenger id {userId} not found",
     )
 
+
+
+@router.get(
+    "/passenger/cancel-trip/{tripId}", response_description="Cancel a trip from passenger"
+)
+def total_trips_by_passenger_id(tripId: str, body=Body(...)):
+    try:
+        latitude = body.get("latitude")
+        longitude = body.get("longitude")
+        cancel_from_passenger(tripId, latitude=latitude, longitude=longitude)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cannot cancel {tripId}: {str(ex)}",
+        )
+
+@router.get(
+    "/driver/cancel-trip/{tripId}", response_description="Cancel a trip from driver"
+)
+def total_trips_by_passenger_id(tripId: str, body=Body(...)):
+    try:
+        latitude = body.get("latitude")
+        longitude = body.get("longitude")
+        cancel_from_driver(tripId, latitude=latitude, longitude=longitude)
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cannot cancel {tripId}: {str(ex)}",
+        )
 
 @router.get("/driver/{userId}", response_description="Get trips by driver id")
 def trips_by_driver_id(userId: str, skip: int, limit: int, in_progress: bool = False):
