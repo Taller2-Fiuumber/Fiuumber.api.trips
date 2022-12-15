@@ -53,6 +53,25 @@ def list_fare_rules(request: Request):
     return None
 
 
+@router.get("/fare-rules/page", response_description="List all fare rules")
+def list_fare_rules_pagination(skip: int, limit: int, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+    data = services.list_fare_rules_pagination(skip, limit, mongo_client)
+    if data is not None:
+        return data
+
+
+@router.get("/fare-rules/amount", response_description="Count all fare rules")
+def count_fare_rules(request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+    count = services.count_fare_rules(mongo_client)
+    if count is not None:
+        return count
+    return None
+
+
 @router.get("/fare-rule/{id}", response_description="Get a single fare rule by id")
 def find_fare_rules_by_id(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
