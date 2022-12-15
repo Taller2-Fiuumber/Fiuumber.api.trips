@@ -146,11 +146,11 @@ def create_trip_payments(mongo_client, trip_id):
             raise Exception(f"Trip with id={trip_id} was not found")
 
         wallet_passenger = get_user_wallet(trip["passengerId"])
-        if trip is None:
+        if wallet_passenger is None:
             raise Exception("Passenger has not a wallet")
 
         wallet_driver = get_user_wallet(trip["driverId"])
-        if trip is None:
+        if wallet_driver is None:
             raise Exception("Driver has not a wallet")
 
         passenger_payment = create_payment(
@@ -176,3 +176,17 @@ def create_payment(trip_id, type, amount, wallet_address, order, mongo_client):
         }
     )
     return payments.create_payment(payment, mongo_client)
+
+
+def create_and_process_trip_payments(trip_id, mongo_client):
+    try:
+        (passenger_payment, driver_payment) = create_trip_payments(
+            mongo_client, trip_id
+        )
+        process_payment(passenger_payment)
+        process_payment(driver_payment)
+    except Exception as ex:
+        print(
+            f"[ERROR] cannot create or process payments for trip {trip_id} reason: {str(ex)}"
+        )
+        raise ex

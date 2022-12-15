@@ -214,7 +214,7 @@ def total_trips_by_driver_id(userId: str):
     )
 
 
-@router.get(
+@router.post(
     "/passenger/cancel-trip/{tripId}",
     response_description="Cancel a trip from passenger",
 )
@@ -222,7 +222,7 @@ def passenger_cancel_trip(tripId: str, body=Body(...)):
     try:
         latitude = body.get("latitude")
         longitude = body.get("longitude")
-        cancel_from_passenger(tripId, latitude=latitude, longitude=longitude)
+        return cancel_from_passenger(tripId, latitude=latitude, longitude=longitude)
     except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -230,14 +230,12 @@ def passenger_cancel_trip(tripId: str, body=Body(...)):
         )
 
 
-@router.get(
+@router.post(
     "/driver/cancel-trip/{tripId}", response_description="Cancel a trip from driver"
 )
-def driver_cancel_trip(tripId: str, body=Body(...)):
+def driver_cancel_trip(tripId: str):
     try:
-        latitude = body.get("latitude")
-        longitude = body.get("longitude")
-        cancel_from_driver(tripId, latitude=latitude, longitude=longitude)
+        return cancel_from_driver(tripId)
     except Exception as ex:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
