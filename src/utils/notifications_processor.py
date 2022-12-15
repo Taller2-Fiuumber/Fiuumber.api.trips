@@ -58,7 +58,7 @@ def notify_for_assigned_driver(mongo_client, trip_id):
     try:
         trip = trips_provider.get_trip_by_id(mongo_client, trip_id)
         passenger_id = trip.get("passengerId")
-        notifications_token = get_notification_token(mongo_client, passenger_id)
+        notifications_token = get_notification_token(passenger_id)
         if notifications_token is None:
             raise Exception(
                 f"Passenger with id={passenger_id} has not setted notifications token"
@@ -71,10 +71,10 @@ def notify_for_assigned_driver(mongo_client, trip_id):
         raise ex
 
 
-def notify_driver_for_new_trip(driver_id, price):
+def notify_driver_for_new_trip(mongo_client, driver_id, price):
     try:
         trips_in_progress = trips_provider.get_trips_driver(
-            driver_id, only_in_progress=True
+            mongo_client, driver_id, only_in_progress=True
         )
 
         if len(trips_in_progress) > 0:
@@ -96,15 +96,15 @@ def notify_driver_for_new_trip(driver_id, price):
         raise ex
 
 
-def notify_for_new_trip(trip_id):
+def notify_for_new_trip(mongo_client, trip_id):
     try:
-        trip = trips_provider.get_trip_by_id(trip_id)
+        trip = trips_provider.get_trip_by_id(mongo_client, trip_id)
         drivers = get_available_drivers()
         for driver in drivers:
             try:
                 driver_id = driver.get("userId")
                 price = str(trip.get("finalPrice"))
-                notify_driver_for_new_trip(driver_id, price)
+                notify_driver_for_new_trip(mongo_client, driver_id, price)
             except Exception as ex:
                 print(ex)
                 pass

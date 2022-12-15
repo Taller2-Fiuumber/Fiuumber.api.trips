@@ -85,3 +85,18 @@ def cancel_from_driver(trip_id, latitude=None, longitude=None):
 
     except Exception as ex:
         raise ex
+
+
+def cancel_all_requested():
+    try:
+        trips = trips_provider.get_trips(mongo_client, ["REQUESTED"])
+        for trip in trips:
+            print(trip)
+            trip_status_service.update_trip_status(
+                trip.get("_id"), mongo_client, trip_status.Canceled().name()
+            )
+
+        return None
+
+    except Exception as ex:
+        raise ex

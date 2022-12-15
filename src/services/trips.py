@@ -7,7 +7,7 @@ from src.utils.notifications_processor import (
     notify_for_new_trip,
 )
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def create_trip(mongo_client, trip):
@@ -17,7 +17,7 @@ def create_trip(mongo_client, trip):
     created_trip = database["trips"].find_one({"_id": new_trip.inserted_id})
 
     try:
-        notify_for_new_trip(new_trip.inserted_id)
+        notify_for_new_trip(mongo_client, new_trip.inserted_id)
     except Exception as ex:
         print(
             f"[ERROR -> Continue] send notification for trip requested {id} reason: {str(ex)}"

@@ -31,11 +31,10 @@ def get_selected_fare(request: Request):
     response_description="Create a fare rule",
     status_code=status.HTTP_201_CREATED,
 )
-def create_fare_rule(request: Request, rule: FareRule = Body(...)):
+def create_fare_rule(request: Request, fare_rule: FareRule = Body(...)):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    fare_rule = jsonable_encoder(rule)
-    new_fare_rule = services.create_fare_rule(mongo_client, fare_rule)
+    new_fare_rule = services.create_fare_rule(mongo_client, jsonable_encoder(fare_rule))
 
     if new_fare_rule is not None:
         return new_fare_rule
@@ -51,6 +50,25 @@ def list_fare_rules(request: Request):
     fare_rules = services.list_fare_rules(mongo_client)
     if fare_rules is not None:
         return list(fare_rules)
+    return None
+
+
+@router.get("/fare-rules/page", response_description="List all fare rules")
+def list_fare_rules_pagination(skip: int, limit: int, request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+    data = services.list_fare_rules_pagination(skip, limit, mongo_client)
+    if data is not None:
+        return data
+
+
+@router.get("/fare-rules/amount", response_description="Count all fare rules")
+def count_fare_rules(request: Request):
+    mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+    count = services.count_fare_rules(mongo_client)
+    if count is not None:
+        return count
     return None
 
 

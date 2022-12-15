@@ -2,7 +2,11 @@ from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from pymongo import MongoClient
 
-from src.utils.cancelation_processor import cancel_from_driver, cancel_from_passenger
+from src.utils.cancelation_processor import (
+    cancel_all_requested,
+    cancel_from_driver,
+    cancel_from_passenger,
+)
 
 from src.domain.trip import Trip, TripUpdate
 import src.services.trips as services
@@ -240,4 +244,17 @@ def driver_cancel_trip(tripId: str):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Cannot cancel {tripId}: {str(ex)}",
+        )
+
+
+@router.get(
+    "/trips/cancel-requested-trips", response_description="Cancel all requested trips"
+)
+def cancel_all_trips_requested():
+    try:
+        return cancel_all_requested()
+    except Exception as ex:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cannot cancel trips: {str(ex)}",
         )
