@@ -71,10 +71,10 @@ def notify_for_assigned_driver(mongo_client, trip_id):
         raise ex
 
 
-def notify_driver_for_new_trip(driver_id, price):
+def notify_driver_for_new_trip(mongo_client, driver_id, price):
     try:
         trips_in_progress = trips_provider.get_trips_driver(
-            driver_id, only_in_progress=True
+            mongo_client, driver_id, only_in_progress=True
         )
 
         if len(trips_in_progress) > 0:
@@ -104,7 +104,7 @@ def notify_for_new_trip(mongo_client, trip_id):
             try:
                 driver_id = driver.get("userId")
                 price = str(trip.get("finalPrice"))
-                notify_driver_for_new_trip(driver_id, price)
+                notify_driver_for_new_trip(mongo_client, driver_id, price)
             except Exception as ex:
                 print(ex)
                 pass
