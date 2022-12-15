@@ -23,6 +23,9 @@ start-services:
 stop-services:
 	docker-compose down
 
+install:
+	pip install -r requirements.txt
+
 exec:
 	docker exec -it fiuumberapitrip_web_1 sh
 

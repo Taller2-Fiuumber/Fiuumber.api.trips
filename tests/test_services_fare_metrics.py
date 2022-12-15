@@ -5,7 +5,7 @@ import src.services.fare_metrics as service
 
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
 
 
 class TestFareCalculator:

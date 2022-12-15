@@ -7,7 +7,7 @@ from src.utils.notifications_processor import (
     notify_for_new_trip,
 )
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
 
 
 def create_trip(mongo_client, trip):
@@ -125,7 +125,7 @@ def assign_driver(id: str, driver_id, mongo_client):
     )
 
     try:
-        notify_for_assigned_driver(id)
+        notify_for_assigned_driver(mongo_client, id)
     except Exception as ex:
         print(
             f"[ERROR -> Continue] send notification for driver assigned {id} reason: {str(ex)}"

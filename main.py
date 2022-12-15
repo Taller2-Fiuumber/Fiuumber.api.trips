@@ -19,7 +19,7 @@ from src.controllers.trips_status import router as trips_status_router
 from src.controllers.trips import router as trip_router
 
 
-from src.services.payments import router as payments_router
+from src.controllers.payments import router as payments_router
 
 
 app = FastAPI()

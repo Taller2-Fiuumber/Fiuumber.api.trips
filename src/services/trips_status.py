@@ -11,7 +11,7 @@ import datetime
 
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
 
 
 def find_trip_status(id: str, mongo_client):
@@ -31,7 +31,7 @@ def update_trip_status(id: str, mongo_client, status):
 
     if status == trip_status.Terminated().name():
         try:
-            (passenger_payment, driver_payment) = create_trip_payments(id)
+            (passenger_payment, driver_payment) = create_trip_payments(mongo_client, id)
             process_payment(passenger_payment)
             process_payment(driver_payment)
         except Exception as ex:
@@ -42,7 +42,7 @@ def update_trip_status(id: str, mongo_client, status):
 
     if status == trip_status.DriverAssigned().name():
         try:
-            notify_for_assigned_driver(id)
+            notify_for_assigned_driver(mongo_client, id)
         except Exception as ex:
             print(
                 f"[ERROR -> Continue] send notification for driver assigned {id} reason: {str(ex)}"

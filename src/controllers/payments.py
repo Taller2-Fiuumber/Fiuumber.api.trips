@@ -35,7 +35,9 @@ def process():
 )
 def create_for_trip(params: TripId = Body(...)):
     try:
-        return create_trip_payments(params.trip_id)
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
+
+        return create_trip_payments(mongo_client, params.trip_id)
     except Exception as ex:
         raise HTTPException(
             status_code=500, detail=f"Cannot create payments for trip: {str(ex)}"

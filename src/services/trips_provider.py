@@ -1,12 +1,13 @@
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
 
 
 def get_trip_by_id(mongo_client, trip_id):
     database = mongo_client[DB_NAME]
 
     trip = database["trips"].find_one({"_id": trip_id})
+
     return trip
 
 

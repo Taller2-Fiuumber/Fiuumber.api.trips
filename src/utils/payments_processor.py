@@ -137,10 +137,11 @@ def get_user_wallet(user_id):
         raise ex
 
 
-def create_trip_payments(trip_id):
+def create_trip_payments(mongo_client, trip_id):
 
+    print("____________trip_id", trip_id)
     try:
-        trip = trips_provider.get_trip_by_id(trip_id)
+        trip = trips_provider.get_trip_by_id(mongo_client, trip_id)
         if trip is None:
             raise Exception(f"Trip with id={trip_id} was not found")
 

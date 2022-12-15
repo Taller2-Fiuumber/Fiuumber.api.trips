@@ -3,7 +3,7 @@ from os import environ
 
 from fastapi.encoders import jsonable_encoder
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
 MAX_ETH_TEST = 0.0005
 
 
