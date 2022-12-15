@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 # Duration----------------------------------------------------------------------

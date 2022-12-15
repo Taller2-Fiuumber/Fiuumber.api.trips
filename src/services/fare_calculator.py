@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 from os import environ
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def calculate(from_latitude, to_latitude, from_longitude, to_longitude):
@@ -31,7 +31,7 @@ def calculate_final(
     distance,
     dailyTripAmountDriver,
     dailyTripAmountPassenger,
-    monthlyTripAmountDrive,
+    monthlyTripAmountDriver,
     monthlyTripAmountPassenger,
     seniorityDriver,
     seniorityPassenger,
@@ -45,7 +45,7 @@ def calculate_final(
         + distance_fare * distance
         + dailyTripAmountDriver_fare * dailyTripAmountDriver
         + dailyTripAmountPassenger_fare * dailyTripAmountPassenger
-        + monthlyTripAmountDrive_fare * monthlyTripAmountDrive
+        + monthlyTripAmountDrive_fare * monthlyTripAmountDriver
         + monthlyTripAmountPassenger_fare * monthlyTripAmountPassenger
         + seniorityDriver_fare * seniorityDriver
         + seniorityPassenger_fare * seniorityPassenger
@@ -70,7 +70,7 @@ def calculate_test(
     distance,
     dailyTripAmountDriver,
     dailyTripAmountPassenger,
-    monthlyTripAmountDrive,
+    monthlyTripAmountDriver,
     monthlyTripAmountPassenger,
     seniorityDriver,
     seniorityPassenger,
@@ -84,7 +84,7 @@ def calculate_test(
         + (distance_fare * distance)
         + (dailyTripAmountDriver_fare * dailyTripAmountDriver)
         + (dailyTripAmountPassenger_fare * dailyTripAmountPassenger)
-        + (monthlyTripAmountDrive_fare * monthlyTripAmountDrive)
+        + (monthlyTripAmountDrive_fare * monthlyTripAmountDriver)
         + (monthlyTripAmountPassenger_fare * monthlyTripAmountPassenger)
         + (seniorityDriver_fare * seniorityDriver)
         + (seniorityPassenger_fare * seniorityPassenger)

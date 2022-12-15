@@ -7,7 +7,7 @@ from src.utils.notifications_processor import (
     notify_for_new_trip,
 )
 
-DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "fiuumber"
+DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def create_trip(mongo_client, trip):
