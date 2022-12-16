@@ -1,5 +1,3 @@
-from fastapi import HTTPException, status
-
 import src.services.fare_calculator as fare_calculator
 from os import environ
 
@@ -12,21 +10,23 @@ def get_trip_fare(
     mongo_client, from_latitude, to_latitude, from_longitude, to_longitude
 ):
     try:
-        # fare = fare_calculator.lineal(
-        #     float(from_latitude),
-        #     float(to_latitude),
-        #     float(from_longitude),
-        #     float(to_longitude),
-        # )
         distance_km = fare_calculator.distance(
             float(from_latitude),
             float(to_latitude),
             float(from_longitude),
             float(to_longitude),
         )
+        print(f"DISTANCE: {distance_km}")
         return get_trip_fare_final(mongo_client, distance=distance_km)
     except Exception as ex:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
+        print(f"CANNOT CALCULATE FARE W RULES: {str(ex)}")
+        fare = fare_calculator.lineal(
+            float(from_latitude),
+            float(to_latitude),
+            float(from_longitude),
+            float(to_longitude),
+        )
+        return fare
 
 
 def get_trip_fare_final(

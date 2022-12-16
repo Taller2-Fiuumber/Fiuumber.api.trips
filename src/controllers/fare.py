@@ -17,6 +17,7 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
         fare = services.get_trip_fare(
             mongo_client, from_latitude, to_latitude, from_longitude, to_longitude
         )
+        print(fare)
         return Response(content=str(fare), media_type="application/json")
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
@@ -26,8 +27,8 @@ def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     "/fare/final", response_description="Get a calculated fare from coordinates"
 )
 def get_trip_fare_final(
-    passenger_id: str = "2",
-    driver_id: str = "1",
+    passenger_id: str = "7897",
+    driver_id: str = "9998",
     distance: float = 12,
     duration: float = 26,
 ):
