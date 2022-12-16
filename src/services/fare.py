@@ -1,5 +1,3 @@
-from fastapi import HTTPException, status
-
 import src.services.fare_calculator as fare_calculator
 from os import environ
 
@@ -18,7 +16,7 @@ def get_trip_fare(
             float(from_longitude),
             float(to_longitude),
         )
-        print(f"DISTANCE: ")
+        print(f"DISTANCE: {distance_km}")
         return get_trip_fare_final(mongo_client, distance=distance_km)
     except Exception as ex:
         print(f"CANNOT CALCULATE FARE W RULES: {str(ex)}")
