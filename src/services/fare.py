@@ -1,22 +1,30 @@
 from fastapi import HTTPException, status
 
 import src.services.fare_calculator as fare_calculator
-
-
 from os import environ
 
 DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
+ETH_SHIFT = 1000000
 
-def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
+
+def get_trip_fare(
+    mongo_client, from_latitude, to_latitude, from_longitude, to_longitude
+):
     try:
-        fare = fare_calculator.lineal(
+        # fare = fare_calculator.lineal(
+        #     float(from_latitude),
+        #     float(to_latitude),
+        #     float(from_longitude),
+        #     float(to_longitude),
+        # )
+        distance_km = fare_calculator.distance(
             float(from_latitude),
             float(to_latitude),
             float(from_longitude),
             float(to_longitude),
         )
-        return fare
+        return get_trip_fare_final(mongo_client, distance=distance_km)
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
@@ -56,7 +64,7 @@ def get_trip_fare_final(
             fare_calculator.get_recent_trip_amount(mongo_client, passenger_id),
             fare_calculator.is_night_shift(),
         )
-        return fare
+        return fare / ETH_SHIFT
     else:
         return None
 

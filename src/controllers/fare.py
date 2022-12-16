@@ -13,8 +13,9 @@ router = APIRouter()
 @router.get("/fare", response_description="Get a calculated fare from coordinates")
 def get_trip_fare(from_latitude, to_latitude, from_longitude, to_longitude):
     try:
+        mongo_client = MongoClient(MONGODB_URL, connect=False)
         fare = services.get_trip_fare(
-            from_latitude, to_latitude, from_longitude, to_longitude
+            mongo_client, from_latitude, to_latitude, from_longitude, to_longitude
         )
         return Response(content=str(fare), media_type="application/json")
     except Exception as ex:

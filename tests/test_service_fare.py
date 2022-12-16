@@ -74,9 +74,17 @@ class TestFareService:
         self.trip1 = jsonable_encoder(trip1)
 
     def test_get_trip_fare(self):
+        mongo_client = mongomock.MongoClient()
+        print(
+            service.get_trip_fare(
+                mongo_client, -39.603683, -31.6175841, -50.381557, -55.3682286
+            )
+        )
         assert (
-            service.get_trip_fare(-39.603683, -31.6175841, -50.381557, -55.3682286)
-            == 0.013982
+            service.get_trip_fare(
+                mongo_client, -39.603683, -31.6175841, -50.381557, -55.3682286
+            )
+            is None
         )
 
     def test_get_trip_fare_final_is_none(self):
