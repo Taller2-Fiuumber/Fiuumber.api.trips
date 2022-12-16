@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Request, HTTPException, status
 from pymongo import MongoClient
 
-import src.services.trips_status as trip_status_service
+import src.services.trips_status as services
 
 from os import environ
 
@@ -15,7 +15,7 @@ router = APIRouter()
 )
 def find_trip_status(id: str, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
-    trip = find_trip_status(id, mongo_client)
+    trip = services.find_trip_status(id, mongo_client)
     if trip is not None:
         return trip
     raise HTTPException(
@@ -29,7 +29,7 @@ def update_trip_status(id: str, request: Request, body=Body(...)):
         mongo_client = MongoClient(MONGODB_URL, connect=False)
         status = body.get("status")
 
-        stored_trip = trip_status_service.update_trip_status(id, mongo_client, status)
+        stored_trip = services.update_trip_status(id, mongo_client, status)
 
         return stored_trip
 
@@ -44,7 +44,7 @@ def update_trip_to_next_status(id: str, request: Request):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-        trip = trip_status_service.update_trip_to_next_status(id, mongo_client)
+        trip = services.update_trip_to_next_status(id, mongo_client)
 
         if trip is not None:
 
@@ -62,7 +62,7 @@ def cancel_trip(id: str, request: Request, body=Body(...)):
     try:
         mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-        trip = trip_status_service.cancel_trip(id, mongo_client)
+        trip = services.cancel_trip(id, mongo_client)
         if trip is not None:
 
             return trip
