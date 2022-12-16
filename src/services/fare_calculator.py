@@ -9,7 +9,7 @@ DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
 
 def calculate(from_latitude, to_latitude, from_longitude, to_longitude):
-    distance_km = __distance(from_latitude, to_latitude, from_longitude, to_longitude)
+    distance_km = distance(from_latitude, to_latitude, from_longitude, to_longitude)
     base_price = 250  # TODO add to database
     price_per_km = 40  # TODO add to database
     return round(base_price + (distance_km * price_per_km), 2)
@@ -95,7 +95,7 @@ def calculate_test(
 
 def lineal(from_latitude, to_latitude, from_longitude, to_longitude):
 
-    distance_km = __distance(from_latitude, to_latitude, from_longitude, to_longitude)
+    distance_km = distance(from_latitude, to_latitude, from_longitude, to_longitude)
 
     # 0.00046 = $10
     base_price = 0.000046  # TODO add to database
@@ -105,7 +105,7 @@ def lineal(from_latitude, to_latitude, from_longitude, to_longitude):
     return round(base_price + (distance_km * price_per_km), 6)
 
 
-def __distance(lat1, lat2, lon1, lon2):
+def distance(lat1, lat2, lon1, lon2):
 
     # The math module contains a function named
     # radians which converts from degrees to radians.
