@@ -130,18 +130,18 @@ class TestTripMetrics:
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
         assert service.count_trips_new_count_today(mongo_client) == 0
 
-    def test_count_trips_new_countlast_n_days(self):
+    def test_count_trips_new_count_last_n_days(self):
         self.setUp()
         mongo_client = mongomock.MongoClient()
 
         mongo_client[DB_NAME]["trips"].insert_one(self.trip1)
-        assert service.count_trips_new_countlast_n_days(1, mongo_client) == 0
+        assert service.count_trips_new_count_last_n_days(1, mongo_client) == 0
 
-    def test_count_trips_new_countlast_n_days_range(self):
+    def test_count_trips_new_count_last_n_days_range(self):
         self.setUp()
         mongo_client = mongomock.MongoClient()
 
-        assert service.count_trips_new_countlast_n_days_range(1, mongo_client) == []
+        assert service.count_trips_new_count_last_n_days_range(1, mongo_client) == []
 
     def test_count_trips_new_count_last_n_months(self):
         self.setUp()
