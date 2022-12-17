@@ -3,7 +3,7 @@ from os import environ
 
 DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
-ETH_SHIFT = 10000000000
+ETH_SHIFT = 10000000000000000000
 
 
 def get_trip_fare(
@@ -26,7 +26,7 @@ def get_trip_fare(
             float(from_longitude),
             float(to_longitude),
         )
-        return fare
+        return fare / ETH_SHIFT
 
 
 def get_trip_fare_final(
@@ -109,7 +109,7 @@ def get_trip_fare_to_test_fare_rule(
             recentTripAmount,
             nightShift,
         )
-        return fare
+        return fare / ETH_SHIFT
     return None
 
 
@@ -160,4 +160,4 @@ def get_trip_fare_to_test_new_fare_rule(
         recentTripAmount,
         nightShift,
     )
-    return fare
+    return fare / ETH_SHIFT

@@ -162,23 +162,17 @@ def count_trips_duration_last_n_years_range(amount: int, mongo_client):
 def count_trips_duration_last_n_days_range(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
-    the_date = (datetime.today() - relativedelta(days=+amount))
+    the_date = datetime.today() - relativedelta(days=+amount)
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
-    stage_to_date ={
+    stage_to_date = {
         "$project": {
-            "start": {
-                "$toDate": "$start"
-            },
-            "finish": {
-                "$toDate": "$finish"
-            },
+            "start": {"$toDate": "$start"},
+            "finish": {"$toDate": "$finish"},
         }
     }
-    stage_match_last_n_days = {
-        "$match": {"start": {"$gte": the_date}}
-    }
+    stage_match_last_n_days = {"$match": {"start": {"$gte": the_date}}}
 
     stage_trip_duration = {
         "$project": {
@@ -316,21 +310,16 @@ def count_trips_new_count_last_n_days(amount: int, mongo_client):
 def count_trips_new_count_last_n_days_range(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
-    the_date = (datetime.today() - relativedelta(days=+amount))
+    the_date = datetime.today() - relativedelta(days=+amount)
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
 
-    stage_match_last_n_days = {
-        "$match": {"date": {"$gte": the_date}}
-    }
+    stage_match_last_n_days = {"$match": {"date": {"$gte": the_date}}}
 
-
-    stage_to_date ={
+    stage_to_date = {
         "$project": {
-            "date": {
-                "$toDate": "$start"
-            },
-    }
+            "date": {"$toDate": "$start"},
+        }
     }
 
     stage_trip_count = {
@@ -340,14 +329,11 @@ def count_trips_new_count_last_n_days_range(amount: int, mongo_client):
         }
     }
 
-    stage_to_string ={
+    stage_to_string = {
         "$project": {
-            "date": {
-                "$dateToString": {"format": "%Y-%m-%d", "date": "$date"}
-            },
+            "date": {"$dateToString": {"format": "%Y-%m-%d", "date": "$date"}},
         }
     }
-
 
     pipeline = [
         stage_match_terminated_status,
