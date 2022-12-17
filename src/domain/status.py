@@ -75,7 +75,7 @@ class InProgress(Status):
         return Terminated()
 
     def cancel(self):
-        return InProgress()
+        return Canceled()
 
 
 class Terminated(Status):

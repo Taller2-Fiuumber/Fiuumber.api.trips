@@ -49,6 +49,7 @@ def cancel_from_passenger(trip_id, latitude=None, longitude=None):
             # Se recalcula la tarifa con la posición de cancelación
             try:
                 new_final_price = fare_service.get_trip_fare(
+                    mongo_client,
                     trip.get("from_latitude"),
                     latitude,
                     trip.get("from_longitude"),
