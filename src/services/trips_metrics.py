@@ -162,18 +162,34 @@ def count_trips_duration_last_n_years_range(amount: int, mongo_client):
 def count_trips_duration_last_n_days_range(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
+    the_date = datetime.today() - relativedelta(days=+amount)
+
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
-    stage_match_last_n_days = {
-        "$match": {"start": {"$gte": datetime.today() - timedelta(days=amount)}}
+
+    stage_to_date = {
+        "$project": {
+            "start": {"$toDate": "$start"},
+            "finish": {"$toDate": "$finish"},
+        }
     }
+    stage_match_last_n_days = {"$match": {"start": {"$gte": the_date}}}
+
     stage_trip_duration = {
         "$project": {
             "duration": {"$divide": [{"$subtract": ["$finish", "$start"]}, 60000]}
         }
     }
-    stage_trip_count = {"$group": {"_id": "$duration", "count": {"$sum": 1}}}
+
+    stage_trip_count = {
+        "$group": {
+            "_id": "$duration",
+            "count": {"$sum": 1},
+        }
+    }
+
     pipeline = [
         stage_match_terminated_status,
+        stage_to_date,
         stage_match_last_n_days,
         stage_trip_duration,
         stage_trip_count,
@@ -271,7 +287,7 @@ def count_trips_new_count_today(mongo_client):
     return None
 
 
-def count_trips_new_countlast_n_days(amount: int, mongo_client):
+def count_trips_new_count_last_n_days(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
@@ -291,26 +307,44 @@ def count_trips_new_countlast_n_days(amount: int, mongo_client):
     return None
 
 
-def count_trips_new_countlast_n_days_range(amount: int, mongo_client):
+def count_trips_new_count_last_n_days_range(amount: int, mongo_client):
     database = mongo_client[DB_NAME]
 
+    the_date = datetime.today() - relativedelta(days=+amount)
+
     stage_match_terminated_status = {"$match": {"status": "TERMINATED"}}
-    stage_match_last_n_days = {
-        "$match": {"start": {"$gte": datetime.today() - timedelta(days=amount)}}
+
+    stage_match_last_n_days = {"$match": {"date": {"$gte": the_date}}}
+
+    stage_to_date = {
+        "$project": {
+            "date": {"$toDate": "$start"},
+        }
     }
+
     stage_trip_count = {
         "$group": {
-            "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$start"}},
+            "_id": "$date",
             "count": {"$sum": 1},
         }
     }
+
+    stage_to_string = {
+        "$project": {
+            "date": {"$dateToString": {"format": "%Y-%m-%d", "date": "$date"}},
+        }
+    }
+
     pipeline = [
         stage_match_terminated_status,
+        stage_to_date,
         stage_match_last_n_days,
+        stage_to_string,
         stage_trip_count,
     ]
 
     data = database["trips"].aggregate(pipeline)
+
     if data is not None:
         return list(data)
     return None

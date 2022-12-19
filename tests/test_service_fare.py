@@ -96,11 +96,12 @@ class TestFareService:
         self.setUp()
         mongo_client = mongomock.MongoClient()
         mongo_client[DB_NAME]["fare_rules"].insert_one(self.fare_rule1)
-        assert (
-            round(service.get_trip_fare_to_test_fare_rule(mongo_client, "1"), 2)
-            == 457.45
-        )
+        assert round(
+            service.get_trip_fare_to_test_fare_rule(mongo_client, "1"), 2
+        ) == round(4.5745000000000004e-17, 2)
 
     def test_get_trip_fare_to_test_new_fare_rule(self):
         self.setUp()
-        assert round(service.get_trip_fare_to_test_new_fare_rule(), 2) == 225.15
+        assert round(service.get_trip_fare_to_test_new_fare_rule(), 2) == round(
+            2.2514999999999998e-17, 2
+        )

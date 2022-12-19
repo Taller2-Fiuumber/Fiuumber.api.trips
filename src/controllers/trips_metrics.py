@@ -134,20 +134,20 @@ def count_trips_new_count_today(request: Request):
 
 
 @router.get("/new/count/days", response_description="Count new trips last n days")
-def count_trips_new_countlast_n_days(amount: int, request: Request):
+def count_trips_new_count_last_n_days(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    data = services.count_trips_new_countlast_n_days(amount, mongo_client)
+    data = services.count_trips_new_count_last_n_days(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")
 
 
 @router.get("/new/count/days/range", response_description="Count new trips last n days")
-def count_trips_new_countlast_n_days_range(amount: int, request: Request):
+def count_trips_new_count_last_n_days_range(amount: int, request: Request):
     mongo_client = MongoClient(MONGODB_URL, connect=False)
 
-    data = services.count_trips_new_countlast_n_days_range(amount, mongo_client)
+    data = services.count_trips_new_count_last_n_days_range(amount, mongo_client)
     if data is not None:
         return data
     raise HTTPException(status_code=500, detail="Internal error")

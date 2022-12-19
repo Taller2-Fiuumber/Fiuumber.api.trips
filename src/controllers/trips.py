@@ -226,8 +226,10 @@ def passenger_cancel_trip(tripId: str, body=Body(...)):
     try:
         latitude = body.get("latitude")
         longitude = body.get("longitude")
+
         return cancel_from_passenger(tripId, latitude=latitude, longitude=longitude)
     except Exception as ex:
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Cannot cancel {tripId}: {str(ex)}",

@@ -34,7 +34,7 @@ def cancel_from_passenger(trip_id, latitude=None, longitude=None):
         if trip is None:
             raise Exception(f"Trip with id = {trip_id} was not found")
 
-        status = trip_status.InProgress().name()
+        status = trip["status"]
 
         if (
             status == trip_status.DriverAssigned().name()
@@ -49,6 +49,7 @@ def cancel_from_passenger(trip_id, latitude=None, longitude=None):
             # Se recalcula la tarifa con la posición de cancelación
             try:
                 new_final_price = fare_service.get_trip_fare(
+                    mongo_client,
                     trip.get("from_latitude"),
                     latitude,
                     trip.get("from_longitude"),

@@ -45,7 +45,7 @@ class TestStatusDomain:
         status = InProgress()
         assert status.name() == "IN_PROGRESS"
         assert status.next() == Terminated()
-        assert status.cancel() == InProgress()
+        assert status.cancel() == Canceled()
 
     def test_terminated_status(self):
         status = Terminated()

@@ -154,7 +154,7 @@ def create_trip_payments(mongo_client, trip_id):
             raise Exception("Driver has not a wallet")
 
         passenger_payment = create_payment(
-            trip["_id"],
+            trip_id,
             "FROM_SENDER",
             trip["finalPrice"],
             wallet_passenger,
@@ -162,7 +162,7 @@ def create_trip_payments(mongo_client, trip_id):
             mongo_client,
         )
         driver_payment = create_payment(
-            trip["_id"],
+            trip_id,
             "TO_RECEIVER",
             trip["finalPrice"],
             wallet_driver,
