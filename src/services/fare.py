@@ -3,8 +3,7 @@ from os import environ
 
 DB_NAME = environ["DB_NAME"] if "DB_NAME" in environ else "Fiuumber"
 
-ETH_SHIFT = 10000000000000000000
-
+ETH_SHIFT = 1000000
 
 def get_trip_fare(
     mongo_client, from_latitude, to_latitude, from_longitude, to_longitude
